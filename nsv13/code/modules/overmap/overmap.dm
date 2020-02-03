@@ -136,7 +136,12 @@
 /obj/weapon_overlay/laser
 	name = "Laser cannon"
 	icon = 'icons/obj/hand_of_god_structures.dmi'
-	icon_state = "conduit-red"
+	icon_state = "defensepylon-red"
+	pixel_x = 32
+	pixel_y = 64
+
+/obj/weapon_overlay/railgun_overlay/do_animation()
+	flick("defensepylonattack-red",src)
 
 /obj/structure/overmap/proc/add_weapon_overlay(type)
 	var/path = text2path(type)
