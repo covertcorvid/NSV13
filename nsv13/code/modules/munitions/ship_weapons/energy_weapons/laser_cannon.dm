@@ -183,3 +183,9 @@
 		safety = FALSE
 	else
 		safety = TRUE
+
+#undef STATE_DISCONNECTED
+#undef STATE_OFF
+#undef STATE_CHARGING
+#undef STATE_READY
+#undef STATE_FIRING

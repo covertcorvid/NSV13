@@ -132,7 +132,7 @@
  * When the cannon frame is deconstructed, drop plasteel instead of iron
  * Otherwise the same as the base frame code
  */
-/obj/machinery/frame/machine/laser_cannon/deconstruct(mob/user, disassembled = TRUE) // Frame is made of plasteel instead of iron
+/obj/structure/frame/machine/laser_cannon/deconstruct(mob/user, disassembled = TRUE) // Frame is made of plasteel instead of iron
 	if(!(flags_1 & NODECONSTRUCT_1))
 		var/obj/item/stack/sheet/plasteel/M = new(loc, 8)
 		if(circuit)
