@@ -53,3 +53,13 @@
 /obj/item/ship_weapon/parts/railgun_rail/Initialize()
 	..()
 	AddComponent(/datum/component/twohanded/required)
+
+/**
+ * Gauss dispenser circuitboard
+ **/
+/obj/item/circuitboard/machine/gauss_dispenser
+	name = "\improper Gauss ammunition dispenser (Machine Board)"
+	build_path = /obj/machinery/gauss_dispenser
+	req_components = list(
+		/obj/item/stock_parts/capacitor = 1,
+		/obj/item/ship_weapon/parts/loading_tray = 1)

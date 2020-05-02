@@ -279,3 +279,61 @@
 		ammo -= 1
 		if(speed)
 			proj.set_pixel_speed(speed)
+/**
+ * Handles automatic firing of the PDCs to shoot down torpedoes
+ */
+/obj/structure/overmap/proc/handle_pdcs()
+	if(fire_mode == FIRE_MODE_FLAK) //If theyre aiming the flak manually.
+		return
+	if(mass <= MASS_TINY && !ai_controlled) //Small ships don't get to use PDCs. AIs still need to aim like this, though
+		return
+	if(!last_target || QDELETED(last_target) || !isovermap(last_target) || last_target == src) //Stop hitting yourself enterprise
+		last_target = null
+	else
+		fire_weapon(last_target, mode=FIRE_MODE_FLAK, lateral=TRUE)
+		return
+	for(var/obj/structure/overmap/ship in GLOB.overmap_objects)
+		if(!ship || !istype(ship))
+			continue
+		if(ship == src || ship.faction == faction || wrecked || ship.wrecked || ship.z != z) //No friendly fire, don't blow up wrecks that the crew may wish to loot.
+			continue
+		var/target_range = get_dist(ship,src)
+		if(target_range > 50) //Random pulled from the aether
+			continue
+		if(!QDELETED(ship) && isovermap(ship))
+			if(mass >= MASS_MEDIUM)
+				fire_weapon(ship, mode=FIRE_MODE_FLAK, lateral=TRUE)
+				break
+			else
+				fire_weapon(ship, mode=FIRE_MODE_PDC, lateral=TRUE)
+				break
+
+/obj/structure/overmap/proc/get_flak_range(atom/target)
+	if(!target)
+		target = src
+	var/dist = (get_dist(src, target) / 2)
+	var/minimum_safe_distance = pixel_collision_size_y / 32
+	return (dist >= minimum_safe_distance) ? dist : minimum_safe_distance //Stops you flak-ing yourself
+
+/obj/structure/overmap/proc/fire_flak(target,speed=null)
+	var/turf/T = get_turf(src)
+	var/flak_range = get_flak_range(target)
+	var/obj/item/projectile/proj = new /obj/item/projectile/bullet/flak(T, flak_range)
+	proj.starting = T
+	if(gunner)
+		proj.firer = gunner
+	else
+		proj.firer = src
+	proj.def_zone = "chest"
+	proj.original = target
+	proj.pixel_x = round(pixel_x)
+	proj.pixel_y = round(pixel_y)
+	var/theangle = Get_Angle(src,target)
+	spawn()
+		proj.fire(theangle)
+		if(speed)
+			proj.set_pixel_speed(speed)
+
+/obj/structure/overmap/proc/handle_flak()
+	if(mass <= MASS_MEDIUM) //This is for big boys only.
+		return

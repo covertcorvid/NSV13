@@ -123,7 +123,7 @@
  */
 /obj/machinery/ship_weapon/proc/get_ship(error_log=TRUE)
 	var/area/AR = get_area(src)
-	if(AR && AR.linked_overmap)
+	if(AR && AR.linked_overmap && (!linked || linked != AR.linked_overmap) )
 		linked = AR.linked_overmap
 		set_position(linked)
 	else if(!AR && error_log)
@@ -135,7 +135,8 @@
  * Adds the weapon to the overmap ship's list of weapons of this type
  */
 /obj/machinery/ship_weapon/proc/set_position(obj/structure/overmap/OM) //Use this to tell your ship what weapon category this belongs in
-	OM.add_weapon(src)
+	message_admins("Adding [weapon_type:type] to overmap")
+	OM.add_weapon(weapon_type)
 
 /**
  * If we're not already linked to an overmap ship, try again.
@@ -361,6 +362,7 @@
 		if(chamber_sound && !rapidfire) //This got super annoying on gauss guns, so i've made it only work for the initial "ready to fire" warning.
 			playsound(src, chamber_sound, 100, 1)
 		state = STATE_CHAMBERED
+		weapon_type.ammo = ammo.len
 
 /**
  * Unchambers a chambered round.
@@ -401,13 +403,13 @@
  * Verifies that we are ready to fire this many shots, then does that.
  * Transitions from STATE_CHAMBERED to STATE_FIRING, then transitions
  *   from STATE_FIRING to STATE_NOTLOADED if no more ammo,
- *   from STATE_FED if not semi-auto and have ammo
- *   from STATE_CHAMBERED if semi-auto and have ammo.
+ *   				   to STATE_FED if not semi-auto and have ammo
+ *   				   to STATE_CHAMBERED if semi-auto and have ammo.
  * Returns projectile if successfully fired, FALSE otherwise.
  */
 /obj/machinery/ship_weapon/proc/fire(atom/target, shots = weapon_type.burst_size, manual = TRUE)
 	if(can_fire(shots))
-		if(manual)
+		if(manual && overlay)
 			linked.last_fired = overlay
 
 		for(var/i = 0, i < shots, i++)
@@ -416,7 +418,6 @@
 			state = STATE_FIRING
 
 			local_fire()
-			overmap_fire(target)
 
 			ammo -= chambered
 			qdel(chambered)
@@ -444,23 +445,6 @@
 		for(var/mob/living/M in get_hearers_in_view(10, get_turf(src))) //Burst unprotected eardrums
 			if(M.stat != DEAD && isliving(M)) //Don't make noise if they're dead
 				M.soundbang_act(1,200,10,15)
-
-/**
- * Handles firing animations and sounds on the overmap.
- */
-/obj/machinery/ship_weapon/proc/overmap_fire(atom/target)
-	if(weapon_type.overmap_firing_sounds)
-		var/sound/chosen = pick(weapon_type.overmap_firing_sounds)
-		linked.relay_to_nearby(chosen)
-	if(overlay)
-		overlay.do_animation()
-	animate_projectile(target)
-
-/**
- * Animates an overmap projectile matching whatever we're shooting.
- */
-/obj/machinery/ship_weapon/proc/animate_projectile(atom/target)
-	linked.fire_lateral_projectile(weapon_type.default_projectile_type, target)
 
 /**
  * Updates maintenance counter after firing if applicable.
