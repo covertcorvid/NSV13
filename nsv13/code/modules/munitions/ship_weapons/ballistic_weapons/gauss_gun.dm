@@ -8,7 +8,7 @@
 	pixel_x = -44
 
 	fire_mode = FIRE_MODE_GAUSS
-	weapon_type = new/datum/ship_weapon/gauss/on_map
+	weapon_type = /datum/ship_weapon/gauss/on_map
 	ammo_type = /obj/item/ship_weapon/ammunition/gauss
 
 	semi_auto = TRUE

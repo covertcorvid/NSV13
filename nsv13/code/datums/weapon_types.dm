@@ -61,18 +61,12 @@
 
 /datum/ship_weapon/torpedo_launcher/proc/set_torpedo_vars(obj/item/ship_weapon/ammunition/torpedo/T)
 	default_projectile_type = T.projectile_type
-	torp_speed = T.speed
 
 /datum/ship_weapon/torpedo_launcher/fire_projectile(obj/structure/overmap/source, atom/target)
-	if(istype(default_projectile_type, /obj/item/projectile/bullet/torpedo/dud)) //Some brainlet MAA loaded an incomplete torp
+	if(istype(default_projectile_type, /obj/item/projectile/guided_munition/torpedo/dud)) //Some brainlet MAA loaded an incomplete torp
 		source.fire_projectile(default_projectile_type, target, homing=FALSE, speed=torp_speed, explosive=TRUE)
 	else
 		source.fire_projectile(default_projectile_type, target, homing=TRUE, speed=torp_speed, explosive=TRUE)
-
-/datum/ship_weapon/torpedo_launcher/on_map
-	requires_linked = TRUE
-	max_ammo = 1
-	ammo = 0
 
 /datum/ship_weapon/torpedo_launcher/on_map/fire_projectile(obj/structure/overmap/source, atom/target)
 	message_admins("Animating a torpedo")
@@ -88,15 +82,14 @@
 	..()
 
 /datum/ship_weapon/torpedo_launcher/fighter
-	max_ammo = 6
 	ammo = 6
 
 /datum/ship_weapon/torpedo_launcher/fighter/fire_projectile(obj/structure/overmap/fighter/source, atom/target)
-	if(istype(source) && (source.munitions.len))
-		var/obj/item/ship_weapon/ammunition/torpedo/T = pick(source.munitions)
+	if(istype(source) && (source.mun_torps.len))
+		var/obj/item/ship_weapon/ammunition/torpedo/T = pick(source.mun_torps)
 		message_admins("Firing a [T]")
 		set_torpedo_vars(T)
-		source.munitions -= T
+		source.mun_torps -= T
 		qdel(T)
 	..()
 
@@ -113,12 +106,6 @@
 	select_alert = "<span class='notice'>Activating point defense emplacements..</span>"
 	failure_alert = "<span class='warning'>DANGER: Point defense emplacements are unable to fire due to lack of ammunition.</span>"
 	firing_zone = FIRE_ZONE_OMNIDIRECTIONAL
-
-/datum/ship_weapon/pdc_mount/on_map
-	gunner_controlled = TRUE // TODO: make false
-	requires_linked = TRUE
-+	select_alert = "<span class='notice'>Activating point defense emplacements..</span>"
-+	failure_alert = "<span class='warning'>DANGER: Point defense emplacements are unable to fire due to lack of ammunition.</span>"
 
 /datum/ship_weapon/pdc_mount/fighter
 	lateral = FALSE

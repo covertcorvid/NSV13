@@ -71,7 +71,8 @@
 	var/magazine_type = null
 	var/max_ammo = 1
 
-	var/datum/ship_weapon/weapon_type
+	var/weapon_type
+	var/datum/ship_weapon/weapon_dat
 
 	// Things that change while we're operating
 	var/maint_req = 0 //Number of times a weapon can fire until a maintenance cycle is required. This will countdown to 0.
@@ -93,6 +94,7 @@
  */
 /obj/machinery/ship_weapon/Initialize()
 	. = ..()
+	weapon_dat = new weapon_type(req_linked=TRUE, linked=src, ammo=0)
 	addtimer(CALLBACK(src, .proc/PostInitialize), 5 SECONDS)
 
 /**
@@ -135,8 +137,8 @@
  * Adds the weapon to the overmap ship's list of weapons of this type
  */
 /obj/machinery/ship_weapon/proc/set_position(obj/structure/overmap/OM) //Use this to tell your ship what weapon category this belongs in
-	message_admins("Adding [weapon_type:type] to overmap")
-	OM.add_weapon(weapon_type)
+	message_admins("Adding [weapon_dat] to overmap")
+	OM.add_weapon(weapon_dat)
 
 /**
  * If we're not already linked to an overmap ship, try again.
@@ -362,7 +364,7 @@
 		if(chamber_sound && !rapidfire) //This got super annoying on gauss guns, so i've made it only work for the initial "ready to fire" warning.
 			playsound(src, chamber_sound, 100, 1)
 		state = STATE_CHAMBERED
-		weapon_type.ammo = ammo.len
+		weapon_dat.ammo = ammo.len
 
 /**
  * Unchambers a chambered round.
@@ -384,7 +386,7 @@
  * Checks if the weapon is able to fire the given number of shots.
  * Need to have a round in the chamber, not already be shooting, not be in maintenance, not be malfunctioning, and have enough shots in our ammo pool.
  */
-/obj/machinery/ship_weapon/proc/can_fire(shots = weapon_type.burst_size)
+/obj/machinery/ship_weapon/proc/can_fire(shots = weapon_dat.burst_size)
 	if((state < STATE_CHAMBERED) || !chambered) //Do we have a round ready to fire
 		return FALSE
 	if (maint_state != MSTATE_CLOSED) //Are we in maintenance?
@@ -407,7 +409,7 @@
  *   				   to STATE_CHAMBERED if semi-auto and have ammo.
  * Returns projectile if successfully fired, FALSE otherwise.
  */
-/obj/machinery/ship_weapon/proc/fire(atom/target, shots = weapon_type.burst_size, manual = TRUE)
+/obj/machinery/ship_weapon/proc/fire(atom/target, shots = weapon_dat.burst_size, manual = TRUE)
 	if(can_fire(shots))
 		if(manual && overlay)
 			linked.last_fired = overlay

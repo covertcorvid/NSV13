@@ -134,7 +134,7 @@ GLOBAL_LIST_INIT(computer_beeps, list('nsv13/sound/effects/computer/beep.ogg','n
 		for(var/obj/machinery/ship_weapon/SW in L)
 			max_ammo += SW.max_ammo
 			ammo += SW.ammo.len
-			thename = SW.weapon_type.name
+			thename = SW.weapon_dat.name
 		data["weapons"] += list(list("name" = thename, "ammo" = ammo, "maxammo" = max_ammo))
 	data["ships"] = list()
 	for(var/obj/structure/overmap/OM in GLOB.overmap_objects)

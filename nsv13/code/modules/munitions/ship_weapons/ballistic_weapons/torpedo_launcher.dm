@@ -14,7 +14,7 @@
 	fire_mode = FIRE_MODE_TORPEDO
 	ammo_type = /obj/item/ship_weapon/ammunition/torpedo
 	fire_mode = 2
-	weapon_type = new/datum/ship_weapon/torpedo_launcher/on_map
+	weapon_type = /datum/ship_weapon/torpedo_launcher/on_map
 
 /obj/machinery/ship_weapon/torpedo_launcher/north
 	dir = NORTH

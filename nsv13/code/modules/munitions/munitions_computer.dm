@@ -14,6 +14,9 @@
 	circuit = /obj/item/circuitboard/computer/ship/munitions_computer
 	var/obj/machinery/ship_weapon/SW //The one we're firing
 
+	var/list/blocked = list(/obj/machinery/ship_weapon/pdc_mount,
+			/obj/machinery/ship_weapon/gauss_gun)
+
 /obj/machinery/computer/ship/munitions_computer/north
 	dir = NORTH
 
@@ -41,7 +44,7 @@
 		if(adjacent && istype(adjacent, /obj/machinery/ship_weapon))
 			SW = adjacent
 			SW.linked_computer = src
-			if(!SW.linked)
+			if(!SW.linked && !(SW:type in blocked))
 				SW.get_ship()
 
 /obj/machinery/computer/ship/munitions_computer/Destroy()

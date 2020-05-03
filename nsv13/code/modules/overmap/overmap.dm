@@ -89,10 +89,10 @@
 	var/obj/machinery/computer/ship/dradis/dradis //So that pilots can check the radar easily
 
 	// Ship weapons
-	var/list/weapons[MAX_POSSIBLE_FIREMODE][] //All of the weapons linked to us
-	var/list/weapon_types[MAX_POSSIBLE_FIREMODE]
-
-	var/fire_mode = FIRE_MODE_PDC //What gun do we want to fire? Defaults to railgun, with PDCs there for flak
+	var/list/weapons = list()
+	var/list/default_weapons // What weapons should this type start with?
+	var/list/weapon_types = list() // Needed for mode cycling
+	var/fire_mode = 1 // Needed for mode cycling
 	var/weapon_safety = FALSE //Like a gun safety. Entirely un-used except for fighters to stop brainlets from shooting people on the ship unintentionally :)
 	var/faction = null //Used for target acquisition by AIs
 
@@ -122,28 +122,6 @@
 
 	var/role = NORMAL_OVERMAP
 
-/obj/weapon_overlay
-	name = "Weapon overlay"
-	layer = 4
-	mouse_opacity = FALSE
-	layer = WALL_OBJ_LAYER
-	var/angle = 0 //Debug
-
-/obj/weapon_overlay/proc/do_animation()
-	return
-
-/obj/weapon_overlay/railgun //Railgun sits on top of the ship and swivels to face its target
-	name = "Railgun"
-	icon_state = "railgun"
-
-/obj/weapon_overlay/railgun_overlay/do_animation()
-	flick("railgun_charge",src)
-
-/obj/weapon_overlay/laser
-	name = "Laser cannon"
-	icon = 'icons/obj/hand_of_god_structures.dmi'
-	icon_state = "conduit-red"
-
 /obj/structure/overmap/proc/add_weapon_overlay(type)
 	var/path = text2path(type)
 	var/obj/weapon_overlay/OL = new path
@@ -154,13 +132,15 @@
 	weapon_overlays += OL
 	return OL
 
-/obj/weapon_overlay/laser/do_animation()
-	flick("laser",src)
-
 /obj/structure/overmap/Initialize()
 	. = ..()
 	current_tracers = list()
 	GLOB.overmap_objects += src
+
+	if((default_weapons) && (default_weapons.len))
+		for(var/weap in default_weapons)
+			add_weapon(new weap(src))
+
 	START_PROCESSING(SSovermap, src)
 
 	vector_overlay = new()
@@ -213,16 +193,6 @@
 		name = "[station_name()]"
 	current_system = SSstarsystem.find_system(src)
 	addtimer(CALLBACK(src, .proc/check_armour), 20 SECONDS)
-
-	weapon_types[FIRE_MODE_PDC] = new/datum/ship_weapon/pdc_mount
-	weapon_types[FIRE_MODE_TORPEDO] = new/datum/ship_weapon/torpedo_launcher
-	weapon_types[FIRE_MODE_RAILGUN] = new/datum/ship_weapon/railgun
-
-/obj/structure/overmap/proc/add_weapon(obj/machinery/ship_weapon/weapon)
-	if(!weapons[weapon.fire_mode])
-		weapons[weapon.fire_mode] = list(weapon)
-	else
-		weapons[weapon.fire_mode] += weapon
 
 /obj/structure/overmap/Destroy()
 	QDEL_LIST(current_tracers)

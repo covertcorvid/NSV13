@@ -10,6 +10,16 @@
 	icon_state = pick(states)
 	. = ..()
 
+/obj/effect/temp_visual/overmap_explosion
+	icon = 'nsv13/goonstation/icons/hugeexplosion.dmi'
+	icon_state = "explosion"
+	duration = 10
+
+/obj/effect/temp_visual/overmap_explosion/alt
+	icon = 'nsv13/goonstation/icons/hugeexplosion2.dmi'
+	icon_state = "explosion"
+	duration = 10
+
 /obj/effect/temp_visual/nuke_impact
 	icon = 'nsv13/goonstation/icons/effects/explosions/224x224.dmi'
 	icon_state = "explosion"
@@ -24,13 +34,6 @@
 	pixel_x = -32
 	pixel_y = -32
 	var/flak_range = 2 //AOE where flak hits torpedoes. May need to buff this a bit.
-
-/obj/item/projectile/bullet/flak
-	icon_state = "flak"
-	name = "flak round"
-	damage = 2
-	alpha = 0
-	var/steps_left = 0 //Flak range, AKA how many tiles can we move before we go kaboom
 
 //Small object to make flak "flicker" a bit. Kills itself after spawning flak
 /obj/effect/flak_handler/Initialize()
@@ -51,3 +54,28 @@
 		else
 			X.ex_act(severity)
 	. = ..()
+
+/obj/weapon_overlay
+	name = "Weapon overlay"
+	layer = 4
+	mouse_opacity = FALSE
+	layer = WALL_OBJ_LAYER
+	var/angle = 0 //Debug
+
+/obj/weapon_overlay/proc/do_animation()
+	return
+
+/obj/weapon_overlay/railgun //Railgun sits on top of the ship and swivels to face its target
+	name = "Railgun"
+	icon_state = "railgun"
+
+/obj/weapon_overlay/railgun_overlay/do_animation()
+	flick("railgun_charge",src)
+
+/obj/weapon_overlay/laser
+	name = "Laser cannon"
+	icon = 'icons/obj/hand_of_god_structures.dmi'
+	icon_state = "conduit-red"
+
+/obj/weapon_overlay/laser/do_animation()
+	flick("laser",src)

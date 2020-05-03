@@ -13,7 +13,7 @@
 	pixel_y = -64
 
 	fire_mode = FIRE_MODE_RAILGUN
-	weapon_type = new/datum/ship_weapon/railgun
+	weapon_type = /datum/ship_weapon/railgun
 	ammo_type = /obj/item/ship_weapon/ammunition/railgun_ammo
 
 	semi_auto = TRUE
@@ -112,8 +112,4 @@
 
 /obj/machinery/ship_weapon/railgun/MouseDrop_T(obj/structure/A, mob/user)
 	return
-
-/obj/machinery/ship_weapon/railgun/animate_projectile(atom/target)
-	. = ..()
-	linked.shake_everyone(3)
 
