@@ -286,6 +286,8 @@ You need to fire emag the fighter's IFF board. This makes it list as "ENEMY" on 
 	max_passengers = pc?.passenger_capacity
 
 	//Setup weapon datums and fire modes
+
+	/*
 	weapon_types = list() //Hard reset
 	weapon_types.len = MAX_POSSIBLE_FIREMODE
 
@@ -304,6 +306,7 @@ You need to fire emag the fighter's IFF board. This makes it list as "ENEMY" on 
 			var/path_two = new py.weapon_type_path_two
 			if(path_two)
 				weapon_types[FIRE_MODE_FIGHTER_SLOT_TWO] = path_two
+	*/
 
 /obj/structure/overmap/fighter/proc/fuel_setup()
 	var/obj/item/fighter_component/fuel_tank/fft = get_part(/obj/item/fighter_component/fuel_tank)

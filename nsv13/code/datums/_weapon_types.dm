@@ -5,7 +5,7 @@
 #define FIRE_ZONE_OMNIDIRECTIONAL	"omni"
 
 /datum/ship_weapon/New(dest, proj_type=null, burst_size=null, fire_delay=null, \
-		range_mod=null, select_alert=null, failure_alert=null, firing_sounds=null, \
+		select_alert=null, failure_alert=null, firing_sounds=null, \
 		select_sound=null, gunner_controlled=null, req_linked=null, linked=null, \
 		firing_zone=null, facing_degrees=null, firing_arc_width=null, ammo=null)
 	. = ..()
@@ -15,8 +15,6 @@
 		src.burst_size = burst_size
 	if(!isnull(fire_delay))
 		src.fire_delay = fire_delay
-	if(!isnull(range_mod))
-		src.range_modifier = range_mod
 	if(!isnull(select_alert))
 		src.select_alert = select_alert
 	if(!isnull(failure_alert))
@@ -38,6 +36,7 @@
 	if(!isnull(ammo))
 		src.ammo = ammo
 
+	message_admins("Initialized weapon on [dest]")
 	calculate_firing_arc()
 
 /datum/ship_weapon/proc/calculate_firing_arc()

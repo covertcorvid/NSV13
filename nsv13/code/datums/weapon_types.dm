@@ -7,7 +7,6 @@
 	var/default_projectile_type
 	var/burst_size = 1 // How many projectiles to fire at a time
 	var/fire_delay = 1 SECONDS // How long the ship has to wait between shots
-	var/range_modifier = 0 // Modification to the overmaps default range
 	var/lateral = TRUE      // "Lateral" means that your ship doesnt have to face the target
 
 	var/select_alert // Text to show when weapon is cycled to
@@ -34,7 +33,6 @@
 	default_projectile_type = /obj/item/projectile/bullet/railgun_slug
 	burst_size = 1
 	fire_delay = 1 SECONDS
-	range_modifier = 30
 	select_alert = "<span class='notice'>Charging railgun hardpoints...</span>"
 	failure_alert = "<span class='warning'>DANGER: Launch failure! Railgun systems are not loaded.</span>"
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/railgun_fire.ogg')
@@ -46,7 +44,6 @@
 	default_projectile_type = /obj/item/projectile/guided_munition/torpedo
 	burst_size = 1
 	fire_delay = 0.5 SECONDS
-	range_modifier = 30
 	select_alert = "<span class='notice'>Torpedo target acquisition systems: online.</span>"
 	failure_alert = "<span class='warning'>DANGER: Launch failure! Torpedo tubes are not loaded.</span>"
 	overmap_firing_sounds = list(
@@ -98,7 +95,6 @@
 	default_projectile_type = /obj/item/projectile/bullet/pdc_round
 	burst_size = 3
 	fire_delay = 0
-	range_modifier = 0
 	overmap_select_sound = 'nsv13/sound/effects/ship/pdc_start.ogg'
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/pdc.ogg',
 		'nsv13/sound/effects/ship/pdc2.ogg',
@@ -114,7 +110,6 @@
 	default_projectile_type = /obj/item/projectile/guided_munition/missile
 	burst_size = 1
 	fire_delay = 5
-	range_modifier = 30
 	select_alert = "<span class='notice'>Missile target acquisition systems: online.</span>"
 	failure_alert = "<span class='warning'>DANGER: Launch failure! Missile racks are not loaded.</span>"
 	overmap_firing_sounds = list(
@@ -129,7 +124,6 @@
 	default_projectile_type = /obj/item/projectile/bullet/light_cannon_round
 	burst_size = 3
 	fire_delay = 0
-	range_modifier = 0
 	overmap_select_sound = 'nsv13/sound/effects/ship/pdc_start.ogg'
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/pdc.ogg',
 		'nsv13/sound/effects/ship/pdc2.ogg',
@@ -141,7 +135,6 @@
 	default_projectile_type = /obj/item/projectile/bullet/heavy_cannon_round
 	burst_size = 3
 	fire_delay = 0
-	range_modifier = 0
 	overmap_select_sound = 'nsv13/sound/effects/ship/pdc_start.ogg'
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/pdc.ogg',
 		'nsv13/sound/effects/ship/pdc2.ogg',
@@ -153,7 +146,6 @@
 	default_projectile_type = /obj/item/projectile/bullet/pdc_round
 	burst_size = 0
 	fire_delay = 0
-	range_modifier = 0
 	overmap_select_sound = 'nsv13/sound/effects/ship/pdc_start.ogg'
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/pdc.ogg',
 		'nsv13/sound/effects/ship/pdc2.ogg',
@@ -165,7 +157,6 @@
 	default_projectile_type = /obj/item/projectile/bullet/pdc_round
 	burst_size = 0
 	fire_delay = 0
-	range_modifier = 0
 	overmap_select_sound = 'nsv13/sound/effects/ship/pdc_start.ogg'
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/pdc.ogg',
 		'nsv13/sound/effects/ship/pdc2.ogg',
@@ -177,7 +168,6 @@
 	default_projectile_type = /obj/item/projectile/bullet/pdc_round
 	burst_size = 0
 	fire_delay = 0
-	range_modifier = 0
 	overmap_select_sound = 'nsv13/sound/effects/ship/pdc_start.ogg'
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/pdc.ogg',
 		'nsv13/sound/effects/ship/pdc2.ogg',
@@ -189,7 +179,6 @@
 	default_projectile_type = /obj/item/projectile/bullet/pdc_round
 	burst_size = 0
 	fire_delay = 0
-	range_modifier = 0
 	overmap_select_sound = 'nsv13/sound/effects/ship/pdc_start.ogg'
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/pdc.ogg',
 		'nsv13/sound/effects/ship/pdc2.ogg',
@@ -201,7 +190,6 @@
 	default_projectile_type = /obj/item/projectile/bullet/pdc_round
 	burst_size = 0
 	fire_delay = 0
-	range_modifier = 0
 	overmap_select_sound = 'nsv13/sound/effects/ship/pdc_start.ogg'
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/pdc.ogg',
 		'nsv13/sound/effects/ship/pdc2.ogg',
@@ -216,12 +204,12 @@
 	default_projectile_type = /obj/item/projectile/bullet/gauss_slug
 	burst_size = 2
 	fire_delay = 20 SECONDS
-	range_modifier = 20
 	select_alert = "<span class='notice'>Activating gauss weapon systems...</span>"
 	failure_alert = "<span class='warning'>DANGER: Gauss gun systems not loaded.</span>"
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/gauss.ogg')
 	overmap_select_sound = 'nsv13/sound/effects/ship/railgun_ready.ogg'
 	firing_zone = FIRE_ZONE_OMNIDIRECTIONAL
+	gunner_controlled = FALSE
 
 /datum/ship_weapon/gauss/on_map
 	fire_delay = 1 SECONDS
@@ -237,7 +225,6 @@
 	default_projectile_type = /obj/item/projectile/bullet/gauss_slug
 	burst_size = 1
 	fire_delay = 5 SECONDS
-	range_modifier = 30
 	overmap_select_sound = 'nsv13/sound/effects/ship/freespace2/computer/escape.wav'
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/flak/flakhit1.ogg','nsv13/sound/effects/ship/flak/flakhit2.ogg','nsv13/sound/effects/ship/flak/flakhit3.ogg')
 	select_alert = "<span class='notice'>Defensive flak screens: <b>OFFLINE</b>. Activating manual flak control.</span>"
@@ -270,14 +257,14 @@
  * Handles automatic firing of the PDCs to shoot down torpedoes
  */
 /obj/structure/overmap/proc/handle_pdcs()
-	if(fire_mode == FIRE_MODE_FLAK) //If theyre aiming the flak manually.
+	if(fire_mode == (src.weapon_types.Find(/datum/ship_weapon/flak))) //If theyre aiming the flak manually.
 		return
 	if(mass <= MASS_TINY && !ai_controlled) //Small ships don't get to use PDCs. AIs still need to aim like this, though
 		return
 	if(!last_target || QDELETED(last_target) || !isovermap(last_target) || last_target == src) //Stop hitting yourself enterprise
 		last_target = null
 	else
-		fire_weapon(last_target, mode=FIRE_MODE_FLAK, lateral=TRUE)
+		fire_weapon(last_target, mode=(src.weapon_types.Find(/datum/ship_weapon/pdc_mount)))
 		return
 	for(var/obj/structure/overmap/ship in GLOB.overmap_objects)
 		if(!ship || !istype(ship))
@@ -289,10 +276,10 @@
 			continue
 		if(!QDELETED(ship) && isovermap(ship))
 			if(mass >= MASS_MEDIUM)
-				fire_weapon(ship, mode=FIRE_MODE_FLAK, lateral=TRUE)
+				fire_weapon(ship, mode=(src.weapon_types.Find(/datum/ship_weapon/flak)))
 				break
 			else
-				fire_weapon(ship, mode=FIRE_MODE_PDC, lateral=TRUE)
+				fire_weapon(ship, mode=(src.weapon_types.Find(/datum/ship_weapon/pdc_mount)))
 				break
 
 /obj/structure/overmap/proc/get_flak_range(atom/target)

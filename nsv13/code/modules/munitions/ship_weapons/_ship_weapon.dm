@@ -95,15 +95,15 @@
 /obj/machinery/ship_weapon/Initialize()
 	. = ..()
 	weapon_dat = new weapon_type(req_linked=TRUE, linked=src, ammo=0)
-	addtimer(CALLBACK(src, .proc/PostInitialize), 5 SECONDS)
+	return INITIALIZE_HINT_LATELOAD
 
 /**
 *
 *	Late initialize'd these weapons as they're dependant on areas + overmaps being initialized first. This way, they're initialized after everything else in the game.
 *
 */
-
-/obj/machinery/ship_weapon/proc/PostInitialize()
+/obj/machinery/ship_weapon/LateInitialize()
+	message_admins("LateInitialize for [src]")
 	get_ship(error_log=FALSE)
 	if(maintainable)
 		maint_req = rand(15,25) //Setting initial number of cycles until maintenance is required
@@ -119,6 +119,8 @@
 	. = ..()
 	if(linked_computer)
 		linked_computer.SW = null
+	if(linked)
+		linked.remote_weapon(weapon_dat)
 
 /**
  * Tries to link the ship to an overmap by finding the overmap linked it the area we are in.
@@ -138,7 +140,9 @@
  */
 /obj/machinery/ship_weapon/proc/set_position(obj/structure/overmap/OM) //Use this to tell your ship what weapon category this belongs in
 	message_admins("Adding [weapon_dat] to overmap")
-	OM.add_weapon(weapon_dat)
+	if(!weapon_dat)
+		weapon_dat = new weapon_type(src, req_linked=TRUE, linked=src, ammo=0)
+		OM.add_weapon(weapon_dat)
 
 /**
  * If we're not already linked to an overmap ship, try again.

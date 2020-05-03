@@ -11,9 +11,23 @@
 		message_admins("initializing weapon typelist")
 		weapons[W.name] = list(W)
 		weapon_types += W.name
-	else
+	else if(!(W in weapons[W.name]))
 		message_admins("adding weapon to typelist")
 		weapons[W.name] += W
+
+/obj/structure/overmap/proc/remove_weapon(datum/ship_weapon/W)
+	if(!istype(W, /datum/ship_weapon))
+		message_admins("wrong type")
+		return
+	if(!weapons)
+		message_admins("no weapons list")
+		return
+	else if(!(weapons[W.name]))
+		message_admins("no weapons of this type")
+		return
+	else if(W in weapons[W.name])
+		message_admins("adding weapon to typelist")
+		weapons[W.name] -= W
 
 /obj/structure/overmap/proc/fire(atom/target)
 	if(weapon_safety)

@@ -90,7 +90,7 @@
 
 	// Ship weapons
 	var/list/weapons = list()
-	var/list/default_weapons // What weapons should this type start with?
+	var/list/default_weapons = null // What weapons should this type start with?
 	var/list/weapon_types = list() // Needed for mode cycling
 	var/fire_mode = 1 // Needed for mode cycling
 	var/weapon_safety = FALSE //Like a gun safety. Entirely un-used except for fighters to stop brainlets from shooting people on the ship unintentionally :)
@@ -136,10 +136,6 @@
 	. = ..()
 	current_tracers = list()
 	GLOB.overmap_objects += src
-
-	if((default_weapons) && (default_weapons.len))
-		for(var/weap in default_weapons)
-			add_weapon(new weap(src))
 
 	START_PROCESSING(SSovermap, src)
 
@@ -193,6 +189,16 @@
 		name = "[station_name()]"
 	current_system = SSstarsystem.find_system(src)
 	addtimer(CALLBACK(src, .proc/check_armour), 20 SECONDS)
+	return INITIALIZE_HINT_LATELOAD
+
+
+/obj/structure/overmap/LateInitialize()
+	message_admins("LateInitialize for [src]")
+	if((default_weapons) && (default_weapons.len))
+		message_admins("Creating ewapons for [src]")
+		for(var/weap in default_weapons)
+			message_admins("creating [src]")
+			add_weapon(new weap(src))
 
 /obj/structure/overmap/Destroy()
 	QDEL_LIST(current_tracers)
