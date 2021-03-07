@@ -12,6 +12,7 @@
 	new /obj/item/storage/backpack/duffelbag/captain(src)
 	new /obj/item/clothing/neck/cloak/cap(src)
 	new /obj/item/clothing/neck/petcollar(src)
+	new	/obj/item/clothing/suit/armor/vest/capcarapace/jacket(src)
 	new /obj/item/pet_carrier(src)
 	new /obj/item/clothing/shoes/sneakers/brown(src)
 	new /obj/item/clothing/under/rank/captain(src)
@@ -67,12 +68,13 @@
 
 /obj/structure/closet/secure_closet/brig_phys
 	name = "\proper brig physician's locker"
-	req_access = list(ACCESS_BRIG)
+	req_access = list(ACCESS_BRIGPHYS)
 	icon_state = "brig_phys"
 
 /obj/structure/closet/secure_closet/brig_phys/PopulateContents()
 	..()
 	new /obj/item/defibrillator/loaded(src)
+	new /obj/item/blood_filter(src)
 	new /obj/item/radio/headset/headset_medsec(src)
 	new	/obj/item/storage/firstaid/regular(src)
 	new	/obj/item/storage/firstaid/fire(src)
@@ -80,9 +82,6 @@
 	new	/obj/item/storage/firstaid/o2(src)
 	new	/obj/item/storage/firstaid/brute(src)
 	new /obj/item/storage/belt/medical(src)
-	new /obj/item/reagent_containers/spray/pepper(src)
-	new /obj/item/assembly/flash/handheld(src)
-	new /obj/item/restraints/handcuffs(src)
 	new /obj/item/clothing/gloves/color/latex/nitrile(src)
 
 /obj/structure/closet/secure_closet/hos
@@ -149,7 +148,7 @@
 	new /obj/item/clothing/gloves/krav_maga/sec(src)
 	new /obj/item/door_remote/head_of_security(src)
 	new /obj/item/gun/ballistic/shotgun/automatic/combat/compact(src)
-	new /obj/item/ammo_box/c9mm/rubber(src)
+	new /obj/item/storage/box/deputy(src)
 
 /obj/structure/closet/secure_closet/security
 	name = "security officer's locker"
@@ -206,6 +205,7 @@
 	icon_state = "cabinet"
 	resistance_flags = FLAMMABLE
 	max_integrity = 70
+	door_anim_time = 0 // no animation
 	open_sound = 'sound/machines/wooden_closet_open.ogg'
 	close_sound = 'sound/machines/wooden_closet_close.ogg'
 
@@ -282,7 +282,7 @@
 	..()
 	new /obj/item/clothing/shoes/sneakers/brown(src)
 	for(var/i in 1 to 3)
-		new /obj/item/paper/fluff/jobs/security/court_judgement (src)
+		new /obj/item/paper/fluff/jobs/security/court_judgment (src)
 	new /obj/item/pen (src)
 	new /obj/item/clothing/suit/judgerobe (src)
 	new /obj/item/clothing/head/powdered_wig (src)

@@ -17,6 +17,14 @@
 /obj/effect/decal/cleanable/blood/gibs/old,
 /turf/open/floor/plating,
 /area/template_noop)
+<<<<<<< HEAD
+=======
+"c" = (
+/obj/effect/trap/nexus/trickyspawner/catbutcher,
+/obj/effect/spawner/lootdrop/trap,
+/turf/open/floor/plating,
+/area/template_noop)
+>>>>>>> master
 "d" = (
 /obj/structure/table,
 /obj/item/reagent_containers/food/drinks/drinkingglass{
@@ -129,7 +137,11 @@ n
 "}
 (3,1,1) = {"
 j
+<<<<<<< HEAD
 y
+=======
+c
+>>>>>>> master
 f
 j
 "}

@@ -64,7 +64,7 @@
 
 /mob/living/carbon/monkey/proc/battle_screech()
 	if(next_battle_screech < world.time)
-		emote(pick("roar","screech"))
+		INVOKE_ASYNC(src, /mob.proc/emote, pick("roar","screech"))
 		for(var/mob/living/carbon/monkey/M in view(7,src))
 			M.next_battle_screech = world.time + battle_screech_cooldown
 
@@ -139,7 +139,7 @@
 				blacklistItems[pickupTarget] ++
 				pickupTarget = null
 				pickupTimer = 0
-			else if(!IsDeadOrIncap())		
+			else if(!IsDeadOrIncap())
 				INVOKE_ASYNC(src, .proc/walk2derpless, pickupTarget.loc)
 				if(Adjacent(pickupTarget) || Adjacent(pickupTarget.loc)) // next to target
 					drop_all_held_items() // who cares about these items, i want that one!
@@ -387,6 +387,26 @@
 	else if(L.a_intent == INTENT_DISARM && prob(MONKEY_RETALIATE_DISARM_PROB))
 		retaliate(L)
 	return ..()
+
+/mob/living/carbon/monkey/attack_animal(mob/living/simple_animal/M)
+	. = ..()
+	if(. && prob(MONKEY_RETALIATE_HARM_PROB))
+		retaliate(M)
+
+/mob/living/carbon/monkey/attack_alien(mob/living/carbon/alien/humanoid/M)
+	. = ..()
+	if(. && prob(MONKEY_RETALIATE_HARM_PROB))
+		retaliate(M)
+
+/mob/living/carbon/monkey/attack_larva(mob/living/carbon/alien/larva/L)
+	. = ..()
+	if(. && prob(MONKEY_RETALIATE_HARM_PROB))
+		retaliate(L)
+
+/mob/living/carbon/monkey/attack_slime(mob/living/simple_animal/slime/M)
+	. = ..()
+	if(. && prob(MONKEY_RETALIATE_HARM_PROB))
+		retaliate(M)
 
 /mob/living/carbon/monkey/attackby(obj/item/W, mob/user, params)
 	..()

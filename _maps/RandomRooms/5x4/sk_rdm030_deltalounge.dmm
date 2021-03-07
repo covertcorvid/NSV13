@@ -1,4 +1,10 @@
 //MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
+<<<<<<< HEAD
+=======
+"a" = (
+/turf/open/floor/plating,
+/area/template_noop)
+>>>>>>> master
 "b" = (
 /obj/structure/chair/wood/normal{
 	dir = 4
@@ -131,7 +137,11 @@ k
 p
 "}
 (4,1,1) = {"
+<<<<<<< HEAD
 Q
+=======
+a
+>>>>>>> master
 i
 l
 p

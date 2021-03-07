@@ -67,7 +67,8 @@
 	update_client_colour()
 	update_mouse_pointer()
 	if(client)
-		client.change_view(getScreenSize(client.prefs.widescreenpref)) // Resets the client.view in case it was changed.
+		client.view_size?.setDefault(getScreenSize(src))	// Sets the defaul view_size because it can be different to what it was on the lobby.
+		client.change_view(getScreenSize(src)) // Resets the client.view in case it was changed.
 		client?.view_size?.default = (client.prefs.widescreenpref) ? CONFIG_GET(string/default_view) : "15x15" //Nsv13: This view size wrapper is extremely inconsistent and we need to finagle it a bit.
 
 		if(client.player_details.player_actions.len)
@@ -79,6 +80,9 @@
 			CB.Invoke()
 		log_played_names(client.ckey,name,real_name)
 		auto_deadmin_on_login()
+
+	//Sort verbs
+	add_verb(verbs.Copy(), TRUE)	//verbs.Copy() because otherwise you can't see the list
 
 	log_message("Client [key_name(src)] has taken ownership of mob [src]([src.type])", LOG_OWNERSHIP)
 	SEND_SIGNAL(src, COMSIG_MOB_CLIENT_LOGIN, client)

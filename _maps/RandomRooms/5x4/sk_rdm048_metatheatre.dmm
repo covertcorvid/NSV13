@@ -6,11 +6,19 @@
 /area/template_noop)
 "b" = (
 /obj/structure/closet/crate{
-	icon_state = "crateopen"
+	opened = 1
 	},
 /obj/effect/spawner/lootdrop/maintenance/three,
 /turf/open/floor/plating,
 /area/template_noop)
+<<<<<<< HEAD
+=======
+"c" = (
+/obj/effect/spawner/lootdrop/trap,
+/obj/effect/spawner/lootdrop/clowntrap,
+/turf/open/floor/plating,
+/area/template_noop)
+>>>>>>> master
 "d" = (
 /obj/machinery/vending/autodrobe/all_access,
 /turf/open/floor/plating,
@@ -86,7 +94,11 @@ o
 "}
 (3,1,1) = {"
 h
+<<<<<<< HEAD
 B
+=======
+c
+>>>>>>> master
 h
 h
 "}

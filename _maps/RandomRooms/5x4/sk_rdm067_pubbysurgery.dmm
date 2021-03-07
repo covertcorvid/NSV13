@@ -104,6 +104,13 @@
 	icon_state = "panelscorched"
 	},
 /area/template_noop)
+<<<<<<< HEAD
+=======
+"q" = (
+/obj/effect/spawner/lootdrop/trap/reusable,
+/turf/open/floor/plating,
+/area/template_noop)
+>>>>>>> master
 "r" = (
 /obj/effect/spawner/lootdrop/organ_spawner,
 /obj/structure/closet/crate,
@@ -131,7 +138,11 @@ o
 (3,1,1) = {"
 c
 h
+<<<<<<< HEAD
 A
+=======
+q
+>>>>>>> master
 m
 "}
 (4,1,1) = {"

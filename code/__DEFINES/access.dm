@@ -71,6 +71,9 @@
 #define ACCESS_MINING_ENGINEERING 74
 #define ACCESS_MINING_BRIDGE 75
 
+/// Room and launching.
+#define ACCESS_AUX_BASE 72
+
 	//BEGIN CENTCOM ACCESS
 	/*Should leave plenty of room if we need to add more access levels.
 	Mostly for admin fun times.*/

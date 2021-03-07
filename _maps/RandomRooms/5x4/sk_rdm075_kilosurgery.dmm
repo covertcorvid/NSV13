@@ -55,6 +55,44 @@
 	},
 /area/template_noop)
 "g" = (
+/obj/effect/decal/cleanable/dirt,
+<<<<<<< HEAD
+/obj/effect/turf_decal/bot,
+/obj/effect/turf_decal/stripes/corner{
+	dir = 4
+	},
+/obj/effect/turf_decal/stripes/corner{
+	dir = 1
+	},
+/obj/effect/turf_decal/tile/neutral{
+	dir = 4
+	},
+/obj/effect/turf_decal/tile/neutral{
+	dir = 1
+	},
+/obj/item/surgical_drapes,
+/obj/item/clothing/mask/surgical,
+/obj/effect/trap/nexus/doorbolt,
+/obj/effect/trap/nexus/darkness,
+/turf/open/floor/plasteel/dark,
+=======
+/obj/effect/trap/trigger/all,
+/turf/open/floor/plating,
+>>>>>>> master
+/area/template_noop)
+"h" = (
+/obj/effect/decal/cleanable/dirt,
+/obj/effect/turf_decal/stripes/line{
+	dir = 8
+	},
+/obj/item/shard,
+/turf/open/floor/plating{
+	icon_state = "platingdmg1"
+	},
+/area/template_noop)
+<<<<<<< HEAD
+=======
+"i" = (
 /obj/structure/table/optable,
 /obj/effect/decal/cleanable/blood/old,
 /obj/effect/decal/cleanable/dirt,
@@ -77,16 +115,7 @@
 /obj/effect/trap/nexus/darkness,
 /turf/open/floor/plasteel/dark,
 /area/template_noop)
-"h" = (
-/obj/effect/decal/cleanable/dirt,
-/obj/effect/turf_decal/stripes/line{
-	dir = 8
-	},
-/obj/item/shard,
-/turf/open/floor/plating{
-	icon_state = "platingdmg1"
-	},
-/area/template_noop)
+>>>>>>> master
 "j" = (
 /obj/structure/table,
 /obj/effect/decal/cleanable/dirt,
@@ -176,6 +205,7 @@
 	},
 /obj/effect/turf_decal/tile/neutral{
 	dir = 1
+<<<<<<< HEAD
 	},
 /obj/effect/turf_decal/tile/neutral{
 	dir = 4
@@ -190,6 +220,22 @@
 	pixel_x = -4;
 	pixel_y = -4
 	},
+=======
+	},
+/obj/effect/turf_decal/tile/neutral{
+	dir = 4
+	},
+/obj/structure/rack,
+/obj/item/reagent_containers/blood/random{
+	pixel_x = 4;
+	pixel_y = 4
+	},
+/obj/item/reagent_containers/blood/random,
+/obj/item/reagent_containers/blood/random{
+	pixel_x = -4;
+	pixel_y = -4
+	},
+>>>>>>> master
 /obj/effect/turf_decal/stripes/corner,
 /turf/open/floor/plasteel/dark,
 /area/template_noop)
@@ -240,7 +286,11 @@
 
 (1,1,1) = {"
 a
+<<<<<<< HEAD
 Z
+=======
+g
+>>>>>>> master
 j
 o
 "}
@@ -252,7 +302,7 @@ p
 "}
 (3,1,1) = {"
 c
-g
+i
 l
 q
 "}
@@ -264,7 +314,11 @@ r
 "}
 (5,1,1) = {"
 e
+<<<<<<< HEAD
 Z
+=======
+g
+>>>>>>> master
 n
 s
 "}

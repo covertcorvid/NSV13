@@ -5,16 +5,20 @@
 	var/static/list/ignored_things = typecacheof(list(
 		/mob/dead,
 		/mob/camera,
+		/mob/living/simple_animal/revenant,
 		/obj/effect,
 		/obj/docking_port,
 		/atom/movable/lighting_object,
 		/obj/item/projectile,
+		/obj/structure/chisel_message
 		))
 	var/list/processing_list = list(location)
 	. = list()
 	while(processing_list.len)
 		var/atom/thing = processing_list[1]
 		processing_list -= thing
+		if(thing == null)
+			continue
 		if(ignored_things[thing.type])
 			continue
 		. += thing
@@ -38,11 +42,15 @@
 			continue
 		thing.rad_act(intensity)
 
-	var/static/last_huge_pulse = 0
-	if(intensity > 3000 && world.time > last_huge_pulse + 200)
-		last_huge_pulse = world.time
-		log = TRUE
-	if(log)
-		var/turf/_source_T = isturf(source) ? source : get_turf(source)
-		log_game("Radiation pulse with intensity: [intensity] and range modifier: [range_modifier] in [loc_name(_source_T)] ")
+	if(intensity >= RAD_WAVE_MINIMUM) // Don't bother to spawn rad waves if they're just going to immediately go out
+		new /datum/radiation_wave(source, intensity, range_modifier, can_contaminate)
+
+		var/static/last_huge_pulse = 0
+		if(intensity > 3000 && world.time > last_huge_pulse + 200)
+			last_huge_pulse = world.time
+			log = TRUE
+		if(log)
+			var/turf/_source_T = isturf(source) ? source : get_turf(source)
+			log_game("Radiation pulse with intensity: [intensity] and range modifier: [range_modifier] in [loc_name(_source_T)] ")
+	
 	return TRUE
