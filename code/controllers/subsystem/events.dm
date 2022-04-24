@@ -46,7 +46,35 @@ SUBSYSTEM_DEF(events)
 //checks if we should select a random event yet, and reschedules if necessary
 /datum/controller/subsystem/events/proc/checkEvent()
 	if(scheduled <= world.time)
-		spawnEvent()
+		//NSV13 - do events for multiple ships!
+		/*
+		// Get all the ships we want to have events
+		var/list/ships
+		for(var/datum/space_level/level as() in SSmapping.levels_by_trait(ZTRAIT_BOARDABLE))
+			var/obj/structure/overmap/OM = level.linked_overmap
+			ships |= OM
+		var/list/ships_remaining = ships.Copy()
+		// Decide whether we're causing system or ship events this time
+		if(prob(70))
+			// Same system-wide event for everyone that's in the same system
+			var/list/system_weather_map
+			for(var/obj/structure/overmap/OM in ships)
+				if(OM.current_system && length(OM.current_system.possible_events))
+					if(OM.current_system not in system_weather_map)
+						system_weather_map[OM.current_system] = list(pick(OM.current_system.possible_events))
+					spawnEvent(system_weather_map[OM.current_system], OM)
+					ships_remaining -= OM
+		// Normal events if we didn't get prob(70) or if the system didn't have any event types
+		for(var/obj/structure/overmap/OM in ships_remaining)
+			spawnEvent(control, OM)
+		*/
+		var/obj/structure/overmap/mainship = SSstar_system.find_main_overmap()
+		var/list/possible_events
+		if(mainship.current_system && length(mainship.current_system.possible_events) && prob(70))
+			spawnEvent(mainship.current_system.possible_events)
+		else
+			spawnEvent(control)
+
 		reschedule()
 
 //decides which world.time we should select another random event at.
@@ -54,7 +82,7 @@ SUBSYSTEM_DEF(events)
 	scheduled = world.time + rand(frequency_lower, max(frequency_lower,frequency_upper))
 
 //selects a random event based on whether it can occur and it's 'weight'(probability)
-/datum/controller/subsystem/events/proc/spawnEvent()
+/datum/controller/subsystem/events/proc/spawnEvent(var/list/possible_events, obj/structure/overmap/destination)
 	set waitfor = FALSE	//for the admin prompt
 	if(!CONFIG_GET(flag/allow_random_events))
 		return
@@ -64,14 +92,6 @@ SUBSYSTEM_DEF(events)
 	// Only alive, non-AFK human players count towards this.
 
 	var/sum_of_weights = 0
-
-	//NSV13 - are we using our event list or the full one?
-	var/obj/structure/overmap/mainship = SSstar_system.find_main_overmap()
-	var/list/possible_events
-	if(mainship.current_system && length(mainship.current_system.possible_events) && prob(70))
-		possible_events = mainship.current_system.possible_events
-	else
-		possible_events = control
 
 	for(var/datum/round_event_control/E in possible_events)
 		if(!E.canSpawnEvent(players_amt, gamemode))
