@@ -50,7 +50,7 @@ SUBSYSTEM_DEF(events)
 		/*
 		// Get all the ships we want to have events
 		var/list/ships
-		for(var/datum/space_level/level as() in SSmapping.levels_by_trait(ZTRAIT_BOARDABLE))
+		//for(var/datum/space_level/level as() in SSmapping.levels_by_trait(ZTRAIT_BOARDABLE))
 			var/obj/structure/overmap/OM = level.linked_overmap
 			ships |= OM
 		var/list/ships_remaining = ships.Copy()
@@ -68,9 +68,20 @@ SUBSYSTEM_DEF(events)
 		for(var/obj/structure/overmap/OM in ships_remaining)
 			spawnEvent(control, OM)
 		*/
+
+		//The 80% solution
+		var/obj/structure/overmap/OM = SSstar_system.find_main_overmap()
+		//  Same system-wide event for everyone that's in the same system
+		if(prob(70) && mainship.current_system && length(mainship.current_system.possible_events))
+			spawnEvent(system_weather_map[OM.current_system.possible_events)
+		//  Normal events if we didn't get prob(70) or if the system didn't have any event types
+		for(var/obj/structure/overmap/OM in ships_remaining)
+			spawnEvent(control, OM)
+
+		//The 50% solution
 		var/obj/structure/overmap/mainship = SSstar_system.find_main_overmap()
 		var/list/possible_events
-		if(mainship.current_system && length(mainship.current_system.possible_events) && prob(70))
+		if(prob(70) && mainship.current_system && length(mainship.current_system.possible_events))
 			spawnEvent(mainship.current_system.possible_events)
 		else
 			spawnEvent(control)
@@ -81,8 +92,9 @@ SUBSYSTEM_DEF(events)
 /datum/controller/subsystem/events/proc/reschedule()
 	scheduled = world.time + rand(frequency_lower, max(frequency_lower,frequency_upper))
 
+//NSV13 - pass in list of possible events and target ship
 //selects a random event based on whether it can occur and it's 'weight'(probability)
-/datum/controller/subsystem/events/proc/spawnEvent(var/list/possible_events, obj/structure/overmap/destination)
+/datum/controller/subsystem/events/proc/spawnEvent(var/list/possible_events, var/obj/structure/overmap/target)
 	set waitfor = FALSE	//for the admin prompt
 	if(!CONFIG_GET(flag/allow_random_events))
 		return

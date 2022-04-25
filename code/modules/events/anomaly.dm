@@ -12,7 +12,7 @@
 	announceWhen	= 1
 
 
-/datum/round_event/anomaly/proc/findEventArea()
+/datum/round_event/anomaly/proc/findEventArea(list/possible_areas)
 	var/static/list/allowed_areas
 	if(!allowed_areas)
 		//Places that shouldn't explode
@@ -28,12 +28,14 @@
 		//Subtypes from the above that actually should explode.
 		var/list/unsafe_area_subtypes = typecacheof(list(/area/engine/break_room))
 
-		allowed_areas = make_associative(GLOB.the_station_areas) - safe_area_types + unsafe_area_subtypes
+		allowed_areas = make_associative(possible_areas) - safe_area_types + unsafe_area_subtypes
 
-	return safepick(typecache_filter_list(GLOB.sortedAreas,allowed_areas))
+	return safepick(typecache_filter_list(possible_areas,allowed_areas))
 
-/datum/round_event/anomaly/setup()
-	impact_area = findEventArea()
+/datum/round_event/anomaly/setup(obj/structure/overmap/OM)
+	if(!OM)
+		OM = SSstar_system.find_main_overmap()
+	impact_area = findEventArea(OM.linked_areas)
 	if(!impact_area)
 		CRASH("No valid areas for anomaly found.")
 	var/list/turf_test = get_area_turfs(impact_area)

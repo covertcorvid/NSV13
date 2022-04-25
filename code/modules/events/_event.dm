@@ -142,7 +142,7 @@
 //EDIT: if there's anything you want to override within the new() call, it will not be overridden by the time this proc is called.
 //It will only have been overridden by the time we get to announce() start() tick() or end() (anything but setup basically).
 //This is really only for setting defaults which can be overridden later when New() finishes.
-/datum/round_event/proc/setup()
+/datum/round_event/proc/setup(obj/structure/overmap/OM)
 	return
 
 //Called when the tick is equal to the startWhen variable.
