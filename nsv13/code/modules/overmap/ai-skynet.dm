@@ -1647,7 +1647,7 @@ Seek a ship thich we'll station ourselves around
 	if(istype(target, /obj/structure/overmap))
 		add_enemy(target)
 		var/target_range = overmap_dist(src,target)
-		var/new_firemode = FIRE_MODE_GAUSS
+		var/new_firemode = /datum/ship_weapon/gauss
 		if(target_range > max_weapon_range) //Our max range is the maximum possible range we can engage in. This is to stop you getting hunted from outside of your view range.
 			if(fleet)
 				fleet.stop_reporting(target, src)
@@ -1687,16 +1687,16 @@ Seek a ship thich we'll station ourselves around
 				new_firemode = I
 				best_distance = distance
 		if(!weapon_types[new_firemode]) //I have no physical idea how this even happened, but ok. Sure. If you must. If you REALLY must. We can do this, Sarah. We still gonna do this? It's been 5 years since the divorce, can't you just let go?
-			new_firemode = FIRE_MODE_GAUSS
-		if(new_firemode != FIRE_MODE_GAUSS && current_system) //If we're not on PDCs, let's fire off some PDC salvos while we're busy shooting people. This is still affected by weapon cooldowns so that they lay off on their target a bit.
-			var/datum/ship_weapon/SW = weapon_types[FIRE_MODE_GAUSS]
+			new_firemode = /datum/ship_weapon/gauss
+		if(new_firemode != /datum/ship_weapon/gauss && current_system) //If we're not on PDCs, let's fire off some PDC salvos while we're busy shooting people. This is still affected by weapon cooldowns so that they lay off on their target a bit.
+			var/datum/ship_weapon/SW = weapon_types[/datum/ship_weapon/gauss]
 			if(SW)
 				for(var/obj/structure/overmap/ship in current_system.system_contents)
 					if(warcrime_blacklist[ship.type])
 						continue
 					if(!ship || QDELETED(ship) || ship == src || overmap_dist(src, ship) > max_weapon_range || ship.faction == src.faction || ship.z != z)
 						continue
-					if(fire_weapon(ship, FIRE_MODE_GAUSS, ai_aim=TRUE))
+					if(fire_weapon(ship, /datum/ship_weapon/gauss, ai_aim=TRUE))
 						SW.next_firetime += SW.ai_fire_delay
 					break
 		fire_mode = new_firemode
@@ -1729,10 +1729,10 @@ Seek a ship thich we'll station ourselves around
 	var/ammo_use = 0
 
 	for(var/iter = 1, iter <= length(weapon_types), iter++)
-		if(iter == FIRE_MODE_AMS || iter == FIRE_MODE_FLAK)
+		var/datum/ship_weapon/SW = weapon_types[iter]
+		if(SW.autonomous || !SW.selectable)
 			continue	//These act independantly
 		var/will_use_ammo = FALSE
-		var/datum/ship_weapon/SW = weapon_types[iter]
 		if(!SW)
 			continue
 		if(!SW.next_firetime)

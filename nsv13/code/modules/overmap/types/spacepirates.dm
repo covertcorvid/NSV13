@@ -75,7 +75,7 @@
 
 /obj/structure/overmap/spacepirate/ai/nt_missile/apply_weapons()
 	.=..()
-	weapon_types[FIRE_MODE_GAUSS] = null //removed the guass to load more torp
+	weapon_types -= /datum/ship_weapon/gauss
 
 /obj/structure/overmap/spacepirate/ai/syndie_gunboat
 	name = "Space Pirate Gunboat"

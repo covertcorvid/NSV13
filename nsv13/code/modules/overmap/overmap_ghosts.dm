@@ -61,10 +61,6 @@
 		tactical = new /obj/machinery/computer/ship/tactical/internal(src)
 		tactical.linked = src
 
-	//Override AMS
-	weapon_types[FIRE_MODE_AMS] = null //Resolve this later to be auto
-	weapon_types[FIRE_MODE_FLAK] = null //Resolve this later to be a toggle
-
 	//Insert trackable player pilot here
 	var/mob/living/carbon/human/species/skeleton/ghost = new (src.contents)
 	ghost.loc = src

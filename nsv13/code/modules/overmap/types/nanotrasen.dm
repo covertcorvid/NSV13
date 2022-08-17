@@ -161,8 +161,8 @@
 	icon_state = "shrike"
 
 /obj/structure/overmap/nanotrasen/missile_cruiser/starter/shrike/apply_weapons()
-	weapon_types[FIRE_MODE_GAUSS] = new /datum/ship_weapon/gauss(src)
-	weapon_types[FIRE_MODE_PDC] = new /datum/ship_weapon/pdc_mount(src)
+	weapon_types[/datum/ship_weapon/gauss] = new /datum/ship_weapon/gauss(src)
+	weapon_types[/datum/ship_weapon/pdc_mount] = new /datum/ship_weapon/pdc_mount(src)
 	weapon_types[/datum/ship_weapon/hybrid_railgun] = new /datum/ship_weapon/hybrid_railgun(src)
 
 /obj/structure/overmap/nanotrasen/missile_cruiser/starter //Currently assigned to Jeppison and Atlas
@@ -301,9 +301,6 @@
 	weapon_types[/datum/ship_weapon/flak] = new /datum/ship_weapon/flak(src)
 	weapon_types[/datum/ship_weapon/gauss] = new /datum/ship_weapon/gauss(src) //AI ships want to be able to use gauss too. I say let them...
 	weapon_types[/datum/ship_weapon/missile_launcher] = new /datum/ship_weapon/missile_launcher(src)
-
-/obj/structure/overmap/nanotrasen/carrier/ai/get_max_firemode() //This boy really doesn't need a railgun
-	return FIRE_MODE_ANTI_AIR
 
 /obj/structure/overmap/nanotrasen/ai/fighter
 	name = "Viper class light fighter"

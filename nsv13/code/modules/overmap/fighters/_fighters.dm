@@ -1401,7 +1401,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 /obj/item/fighter_component/primary
 	name = "\improper Fuck you"
 	slot = HARDPOINT_SLOT_PRIMARY
-	fire_mode = FIRE_MODE_ANTI_AIR
+	fire_mode = /datum/ship_weapon/fighter_primary
 	var/overmap_select_sound = 'nsv13/sound/effects/ship/pdc_start.ogg'
 	var/overmap_firing_sounds = list('nsv13/sound/effects/fighters/autocannon.ogg')
 	var/accepted_ammo = /obj/item/ammo_box/magazine
@@ -1434,7 +1434,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 
 //Burst arg currently unused for this proc.
 /obj/structure/overmap/proc/primary_fire(obj/structure/overmap/target, ai_aim = FALSE, burst = 1)
-	hardpoint_fire(target, FIRE_MODE_ANTI_AIR)
+	hardpoint_fire(target, /datum/ship_weapon/fighter_primary)
 
 /obj/structure/overmap/proc/hardpoint_fire(obj/structure/overmap/target, fireMode)
 	if(istype(src, /obj/structure/overmap/small_craft) && !pilot.incapacitated())

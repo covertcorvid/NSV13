@@ -282,9 +282,9 @@
 
 
 /obj/structure/overmap/proc/handle_flak()
-	if(fire_mode == FIRE_MODE_FLAK) //If theyre aiming the flak manually.
+	if(fire_mode == /datum/ship_weapon/flak) //If theyre aiming the flak manually.
 		return
-	if(!weapon_types[FIRE_MODE_FLAK] || flak_battery_amount <= 0)
+	if(!weapon_types[/datum/ship_weapon/flak] || flak_battery_amount <= 0)
 		return FALSE
 	if(light_shots_left <= 0)
 		spawn(150)
@@ -292,13 +292,13 @@
 		return FALSE
 	if(!current_system)
 		return
-	var/datum/ship_weapon/SW = weapon_types[FIRE_MODE_FLAK]
+	var/datum/ship_weapon/SW = weapon_types[/datum/ship_weapon/flak]
 	var/flak_left = flak_battery_amount //Multi-flak batteries!
 	if(!ai_controlled)
 		if(!last_target || !istype(last_target, /obj/structure/overmap) || QDELETED(last_target) || !isovermap(last_target) || last_target == src || get_dist(last_target,src) >= SW.range_modifier) //Stop hitting yourself enterprise
 			last_target = null
 		else
-			fire_weapon(last_target, mode=FIRE_MODE_FLAK, lateral=TRUE)
+			fire_weapon(last_target, mode=/datum/ship_weapon/flak, lateral=TRUE)
 			flak_left --
 			if(flak_left <= 0)
 				return
@@ -316,7 +316,7 @@
 			continue
 		if(!QDELETED(ship) && isovermap(ship) && ship.is_sensor_visible(src) >= SENSOR_VISIBILITY_TARGETABLE)
 			last_target = ship
-			fire_weapon(ship, mode=FIRE_MODE_FLAK, lateral=TRUE)
+			fire_weapon(ship, mode=/datum/ship_weapon/flak, lateral=TRUE)
 			flak_left --
 			if(flak_left <= 0)
 				break
@@ -349,13 +349,13 @@
 
 	//Not currently used, but may as well keep it for reference...
 	if(flak_battery_amount > 0 && current_system)
-		var/datum/ship_weapon/SW = weapon_types[FIRE_MODE_FLAK]
+		var/datum/ship_weapon/SW = weapon_types[/datum/ship_weapon/flak]
 		var/flak_left = flak_battery_amount //Multi-flak batteries!
 		if(!ai_controlled)
 			if(!last_target || !istype(last_target, /obj/structure/overmap) || QDELETED(last_target) || !isovermap(last_target) || last_target == src || get_dist(last_target,src) >= SW.range_modifier) //Stop hitting yourself enterprise
 				last_target = null
 			else
-				fire_weapon(last_target, mode=FIRE_MODE_FLAK, lateral=TRUE)
+				fire_weapon(last_target, mode=/datum/ship_weapon/flak, lateral=TRUE)
 				flak_left --
 				if(flak_left <= 0)
 					return
@@ -377,7 +377,7 @@
 					spawn(150)
 						light_shots_left = initial(light_shots_left) // make them reload like real people, sort of
 				else
-					fire_weapon(ship, mode=FIRE_MODE_FLAK, lateral=TRUE)
+					fire_weapon(ship, mode=/datum/ship_weapon/flak, lateral=TRUE)
 				flak_left --
 				if(flak_left <= 0)
 					break

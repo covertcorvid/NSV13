@@ -228,7 +228,7 @@
 
 /obj/machinery/ship_weapon/gauss_gun/proc/onClick(atom/target)
 	if(pdc_mode && world.time >= last_pdc_fire + 2 SECONDS)
-		linked.fire_weapon(target=target, mode=FIRE_MODE_PDC)
+		linked.fire_weapon(target=target, mode=/datum/ship_weapon/pdc_mount)
 		last_pdc_fire = world.time
 		return
 	fire(target)

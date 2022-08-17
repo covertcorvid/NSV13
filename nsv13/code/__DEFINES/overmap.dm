@@ -1,17 +1,3 @@
-//Weapon modes
-#define FIRE_MODE_ANTI_AIR 1
-
-//Revision 2.
-#define FIRE_MODE_AMS_LASER 3 // Laser AMS should be fired before expensive missiles are fired, so this is prioritized first
-#define FIRE_MODE_AMS 4 //You don't get to physically fire this one.
-#define FIRE_MODE_MAC 5
-#define FIRE_MODE_RAILGUN 6
-#define FIRE_MODE_GAUSS 7
-#define FIRE_MODE_PDC 8
-
-//Deprecated / legacy weapons.
-#define FIRE_MODE_FLAK 9
-
 //Weapon classes for AIs
 #define WEAPON_CLASS_LIGHT 1
 #define WEAPON_CLASS_HEAVY 2

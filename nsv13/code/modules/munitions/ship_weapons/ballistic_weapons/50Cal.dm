@@ -40,7 +40,7 @@
 
 //Unifying component for gauss / 50 cal gunning
 /datum/component/overmap_gunning
-	var/fire_mode = FIRE_MODE_GAUSS
+	var/fire_mode = /datum/ship_weapon/gauss
 	var/automatic = FALSE
 	var/mob/living/holder = null
 	var/atom/movable/autofire_target
@@ -50,12 +50,12 @@
 	var/special_fx = FALSE
 
 /datum/component/overmap_gunning/anti_air
-	fire_mode = FIRE_MODE_ANTI_AIR
+	fire_mode = /datum/ship_weapon/aa_guns
 	fire_delay = 0.25 SECONDS
 	automatic = TRUE
 
 /datum/component/overmap_gunning/anti_air/heavy
-	fire_mode = FIRE_MODE_ANTI_AIR
+	fire_mode = /datum/ship_weapon/aa_guns/heavy
 	fire_delay = 0.1 SECONDS
 
 /datum/component/overmap_gunning/Initialize(obj/machinery/ship_weapon/fx_target)

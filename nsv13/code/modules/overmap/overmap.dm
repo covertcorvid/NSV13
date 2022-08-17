@@ -541,18 +541,18 @@ Proc to spool up a new Z-level for a player ship and assign it a treadmill.
 				gauss_gunners -= user
 	if(user != gunner)
 		if(user == pilot)
-			var/datum/ship_weapon/SW = weapon_types[FIRE_MODE_RAILGUN] //For annoying ships like whisp
+			var/datum/ship_weapon/SW = weapon_types[/datum/ship_weapon/railgun] //For annoying ships like whisp
 			var/list/loaded = SW?.weapons["loaded"]
 			if(length(loaded))
-				fire_weapon(target, FIRE_MODE_RAILGUN)
+				fire_weapon(target, /datum/ship_weapon/railgun)
 			else
 				SW = weapon_types[/datum/ship_weapon/burst_phaser]
 				if(SW)
 					fire_weapon(target, /datum/ship_weapon/burst_phaser)
 				else
-					SW = weapon_types[FIRE_MODE_PDC]
+					SW = weapon_types[/datum/ship_weapon/pdc_mount]
 					if(SW)
-						fire_weapon(target, FIRE_MODE_PDC)
+						fire_weapon(target, /datum/ship_weapon/pdc_mount)
 		return FALSE
 	if(tactical && prob(80))
 		var/sound = pick(GLOB.computer_beeps)
