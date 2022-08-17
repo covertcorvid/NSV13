@@ -30,7 +30,13 @@ Adding tasks is easy! Just define a datum for it.
 	var/list/supply_types = list(/obj/structure/overmap/syndicate/ai/carrier)
 	var/list/all_ships = list()
 	var/list/lances = list()
+	var/obj/structure/overmap/default_ghost_ship = /obj/structure/overmap/syndicate/ai
+
 	var/size = FLEET_DIFFICULTY_MEDIUM //How big is this fleet anyway?
+	var/applied_size	//How big is this fleet ACTUALLY after modifications applied by.. well. everything.
+	var/threat_elevation_allowed = TRUE	//Does the threat elevation system apply to this fleet? This acts independantly to the base difficulty pop scaling.
+	var/can_reinforce = TRUE	//Can this fleet gain new ships after a while out of combat has passed?
+
 	var/allow_difficulty_scaling = TRUE	//Set this to false if the fleet is supposed to have a constant difficulty as opposed to scaling with pop.
 	var/list/audio_cues = list() //Does this fight come with a theme tune? Takes youtube / media links so that we don't have to store a bunch of copyrighted music on the box.
 	var/instantiated = FALSE //If we're not instantiated, moving all the ships is a piece of cake, if we are however, we do some extra steps to FTL them all.
@@ -120,7 +126,45 @@ Adding tasks is easy! Just define a datum for it.
 
 	return target
 
+/datum/fleet/proc/try_threat_elevation_reinforce()
+	if(!current_system)
+		return	//Which admin did this?
+	if(current_system.occupying_z)
+		return	//Loaded z - abort
+	if(current_system.check_conflict_status())
+		return //Bonking in progress - abort
+	if(world.time < last_encounter_time + TE_REINFORCEMENT_DELAY)
+		return
+	if(allow_difficulty_scaling)
+		//Account for pre-round spawned fleets.
+		if(SSovermap_mode?.mode)
+			applied_size = SSovermap_mode.mode.difficulty
+		else
+			applied_size = 1 //Lets assume a low number of players
+	else
+		applied_size = size
+	applied_size = max(applied_size, FLEET_DIFFICULTY_EASY)
+	if(threat_elevation_allowed)
+		applied_size += round(SSovermap_mode.threat_elevation / TE_POINTS_PER_FLEET_SIZE)	//Threat level modifies danger
+	if(length(destroyer_types))
+		for(var/i = length(taskforces["destroyers"]); i < max(round(applied_size/2), 1); i++)
+			var/shipType = pick(destroyer_types)
+			var/obj/structure/overmap/member = new shipType()
+			add_ship(member, "destroyers")
+	if(length(battleship_types))
+		for(var/i = length(taskforces["battleships"]); i < max(round(applied_size/4), 1); i++)
+			var/shipType = pick(battleship_types)
+			var/obj/structure/overmap/member = new shipType()
+			add_ship(member, "battleships")
+	if(length(supply_types))
+		for(var/i = length(taskforces["supply"]); i < max(round(applied_size/4), 1); i++)
+			var/shipType = pick(supply_types)
+			var/obj/structure/overmap/member = new shipType()
+			add_ship(member, "supply")
+
 /datum/fleet/proc/move(datum/star_system/target, force=FALSE)
+	if(can_reinforce)
+		try_threat_elevation_reinforce()
 	var/course_picked_target = FALSE
 	if(!target)
 		if(goal_system)
@@ -210,7 +254,8 @@ Adding tasks is easy! Just define a datum for it.
 			if(alignment != target.owner && !federation_check(target))
 				current_system.mission_sector = TRUE
 	if(!hide_movements && !current_system.hidden)
-		(alignment != "nanotrasen") && mini_announce("Typhoon drive signatures detected in [current_system]", "White Rapids EAS")
+		if((alignment == "syndicate") || (alignment == "pirate"))
+			mini_announce("Typhoon drive signatures detected in [current_system]", "White Rapids EAS")
 	for(var/obj/structure/overmap/OM in current_system.system_contents)
 		//Boarding ships don't want to go to brasil
 		if(OM.mobs_in_ship?.len && OM.reserved_z)
@@ -290,9 +335,11 @@ Adding tasks is easy! Just define a datum for it.
 	if(player_caused)	//Only modify influence if players caused this, otherwise someone else claimed the kill and it doesn't modify influence for the purpose of Patrol completion.
 		faction = SSstar_system.faction_by_id(faction_id)
 		faction?.lose_influence(reward)
+		if(alignment != "nanotrasen")
+			SSovermap_mode.modify_threat_elevation(TE_FLEET_THREAT_DYNAMIC ? (TE_FLEET_KILL_THREAT * applied_size ) : TE_FLEET_KILL_THREAT)
 	QDEL_NULL(src)
 
-/datum/fleet/nanotrasen/earth/defeat()
+/datum/fleet/solgov/earth/defeat()
 	. = ..() //If you lose sol...game over man, game over.
 	priority_announce("SolGov command do you read?! Requesting immediate assistance, we have a foothold situation, repeat, a foothold sit##----///", "White Rapids Fleet Command")
 	SSticker.mode.check_finished(TRUE)
@@ -318,7 +365,7 @@ Adding tasks is easy! Just define a datum for it.
 		source_ship.hail(text, name, user.name, TRUE) // Let the crew on the source ship know an Outbound message was sent
 		hail(text, source_ship.name, user.name)
 
-/obj/structure/overmap/proc/try_deliver( mob/living/user, var/obj/machinery/computer/ship/dradis/cargo/console )
+/obj/structure/overmap/proc/try_deliver( mob/living/user, var/obj/machinery/computer/ship/dradis/minor/cargo/console )
 	if( !isliving(user) )
 		return FALSE
 	if( !allowed(user) ) //Only cargo auth'd personnel can make purchases.
@@ -347,7 +394,7 @@ Adding tasks is easy! Just define a datum for it.
 	for(var/a in launcher.chambered.GetAllContents())
 		if(is_type_in_typecache(a, GLOB.blacklisted_cargo_types))
 			if ( !istype( a, /mob/living/simple_animal ) ) // Allow the transfer of specimens specifically for cargo missions
-				to_chat(user, "<span class='warning'>[src] Cargo Shuttle Brand lifeform checker blinks an error, \
+				to_chat(user, "<span class='warning'>[launcher] Cargo Shuttle Brand lifeform checker blinks an error, \
 					for safety reasons it cannot transport hazardous organisms, human remains, classified nuclear weaponry, \
 					homing beacons or machinery housing any form of artificial intelligence.")
 				return FALSE
@@ -434,22 +481,20 @@ Adding tasks is easy! Just define a datum for it.
 /obj/structure/overmap/proc/make_paperwork( var/datum/freight_delivery_receipt/receipt, var/approval )
 	// Cargo DRADIS automatically synthesizes and attaches the requisition form to the cargo torp
 	var/obj/item/paper/paper = new /obj/item/paper()
-	paper.info = ""
+	paper.info = "<h2>[receipt.vessel] Shipping Manifest</h2><hr/>"
 
-	paper.info += "<h2>[receipt.vessel] Shipping Manifest</h2>"
-	paper.info += "<hr/>"
-	paper.info += ( "Order: S-[rand( 1000, 5000 )]<br/>" )
-	paper.info += "Destination: [src]<br/>"
-	if ( length( receipt.completed_objectives ) > 1 ) // If receipt has an attach objective which marks it as completed
-		paper.info += ( "Item: Assorted Shipment<br/>" )
-	else if ( length( receipt.completed_objectives ) == 1 )
+	if ( length( receipt.completed_objectives ) == 1 )
 		var/datum/overmap_objective/cargo/objective = receipt.completed_objectives[ 1 ]
-		paper.info += ( "Item: [objective.crate_name]<br/>" )
+		paper.info += "Order: #[GLOB.round_id]-[objective.objective_number]<br/> \
+			Destination: [src]<br/> \
+			Item: [objective.crate_name]<br/>"
 	else
-		paper.info += ( "Item: Unregistered Shipment<br/>" )
-	paper.info += "Contents:<br/>"
+		paper.info += "Order: N/A<br/> \
+			Destination: [src]<br/> \
+			Item: Unregistered Shipment<br/>"
 
-	paper.info += "<ul>"
+	paper.info += "Contents:<br/><ul>"
+
 	if ( istype( receipt.shipment, /obj/item/ship_weapon/ammunition/torpedo/freight ) )
 		var/obj/item/ship_weapon/ammunition/torpedo/freight/shipment = receipt.shipment
 
@@ -460,9 +505,8 @@ Adding tasks is easy! Just define a datum for it.
 				paper.info += "<li>[item]</li>"
 	else
 		paper.info += "<li>miscellaneous unpackaged objects</li>"
-	paper.info += "</ul>"
 
-	paper.info += "<h4>Stamp below to confirm receipt of goods:</h4>"
+	paper.info += "</ul><h4>Stamp below to confirm receipt of goods:</h4>"
 
 	paper.stamped = list()
 	paper.stamps = list()
@@ -536,7 +580,7 @@ Adding tasks is easy! Just define a datum for it.
 		var/obj/structure/overmap/vessel = receipt.vessel
 		vessel.send_supplypod( receipt.shipment, src, TRUE )
 
-/obj/structure/overmap/proc/receive_cargo( mob/living/user, var/obj/machinery/computer/ship/dradis/cargo/console, var/obj/item/ship_weapon/ammunition/torpedo/freight/shipment )
+/obj/structure/overmap/proc/receive_cargo( mob/living/user, var/obj/machinery/computer/ship/dradis/minor/cargo/console, var/obj/item/ship_weapon/ammunition/torpedo/freight/shipment )
 	if ( !console.linked )
 		return FALSE
 
@@ -557,6 +601,10 @@ Adding tasks is easy! Just define a datum for it.
 	receipt.vessel = console.linked
 	receipt.shipment = shipment
 	receipts += receipt
+
+	if ( SSovermap_mode.mode.debug_mode )
+		speed_cargo_check = 1 SECONDS
+		speed_cargo_return = 1 SECONDS
 
 	to_chat(user, "<span class='notice'>The cargo has been sent to [src] and should be received shortly.</span>")
 	addtimer(CALLBACK(src, .proc/check_objectives, receipt), speed_cargo_check)
@@ -624,7 +672,7 @@ Adding tasks is easy! Just define a datum for it.
 
 /datum/fleet/proc/encounter(obj/structure/overmap/OM)
 	set waitfor = FALSE
-	
+
 	if(OM.faction == alignment || federation_check(OM))
 		OM.hail(pick(greetings), name)
 	assemble(current_system)
@@ -639,24 +687,31 @@ Adding tasks is easy! Just define a datum for it.
 			if(SSovermap_mode.override_ghost_ships)
 				message_admins("Failed to spawn ghost ship due to admin override.")
 				return
+			if(!prob(10))
+				return
+
 			var/player_check = get_active_player_count(alive_check = TRUE, afk_check = TRUE, human_check = TRUE)
 			var/list/ship_list = list()
-			if(prob(10))
-				if(player_check > 15) //Requires 15 active players for most ships
-					ship_list += fighter_types
-					ship_list += destroyer_types
-					ship_list += battleship_types
+			if(player_check > 15) //Requires 15 active players for most ships
+				ship_list += fighter_types
+				ship_list += destroyer_types
+				ship_list += battleship_types
 
-				else if(player_check > 10) //10 for fighters
-					ship_list += fighter_types
+			else if(player_check > 10) //10 for fighters
+				ship_list += fighter_types
 
-				else
-					message_admins("Failed to spawn ghost ship due to insufficent players.")
-					return
+			else
+				message_admins("Failed to spawn ghost ship due to insufficent players.")
+				log_game("Failed to spawn ghost ship due to insufficent players.")
+				return
+
+			if(!length(ship_list))
+				log_game("No valid [name] ship types found for [player_check] slayers. Using default ship type: [default_ghost_ship]")
+				ship_list += default_ghost_ship
+				return
 
 			var/target_location = locate(rand(round(world.maxx/2) + 10, world.maxx - 39), rand(40, world.maxy - 39), OM.z)
 			var/obj/structure/overmap/selected_ship = pick(ship_list)
-			
 			var/target_ghost
 			var/list/mob/dead/observer/candidates = pollGhostCandidates("Do you wish to pilot a [initial(selected_ship.faction)] [initial(selected_ship.name)]?", ROLE_GHOSTSHIP, null, null, 20 SECONDS, POLL_IGNORE_GHOSTSHIP)
 			if(LAZYLEN(candidates))
@@ -731,6 +786,7 @@ Adding tasks is easy! Just define a datum for it.
 	fighter_types = null
 	destroyer_types = list(/obj/structure/overmap/spacepirate/ai)
 	battleship_types = list(/obj/structure/overmap/spacepirate/ai/nt_missile, /obj/structure/overmap/spacepirate/ai/syndie_gunboat)
+	default_ghost_ship = /obj/structure/overmap/spacepirate/ai
 	supply_types = null
 	alignment = "pirate"
 	faction_id = FACTION_ID_PIRATES
@@ -833,24 +889,26 @@ Adding tasks is easy! Just define a datum for it.
 	taunts = list("Your assault on Rubicon only served to distract you from the real threat. It's time to end this war in one swift blow.")
 	fleet_trait = FLEET_TRAIT_DEFENSE
 
-/datum/fleet/syndicate/AbassisWrath
-	name = "Abassi's Wrath"
-	size = FLEET_DIFFICULTY_VERY_HARD
-	allow_difficulty_scaling = TRUE
-	battleship_types = list(/obj/structure/overmap/syndicate/ai/fistofsol, /obj/structure/overmap/syndicate/ai/kadesh)
-	supply_types = list(/obj/structure/overmap/syndicate/ai/carrier/elite)
-	destroyer_types = list(/obj/structure/overmap/syndicate/ai/destroyer/elite, /obj/structure/overmap/syndicate/ai/cruiser/elite)
-	taunts = list("Do you see the scrap, the graves of your own making? You'll be in one soon enough.", "A criminal always returns to the scene of the crime...", "We are his wrath, we are his blade. We shall cut you down!", "All ships, end the war.")
-	fleet_trait = FLEET_TRAIT_DEFENSE
-
-/datum/fleet/syndicate/fistofsolo
+/datum/fleet/syndicate/fistofsol_boss
 	name = "SSV Fist of Sol"
+	faction = FACTION_ID_SYNDICATE
 	size = 1
 	allow_difficulty_scaling = FALSE
 	battleship_types = list(/obj/structure/overmap/syndicate/ai/fistofsol)
 	supply_types = list(/obj/structure/overmap/syndicate/ai/carrier/elite)
 	taunts = list("That's it... Just you and me now, no support, no distractions... no war. Whoever wins is the best crew.")
 	fleet_trait = FLEET_TRAIT_DEFENSE
+
+/datum/fleet/hostile/alicorn_boss
+	name = "\proper SGV Alicorn"
+	size = 1
+	hide_movements = TRUE
+	allow_difficulty_scaling = FALSE
+	fighter_types = list(/obj/structure/overmap/hostile/ai/fighter)
+	supply_types = list(/obj/structure/overmap/hostile/ai/alicorn)
+	taunts = list("Ahaha... A powerful ship, a powerful gun, powerful ammunition. The graceful slaughter of a billion lives to save billions more!")
+	fleet_trait = FLEET_TRAIT_DEFENSE
+
 
 //Nanotrasen fleets
 
@@ -860,10 +918,13 @@ Adding tasks is easy! Just define a datum for it.
 	destroyer_types = list(/obj/structure/overmap/nanotrasen/ai, /obj/structure/overmap/nanotrasen/missile_cruiser/ai)
 	battleship_types = list(/obj/structure/overmap/nanotrasen/patrol_cruiser/ai, /obj/structure/overmap/nanotrasen/heavy_cruiser/ai, /obj/structure/overmap/nanotrasen/battlecruiser/ai)
 	supply_types = list(/obj/structure/overmap/nanotrasen/carrier/ai)
+	default_ghost_ship = /obj/structure/overmap/nanotrasen/ai
 	alignment = "nanotrasen"
 	hide_movements = TRUE //Friendly fleets just move around as you'd expect.
 	faction_id = FACTION_ID_NT
 	taunts = list("Syndicate vessel, stand down or be destroyed", "You are encroaching on our airspace, prepare to be destroyed", "Unidentified vessel, your existence will be forfeit in accordance with the peacekeeper act.")
+	can_reinforce = FALSE
+	threat_elevation_allowed = FALSE	//Sorry EDF, nothing personal.
 
 /datum/fleet/nanotrasen/light
 	name = "\improper Nanotrasen light fleet"
@@ -1020,12 +1081,18 @@ Adding tasks is easy! Just define a datum for it.
 	if(allow_difficulty_scaling)
 		//Account for pre-round spawned fleets.
 		if(SSovermap_mode?.mode)
-			size = SSovermap_mode.mode.difficulty
+			applied_size = SSovermap_mode.mode.difficulty
 		else
-			size = 1 //Lets assume a low number of players
-	size = CLAMP(size, FLEET_DIFFICULTY_EASY, INFINITY)
+			applied_size = 1 //Lets assume a low number of players
+	else
+		applied_size = size
+	applied_size = CLAMP(applied_size, FLEET_DIFFICULTY_EASY, INFINITY)
 	faction = SSstar_system.faction_by_id(faction_id)
-	reward *= size //Bigger fleet = larger reward
+	reward *= applied_size //Bigger fleet = larger reward
+	if(istype(SSticker.mode, /datum/game_mode/pvp)) //Disables notoriety during Galactic Conquest. 
+		threat_elevation_allowed = FALSE
+	if(SSovermap_mode && threat_elevation_allowed)
+		applied_size += round(SSovermap_mode.threat_elevation / TE_POINTS_PER_FLEET_SIZE)	//Threat level modifies danger
 	if(current_system)
 		current_system.alignment = alignment
 		if(current_system.alignment != current_system.owner && !federation_check())
@@ -1055,7 +1122,7 @@ Adding tasks is easy! Just define a datum for it.
 			STOP_PROCESSING(SSphysics_processing, member.physics2d)
 
 //A fleet has entered a system. Assemble the fleet so that it lives in this system now.
-/datum/fleet/proc/assemble(datum/star_system/SS, difficulty=size)
+/datum/fleet/proc/assemble(datum/star_system/SS, difficulty=applied_size)
 	if(!SS)
 		return
 	if(SS.occupying_z && instantiated)
@@ -1160,7 +1227,7 @@ Adding tasks is easy! Just define a datum for it.
 		supplyPost = supply
 		break
 	if(supplyPost) //Neat, we've found a supply post. Autobots roll out.
-		if(get_dist(OM, supplyPost) <= AI_PDC_RANGE)
+		if(overmap_dist(OM, supplyPost) <= AI_PDC_RANGE)
 			OM.brakes = TRUE
 			OM.move_mode = null
 		else
@@ -1187,7 +1254,7 @@ Adding tasks is easy! Just define a datum for it.
 /datum/ai_goal/seek/action(obj/structure/overmap/OM)
 	..()
 	if(OM.last_target)
-		if(get_dist(OM, OM.last_target) <= 10)
+		if(overmap_dist(OM, OM.last_target) <= 10)
 			OM.circle_around(OM.last_target)
 		else
 			OM.move_toward(OM.last_target)
@@ -1253,8 +1320,8 @@ Ships with this goal create a a lance, but are not exactly bound to it. They'll 
 	else if(L.last_finder == OM && OM.last_target != L.lance_target)	//We switched targets, relay this too.
 		L.lance_target = OM.last_target
 
-	if(get_dist(OM, OM.last_target) <= 4)	//Strafe Flyby (and / or ram) them.
-		OM.desired_angle = Get_Angle(OM, OM.last_target)
+	if(overmap_dist(OM, OM.last_target) <= 4)	//Strafe Flyby (and / or ram) them.
+		OM.desired_angle = overmap_angle(OM, OM.last_target)
 		OM.move_mode = null
 	else
 		OM.move_toward(OM.last_target)
@@ -1274,7 +1341,7 @@ Staging point priorities are supply ships > battleships > destroyers > just floa
 	if(!movement_target)
 		OM.move_toward(null)	//Just drift I guess?
 	else
-		if(get_dist(OM, movement_target) <= 8)
+		if(overmap_dist(OM, movement_target) <= 8)
 			OM.brakes = TRUE
 			OM.move_mode = null
 			OM.desired_angle = movement_target.angle //Style points
@@ -1341,7 +1408,7 @@ Seek a ship thich we'll station ourselves around
 	..()
 	if(OM.last_target)
 		OM.move_toward(OM.last_target)
-		if(get_dist(OM.last_target, OM) <= 8)
+		if(overmap_dist(OM.last_target, OM) <= 8)
 			var/obj/structure/overmap/foo = OM.last_target
 			if(istype(foo))
 				OM.desired_angle = foo.angle //Pull up parallel beside it for style points.
@@ -1363,10 +1430,10 @@ Seek a ship thich we'll station ourselves around
 		var/list/supplyline = OM.fleet.taskforces["supply"]
 		OM.defense_target = supplyline?.len ? pick(OM.fleet.taskforces["supply"]) : OM
 
-	if(OM.defense_target.last_target && get_dist(OM.defense_target, OM.defense_target.last_target) < OM.defense_target.max_weapon_range * 1.5)	//Enemy close to our defense target, prioritize.
+	if(OM.defense_target.last_target && overmap_dist(OM.defense_target, OM.defense_target.last_target) < OM.defense_target.max_weapon_range * 1.5)	//Enemy close to our defense target, prioritize.
 		defensively_engage(OM, OM.defense_target.last_target)
 		return
-	if(OM.last_target && (get_dist(OM, OM.defense_target) <= OM.max_weapon_range * 2 || get_dist(OM.last_target, OM.defense_target) <= OM.max_weapon_range * 2))	//If we have a target and they're somewhat close to our defense target: Engage them.
+	if(OM.last_target && (overmap_dist(OM, OM.defense_target) <= OM.max_weapon_range * 2 || overmap_dist(OM.last_target, OM.defense_target) <= OM.max_weapon_range * 2))	//If we have a target and they're somewhat close to our defense target: Engage them.
 		defensively_engage(OM, OM.last_target)
 		return
 
@@ -1374,7 +1441,7 @@ Seek a ship thich we'll station ourselves around
 
 //Proc for flying close to a target, then copying its angle. Usually used to defend, probably useful elsewhere.
 /datum/ai_goal/proc/guard(obj/structure/overmap/OM, obj/structure/overmap/to_guard)
-	if(get_dist(OM, to_guard) <= AI_PDC_RANGE)
+	if(overmap_dist(OM, to_guard) <= AI_PDC_RANGE)
 		OM.brakes = TRUE
 		OM.move_mode = null
 		OM.desired_angle = to_guard.angle //Turn and face boys!
@@ -1383,7 +1450,7 @@ Seek a ship thich we'll station ourselves around
 
 //Proc for flying towards a target till pretty close, then orbiting said target. Usually used to engage enemies.
 /datum/ai_goal/proc/defensively_engage(obj/structure/overmap/OM, obj/structure/overmap/to_engage)
-	if(get_dist(OM, to_engage) <= 10)
+	if(overmap_dist(OM, to_engage) <= 10)
 		OM.circle_around(to_engage)
 	else
 		OM.move_toward(to_engage)
@@ -1429,7 +1496,7 @@ Seek a ship thich we'll station ourselves around
 	..()
 	OM.brakes = TRUE
 	var/obj/structure/overmap/foo = OM.last_target
-	if(!foo || !istype(foo) || get_dist(OM, foo) > OM.max_weapon_range) //You can run on for a long time, run on for a long time, run on for a long time, sooner or later gonna cut you down
+	if(!foo || !istype(foo) || overmap_dist(OM, foo) > OM.max_weapon_range) //You can run on for a long time, run on for a long time, run on for a long time, sooner or later gonna cut you down
 		return //Just drift aimlessly, let the fleet form up with it.
 	OM.move_away_from(foo) //Turn the opposite direction and run.
 
@@ -1444,7 +1511,7 @@ Seek a ship thich we'll station ourselves around
 	if(!OM.last_target || !OM.fleet?.is_reporting_target(OM.last_target, OM))
 		OM.seek_new_target()
 	if(OM.last_target)
-		if(get_dist(OM, OM.last_target) < OM.max_tracking_range)
+		if(overmap_dist(OM, OM.last_target) < OM.max_tracking_range)
 			OM.patrol_target = null	//Clear our destination if we are getting close to the enemy. Otherwise we resume patrol to our old destination.
 			return 0
 		if(!CHECK_BITFIELD(OM.ai_flags, AI_FLAG_SUPPLY))	//Supply ships only stop patrolling to run away (which when needed still has higher score
@@ -1459,7 +1526,7 @@ Seek a ship thich we'll station ourselves around
 	..()
 	if(prob(8))	//Ping every now and then, so things can't sneak up on you.
 		OM.send_radar_pulse()
-	if(OM.patrol_target && get_dist(OM, OM.patrol_target) <= 8)
+	if(OM.patrol_target && overmap_dist(OM, OM.patrol_target) <= 8)
 		OM.patrol_target = null	//You have arrived at your destination.
 	if(!OM.patrol_target || OM.patrol_target.z != OM.z)
 		var/min_x = max(OM.x - 50, 15)
@@ -1549,8 +1616,8 @@ Seek a ship thich we'll station ourselves around
 	var/nodamage = FALSE // Mob immunity equivalent for stations, used for mission critical targets. Separate var if mission critical stations need to be essential but not immortal
 	var/supply_pod_type = /obj/structure/closet/supplypod/centcompod
 	var/returns_rejected_cargo = TRUE // AI ships will return cargo that does not match their expected shipments
-	var/speed_cargo_check = 30 SECONDS
-	var/speed_cargo_return = 30 SECONDS
+	var/speed_cargo_check = 30 SECONDS // Time it takes for a ship to respond to a shipment
+	var/speed_cargo_return = 30 SECONDS // Time it takes for a ship to return shipment results (approved paperwork, rejected shipment)
 
 	var/last_decision = 0
 	var/decision_delay = 2 SECONDS
@@ -1579,7 +1646,7 @@ Seek a ship thich we'll station ourselves around
 /obj/structure/overmap/proc/ai_fire(atom/target)
 	if(istype(target, /obj/structure/overmap))
 		add_enemy(target)
-		var/target_range = get_dist(src,target)
+		var/target_range = overmap_dist(src,target)
 		var/new_firemode = FIRE_MODE_GAUSS
 		if(target_range > max_weapon_range) //Our max range is the maximum possible range we can engage in. This is to stop you getting hunted from outside of your view range.
 			if(fleet)
@@ -1610,7 +1677,7 @@ Seek a ship thich we'll station ourselves around
 					spawn(150)
 						light_shots_left = initial(light_shots_left) // make them reload like real people, sort of
 					continue
-				var/arc = Get_Angle(src, target)
+				var/arc = overmap_angle(src, target)
 				if(SW.firing_arc && arc > SW.firing_arc) //So AIs don't fire their railguns into nothing.
 					continue
 				if(SW.weapon_class > WEAPON_CLASS_LIGHT)
@@ -1627,7 +1694,7 @@ Seek a ship thich we'll station ourselves around
 				for(var/obj/structure/overmap/ship in current_system.system_contents)
 					if(warcrime_blacklist[ship.type])
 						continue
-					if(!ship || QDELETED(ship) || ship == src || get_dist(src, ship) > max_weapon_range || ship.faction == src.faction || ship.z != z)
+					if(!ship || QDELETED(ship) || ship == src || overmap_dist(src, ship) > max_weapon_range || ship.faction == src.faction || ship.z != z)
 						continue
 					if(fire_weapon(ship, FIRE_MODE_GAUSS, ai_aim=TRUE))
 						SW.next_firetime += SW.ai_fire_delay
@@ -1652,7 +1719,7 @@ Seek a ship thich we'll station ourselves around
 	if(!istype(target, /obj/structure/overmap))
 		return
 	add_enemy(target)
-	var/target_range = get_dist(src,target)
+	var/target_range = overmap_dist(src,target)
 	if(target_range > max_weapon_range) //Our max range is the maximum possible range we can engage in. This is to stop you getting hunted from outside of your view range.
 		if(fleet)
 			fleet.stop_reporting(target, src)
@@ -1681,7 +1748,7 @@ Seek a ship thich we'll station ourselves around
 					addtimer(CALLBACK(src, .proc/ai_self_resupply), ai_resupply_time)
 				continue //If we are out of shots. Continue.
 			will_use_ammo = TRUE
-		var/arc = Get_Angle(src, target)
+		var/arc = overmap_angle(src, target)
 		if(SW.firing_arc && arc > SW.firing_arc) //So AIs don't fire their railguns into nothing.
 			continue
 		fire_weapon(target, iter, ai_aim=TRUE)
@@ -1774,7 +1841,7 @@ Seek a ship thich we'll station ourselves around
 		gunner = pilot
 	if(last_target) //Have we got a target?
 		var/obj/structure/overmap/OM = last_target
-		if(get_dist(last_target, src) > max(max_tracking_range, OM.sensor_profile) || istype(OM) && OM.is_sensor_visible(src) < SENSOR_VISIBILITY_TARGETABLE) //Out of range - Give up the chase
+		if(overmap_dist(last_target, src) > max(max_tracking_range, OM.sensor_profile) || istype(OM) && OM.is_sensor_visible(src) < SENSOR_VISIBILITY_TARGETABLE) //Out of range - Give up the chase
 			if(istype(OM) && CHECK_BITFIELD(ai_flags, AI_FLAG_DESTROYER) && OM.z == z)
 				patrol_target = get_turf(last_target)	//Destroyers are wary and will actively investigate when their target exits their sensor range. You might be able to use this to your advantage though!
 			if(fleet)
@@ -1782,7 +1849,7 @@ Seek a ship thich we'll station ourselves around
 			if(!fleet?.shared_targets?[last_target])
 				last_target = null
 		else //They're in our tracking range. Let's hunt them down.
-			if(get_dist(last_target, src) <= max_weapon_range) //Theyre within weapon range.  Calculate a path to them and fire.
+			if(overmap_dist(last_target, src) <= max_weapon_range) //Theyre within weapon range.  Calculate a path to them and fire.
 				if(CHECK_BITFIELD(ai_flags, AI_FLAG_ELITE))
 					ai_elite_fire(last_target)
 				else
@@ -1790,13 +1857,13 @@ Seek a ship thich we'll station ourselves around
 	if(move_mode)
 		user_thrust_dir = move_mode
 	if(can_resupply)
-		if(resupply_target && !QDELETED(resupply_target) && get_dist(src, resupply_target) <= resupply_range)
+		if(resupply_target && !QDELETED(resupply_target) && overmap_dist(src, resupply_target) <= resupply_range)
 			new /obj/effect/temp_visual/heal(get_turf(resupply_target))
 			return
 		var/list/maybe_resupply = current_system.system_contents.Copy()
 		shuffle(maybe_resupply)	//Lets not have a fixed resupply list that can cause things to be wonky.
 		for(var/obj/structure/overmap/OM in maybe_resupply)
-			if(OM.z != z || OM == src || OM.faction != faction || get_dist(src, OM) > resupply_range) //No self healing
+			if(OM.z != z || OM == src || OM.faction != faction || overmap_dist(src, OM) > resupply_range) //No self healing
 				continue
 			if(OM.obj_integrity >= OM.max_integrity && OM.shots_left >= initial(OM.shots_left) && OM.missiles >= initial(OM.missiles) && OM.torpedoes >= initial(OM.torpedoes)) //No need to resupply this ship at all.
 				continue
@@ -1808,7 +1875,7 @@ Seek a ship thich we'll station ourselves around
 
 /obj/structure/overmap/proc/resupply()
 	resupplying--
-	if(!resupply_target || QDELETED(resupply_target) || get_dist(src, resupply_target) > resupply_range)
+	if(!resupply_target || QDELETED(resupply_target) || overmap_dist(src, resupply_target) > resupply_range)
 		resupply_target = null
 		return
 	var/missileStock = initial(resupply_target.missiles)
@@ -1824,14 +1891,14 @@ Seek a ship thich we'll station ourselves around
 /obj/structure/overmap/proc/can_board(obj/structure/overmap/ship)
 	if(!length(ship.occupying_levels))
 		return FALSE
-	if(get_dist(ship, src) > 8)
+	if(overmap_dist(ship, src) > 8)
 		return FALSE
 	if(next_boarding_time <= world.time || next_boarding_attempt <= world.time)
 		return TRUE
 	return FALSE
 
 /obj/structure/overmap/proc/try_board(obj/structure/overmap/ship)
-	if(get_dist(ship, src) > 8)
+	if(overmap_dist(ship, src) > 8)
 		return FALSE
 	next_boarding_attempt = world.time + 5 MINUTES //We very rarely try to board.
 	if(next_boarding_time <= world.time)
@@ -1904,8 +1971,8 @@ Seek a ship thich we'll station ourselves around
 			target = defense_target
 		else
 			return
-	desired_angle = Get_Angle(src, target)
-	var/target_dist = get_dist(src, target)
+	desired_angle = overmap_angle(src, target)
+	var/target_dist = overmap_dist(src, target)
 	if(world.time >= next_maneuvre && (target_dist > 12 || ram_target || ignore_all_collisions))
 		var/angular_difference = desired_angle - angle
 		switch(angular_difference)
@@ -1923,7 +1990,7 @@ Seek a ship thich we'll station ourselves around
 		return	//FULL SPEED AHEAD!
 	//Raycasting! Should finally give the AI ships their driver's license....
 	for(var/turf/T in getline(src, target))
-		var/dist = get_dist(get_turf(src), T)
+		var/dist = overmap_dist(get_turf(src), T)
 		if(dist >= 8) //ignore collisions this far away, no need to dodge that.
 			break
 		var/obj/structure/overmap/blocked = null
@@ -1933,7 +2000,7 @@ Seek a ship thich we'll station ourselves around
 				continue
 			if(OM == target && ram_target)
 				continue
-			if(get_dist(get_turf(OM), T) <= 5 && OM.mass > MASS_TINY) //Who cares about fighters anyway!
+			if(overmap_dist(get_turf(OM), T) <= 5 && OM.mass > MASS_TINY) //Who cares about fighters anyway!
 				blocked = OM
 				break
 		if(blocked) //Time to do some evasive. Determine the object's direction to evade in the opposite direction.
@@ -1953,14 +2020,14 @@ Seek a ship thich we'll station ourselves around
 	move_mode = NORTH
 	if(!target || QDELETED(target))
 		return
-	desired_angle =	Get_Angle(src, target) - 180
+	desired_angle =	overmap_angle(src, target) - 180
 
 /obj/structure/overmap/proc/circle_around(atom/target)
 	brakes = FALSE
 	move_mode = NORTH
 	if(!target)
 		return
-	var/relative_angle = Get_Angle(src, target)
+	var/relative_angle = overmap_angle(src, target)
 	var/option1 = relative_angle + 90
 	var/option2 = relative_angle - 90
 	if(option2 < 0)
@@ -1986,11 +2053,11 @@ Seek a ship thich we'll station ourselves around
 	for(var/obj/structure/overmap/ship in shiplist)
 		if(warcrime_blacklist[ship.type])
 			continue
-		if(!ship || QDELETED(ship) || ship == src || get_dist(src, ship) > max(max_tracking_range, ship.sensor_profile) || ship.faction == faction || ship.z != z || ship.is_sensor_visible(src) < SENSOR_VISIBILITY_TARGETABLE)
+		if(!ship || QDELETED(ship) || ship == src || overmap_dist(src, ship) > max(max_tracking_range, ship.sensor_profile) || ship.faction == faction || ship.z != z || ship.is_sensor_visible(src) < SENSOR_VISIBILITY_TARGETABLE)
 			continue
 		if ( ship.essential )
 			continue
-		if(max_distance && get_dist(src, ship) > max_distance)
+		if(max_distance && overmap_dist(src, ship) > max_distance)
 			continue
 		if(max_weight_class && ship.mass > max_weight_class)
 			continue
@@ -2175,7 +2242,7 @@ Seek a ship thich we'll station ourselves around
 		return FALSE
 
 	var/list/choices = flist("_maps/map_files/Instanced/")
-	var/ship_file = input(usr, "What ship would you like to load?","Ship Instancing", null) as null|anything in choices
+	var/ship_file = file("_maps/map_files/Instanced/"+input(usr, "What ship would you like to load?","Ship Instancing", null) as null|anything in choices)
 	if(!ship_file)
 		return
 	if(instance_ship_from_json(ship_file))

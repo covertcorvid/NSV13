@@ -244,7 +244,7 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 
 			dat += "<b>Custom Job Preferences:</b><BR>"
 			dat += "<a href='?_src_=prefs;preference=ai_core_icon;task=input'><b>Preferred AI Core Display:</b> [preferred_ai_core_display]</a><br>"
-			dat += "<a href='?_src_=prefs;preference=sec_dept;task=input'><b>Preferred Security Department:</b> [prefered_security_department]</a><br>"
+			dat += "<a href='?_src_=prefs;preference=sec_dept;task=input'><b>Preferred Security/Midshipman Department:</b> [prefered_security_department]</a><br>"
 			dat += "<a href='?_src_=prefs;preference=pilot_role;task=input'><b>Preferred Pilot Role:</b> [preferred_pilot_role]</a><br>"
 
 			dat += "<b>Syndicate Crew Preferences:</b><BR>"//Nsv13
@@ -1252,13 +1252,13 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 					if(TG.sort_category == "Donator")
 						if(CONFIG_GET(flag/donator_items) && alert(parent, "This item is only accessible to our patrons. Would you like to subscribe?", "Patron Locked", "Yes", "No") == "Yes")
 							parent.donate()
-						else if(TG.cost < user.client.get_metabalance())
-							purchased_gear += TG.id
-							TG.purchase(user.client)
-							user.client.inc_metabalance((TG.cost * -1), TRUE, "Purchased [TG.display_name].")
-							save_preferences()
-						else
-							to_chat(user, "<span class='warning'>You don't have enough [CONFIG_GET(string/metacurrency_name)]s to purchase \the [TG.display_name]!</span>")
+					else if(TG.cost < user.client.get_metabalance())
+						purchased_gear += TG.id
+						TG.purchase(user.client)
+						user.client.inc_metabalance((TG.cost * -1), TRUE, "Purchased [TG.display_name].")
+						save_preferences()
+					else
+						to_chat(user, "<span class='warning'>You don't have enough [CONFIG_GET(string/metacurrency_name)]s to purchase \the [TG.display_name]!</span>")
 				if(GEAR_DONATOR)
 					if(usr.ckey != TG.ckey)
 						//The fuck are you playing at?
