@@ -12,7 +12,7 @@
 
 //	circuit = /obj/item/circuitboard/machine/pdc_mount
 
-	fire_mode = FIRE_MODE_FLAK
+	weapon_type = /datum/ship_weapon/flak
 	magazine_type = /obj/item/ammo_box/magazine/nsv/flak
 
 	auto_load = TRUE

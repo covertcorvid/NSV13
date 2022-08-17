@@ -142,8 +142,8 @@
 
 /obj/structure/overmap/nanotrasen/gunstar/apply_weapons()
 	. = ..()
-	weapon_types[FIRE_MODE_RED_LASER] = new /datum/ship_weapon/burst_phaser(src)
-	weapon_types[FIRE_MODE_BLUE_LASER] = new /datum/ship_weapon/phaser(src)
+	weapon_types[/datum/ship_weapon/burst_phaser] = new /datum/ship_weapon/burst_phaser(src)
+	weapon_types[/datum/ship_weapon/phaser] = new /datum/ship_weapon/phaser(src)
 
 //Player Versions
 // deletion_behavior = DAMAGE_STARTS_COUNTDOWN
@@ -163,7 +163,7 @@
 /obj/structure/overmap/nanotrasen/missile_cruiser/starter/shrike/apply_weapons()
 	weapon_types[FIRE_MODE_GAUSS] = new /datum/ship_weapon/gauss(src)
 	weapon_types[FIRE_MODE_PDC] = new /datum/ship_weapon/pdc_mount(src)
-	weapon_types[FIRE_MODE_HYBRID_RAIL] = new /datum/ship_weapon/hybrid_railgun(src)
+	weapon_types[/datum/ship_weapon/hybrid_railgun] = new /datum/ship_weapon/hybrid_railgun(src)
 
 /obj/structure/overmap/nanotrasen/missile_cruiser/starter //Currently assigned to Jeppison and Atlas
 	role = MAIN_OVERMAP

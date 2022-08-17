@@ -116,7 +116,8 @@
 	var/obj/machinery/computer/ship/dradis/dradis //So that pilots can check the radar easily
 
 	// Ship weapons
-	var/list/weapon_types[MAX_POSSIBLE_FIREMODE]
+	var/list/weapons = list()
+	var/list/weapon_types = list()
 	var/list/weapon_numkeys_map = list() // I hate this
 
 	var/fire_mode = FIRE_MODE_TORPEDO //What gun do we want to fire? Defaults to railgun, with PDCs there for flak
@@ -415,7 +416,7 @@ Proc to spool up a new Z-level for a player ship and assign it a treadmill.
 
 	apply_weapons()
 	//We have a lot of types but not that many weapons per ship, so let's just worry about the ones we do have
-	for(var/firemode = 1; firemode <= MAX_POSSIBLE_FIREMODE; firemode++)
+	for(var/firemode = 1; firemode <= length(weapon_types); firemode++)
 		var/datum/ship_weapon/SW = weapon_types[firemode]
 		if(istype(SW) && SW.selectable)
 			weapon_numkeys_map += firemode
@@ -545,9 +546,9 @@ Proc to spool up a new Z-level for a player ship and assign it a treadmill.
 			if(length(loaded))
 				fire_weapon(target, FIRE_MODE_RAILGUN)
 			else
-				SW = weapon_types[FIRE_MODE_RED_LASER]
+				SW = weapon_types[/datum/ship_weapon/burst_phaser]
 				if(SW)
-					fire_weapon(target, FIRE_MODE_RED_LASER)
+					fire_weapon(target, /datum/ship_weapon/burst_phaser)
 				else
 					SW = weapon_types[FIRE_MODE_PDC]
 					if(SW)

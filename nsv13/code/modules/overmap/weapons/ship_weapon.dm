@@ -2,9 +2,10 @@
 
 //These procs should *really* not be here
 /obj/structure/overmap/proc/add_weapon(obj/machinery/ship_weapon/weapon)
-	if(weapon_types[weapon.fire_mode])
-		var/datum/ship_weapon/SW = weapon_types[weapon.fire_mode]
-		SW.add_weapon(weapon) //hand it over to the datum for sane things like adding it idk
+	if(!weapon_types[weapon.weapon_type])
+		weapon_types[weapon.weapon_type] = new weapon.weapon_type(src)
+	var/datum/ship_weapon/SW = weapon_types[weapon.weapon_type]
+	SW.add_weapon(weapon) //hand it over to the datum for sane things like adding it idk
 
 /datum/ship_weapon
 	var/name = "Ship weapon"
@@ -20,6 +21,7 @@
 	var/range = 255 //Todo, change this
 	var/obj/structure/overmap/holder = null
 	var/requires_physical_guns = TRUE //Set this to false for any fighter weapons we may have
+	var/aim_enabled = FALSE
 	var/lateral = TRUE //Does this weapon need you to face the enemy? Mostly no.
 	var/special_fire_proc = null //Override this if you need to replace the firing weapons behaviour with a custom proc. See torpedoes and missiles for this.
 	var/selectable = TRUE //Is this a gun you can manually fire? Or do you want it for example, be an individually manned thing..?

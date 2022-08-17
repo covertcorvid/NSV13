@@ -11,7 +11,7 @@
 	obj_integrity = 500
 	max_integrity = 500
 
-	fire_mode = FIRE_MODE_GAUSS
+	weapon_type = /datum/ship_weapon/gauss
 	ammo_type = /obj/item/ship_weapon/ammunition/gauss
 
 	semi_auto = TRUE

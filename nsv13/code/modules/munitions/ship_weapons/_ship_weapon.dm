@@ -43,7 +43,6 @@
 
 	var/firing_sound = 'nsv13/sound/effects/ship/tri_mount_fire.ogg'
 	var/fire_animation_length = 5
-	var/fire_mode
 
 	var/malfunction_sound = 'sound/effects/alert.ogg'
 

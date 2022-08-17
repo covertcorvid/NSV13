@@ -10,7 +10,7 @@
 	auto_load = TRUE
 	semi_auto = TRUE
 	maintainable = FALSE
-	fire_mode = FIRE_MODE_ANTI_AIR
+	weapon_type = /datum/ship_weapon/aa_guns
 	max_ammo = 300
 	circuit = /obj/item/circuitboard/machine/anti_air
 	var/gunning_component_type = /datum/component/overmap_gunning/anti_air
@@ -25,6 +25,7 @@
 	name = "\improper HAA turret"
 	desc = "For when you need more bullets spat out more quickly."
 	icon_state = "deck_gun_super"
+	weapon_type = /datum/ship_weapon/aa_guns/heavy
 	circuit = /obj/item/circuitboard/machine/anti_air/heavy
 	gunning_component_type = /datum/component/overmap_gunning/anti_air/heavy
 

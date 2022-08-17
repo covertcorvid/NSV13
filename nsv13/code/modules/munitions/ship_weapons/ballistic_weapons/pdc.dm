@@ -11,7 +11,7 @@
 
 	circuit = /obj/item/circuitboard/machine/pdc_mount
 
-	fire_mode = FIRE_MODE_PDC
+	weapon_type = /datum/ship_weapon/pdc_mount
 	magazine_type = /obj/item/ammo_box/magazine/nsv/pdc
 
 	auto_load = TRUE

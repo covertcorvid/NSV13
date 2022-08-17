@@ -2,7 +2,7 @@
 	name = "Radial MAC cannon"
 	desc = "An extremely powerful electromagnet which can accelerate a projectile to devastating speeds."
 	icon_state = "MAC"
-	fire_mode = FIRE_MODE_MAC
+	weapon_type = /datum/ship_weapon/mac
 	ammo_type = /obj/item/ship_weapon/ammunition/railgun_ammo
 	pixel_y = -64
 	bound_width = 128

@@ -121,14 +121,14 @@
 	// Burst fire on solgov fighters
 	var/datum/ship_weapon/SW = new /datum/ship_weapon/burst_phaser( src )
 	SW.burst_size = 3
-	weapon_types[ FIRE_MODE_RED_LASER ] = SW
+	weapon_types[/datum/ship_weapon/burst_phaser] = SW
 	//The bigger the ship, the tankier the shields....
 	AddComponent(/datum/component/overmap_shields, mass*600, mass*600, mass*15)
 
 /obj/structure/overmap/nanotrasen/solgov/proc/apply_medium_ai_weapons()
-	weapon_types[ FIRE_MODE_RED_LASER ] = new /datum/ship_weapon/burst_phaser( src )
-	weapon_types[ FIRE_MODE_BLUE_LASER ] = new /datum/ship_weapon/phaser( src )
-	weapon_types[ FIRE_MODE_AMS_LASER ] = new /datum/ship_weapon/laser_ams( src )
+	weapon_types[/datum/ship_weapon/burst_phaser] = new /datum/ship_weapon/burst_phaser(src)
+	weapon_types[/datum/ship_weapon/phaser] = new /datum/ship_weapon/phaser(src)
+	weapon_types[/datum/ship_weapon/laser_ams] = new /datum/ship_weapon/laser_ams(src)
 
 	// Need to enable the AI ship's countermeasures mode so they can actually use laser ams
 	for( var/datum/ams_mode/atype in src.ams_modes )

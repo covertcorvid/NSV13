@@ -10,6 +10,7 @@
 	burst_size = 1
 	fire_delay = 3.5 SECONDS
 	range_modifier = 50
+	aim_enabled = TRUE
 	select_alert = "<span class='notice'>Naval artillery primed.</span>"
 	failure_alert = "<span class='warning'>DANGER: Launch failure! Naval artillery systems are not loaded.</span>"
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/battleship_gun2.ogg')
@@ -61,6 +62,7 @@
 	burst_size = 1
 	fire_delay = 1 SECONDS
 	range_modifier = 50
+	aim_enabled = TRUE
 	select_alert = "<span class='notice'>Charging railgun hardpoints...</span>"
 	failure_alert = "<span class='warning'>DANGER: Launch failure! Railgun systems are not loaded or charged.</span>"
 	overmap_firing_sounds = list('nsv13/sound/effects/ship/mac_fire.ogg')
@@ -149,6 +151,7 @@
 	burst_size = 1
 	fire_delay = 1.5 SECONDS
 	range_modifier = 60
+	aim_enabled = TRUE
 	weapon_class = WEAPON_CLASS_HEAVY
 	select_alert = "<span class='notice'>Phaser banks standing by...</span>"
 	failure_alert = "<span class='warning'>Unable to comply. Phaser banks recharging.</span>"

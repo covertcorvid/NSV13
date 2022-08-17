@@ -70,7 +70,7 @@
 		swap_to(weapon_numkeys_map[number])
 		return TRUE
 
-/obj/structure/overmap/proc/swap_to(what=FIRE_MODE_ANTI_AIR)
+/obj/structure/overmap/proc/swap_to(what=1)
 	if(!weapon_types[what])
 		return FALSE
 	var/datum/ship_weapon/SW = weapon_types[what]

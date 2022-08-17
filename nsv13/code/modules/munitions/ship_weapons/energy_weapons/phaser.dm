@@ -3,7 +3,7 @@
 	desc = "A coaxial laser system, capable of firing controlled laser bursts at a target."
 	icon ='nsv13/icons/obj/energy_weapons.dmi'
 	icon_state = "phase_cannon"
-	fire_mode = FIRE_MODE_RED_LASER //Shot by the pilot.
+	weapon_type = /datum/ship_weapon/burst_phaser
 	ammo_type = /obj/item/ship_weapon/ammunition/railgun_ammo
 	bound_width = 64
 	pixel_x = -32
@@ -24,7 +24,7 @@
 	name = "phase cannon"
 	desc = "An extremely powerful directed energy weapon which is capable of delivering a devastating beam attack."
 	icon_state = "ion_cannon"
-	fire_mode = FIRE_MODE_BLUE_LASER
+	weapon_type = /datum/ship_weapon/phaser
 	energy_weapon_type = /datum/ship_weapon/phaser
 	charge_rate = 600000 // At power level 5, requires 3MW per tick to charge
 	charge_per_shot = 4000000 // At power level 5, requires 20MW total to fire, takes about 12 seconds to gain 1 charge
@@ -87,17 +87,6 @@
 	else
 		if(src in weapon_type.weapons["loaded"])
 			LAZYREMOVE(weapon_type.weapons["loaded"] , src)
-
-/obj/machinery/ship_weapon/energy/set_position(obj/structure/overmap/OM) //Use this to tell your ship what weapon category this belongs in
-	for(var/I = FIRE_MODE_ANTI_AIR; I <= MAX_POSSIBLE_FIREMODE; I++) //We should ALWAYS default to PDCs.
-		var/datum/ship_weapon/SW = OM.weapon_types[I]
-		if(!SW)
-			continue
-		if(istype(SW, energy_weapon_type)) //Does this ship have a weapon type registered for us? Prevents phantom weapon groups.
-			OM.add_weapon(src)
-			return TRUE
-	OM.weapon_types[fire_mode] = new energy_weapon_type(OM)
-	OM.add_weapon(src)
 
 /obj/machinery/ship_weapon/energy/can_fire(shots = weapon_type.burst_size)
 	if (maint_state != MSTATE_CLOSED) //Are we in maintenance?

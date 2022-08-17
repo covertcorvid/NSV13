@@ -3,7 +3,7 @@
 	desc = "A coaxial laser system, capable of firing controlled laser bursts at a target."
 	icon ='nsv13/icons/obj/energy_weapons.dmi'
 	icon_state = "missile_cannon"
-	fire_mode = FIRE_MODE_AMS_LASER //Shot automatically
+	weapon_type = /datum/ship_weapon/laser_ams
 	ammo_type = /obj/item/ship_weapon/ammunition/railgun_ammo
 	bound_width = 64
 	pixel_x = -32
