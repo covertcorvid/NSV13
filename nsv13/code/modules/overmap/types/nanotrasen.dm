@@ -296,12 +296,11 @@
 	combat_dice_type = /datum/combat_dice/carrier
 
 /obj/structure/overmap/nanotrasen/carrier/ai/apply_weapons()
-	weapon_types[FIRE_MODE_ANTI_AIR] = new /datum/ship_weapon/aa_guns(src)
-	weapon_types[FIRE_MODE_TORPEDO] = new/datum/ship_weapon/torpedo_launcher(src)
-	weapon_types[FIRE_MODE_RAILGUN] = null
-	weapon_types[FIRE_MODE_FLAK] = new/datum/ship_weapon/flak(src)
-	weapon_types[FIRE_MODE_GAUSS] = new /datum/ship_weapon/gauss(src) //AI ships want to be able to use gauss too. I say let them...
-	weapon_types[FIRE_MODE_MISSILE] = new/datum/ship_weapon/missile_launcher(src)
+	weapon_types[/datum/ship_weapon/aa_guns] = new /datum/ship_weapon/aa_guns(src)
+	weapon_types[/datum/ship_weapon/torpedo_launcher] = new /datum/ship_weapon/torpedo_launcher(src)
+	weapon_types[/datum/ship_weapon/flak] = new /datum/ship_weapon/flak(src)
+	weapon_types[/datum/ship_weapon/gauss] = new /datum/ship_weapon/gauss(src) //AI ships want to be able to use gauss too. I say let them...
+	weapon_types[/datum/ship_weapon/missile_launcher] = new /datum/ship_weapon/missile_launcher(src)
 
 /obj/structure/overmap/nanotrasen/carrier/ai/get_max_firemode() //This boy really doesn't need a railgun
 	return FIRE_MODE_ANTI_AIR
@@ -326,5 +325,5 @@
 	combat_dice_type = /datum/combat_dice/fighter
 
 /obj/structure/overmap/nanotrasen/ai/fighter/apply_weapons()
-	weapon_types[FIRE_MODE_ANTI_AIR] = new/datum/ship_weapon/light_cannon(src)
-	weapon_types[FIRE_MODE_MISSILE] = new/datum/ship_weapon/missile_launcher(src)
+	weapon_types[/datum/ship_weapon/light_cannon] = new /datum/ship_weapon/light_cannon(src)
+	weapon_types[/datum/ship_weapon/missile_launcher] = new /datum/ship_weapon/missile_launcher(src)

@@ -61,9 +61,7 @@
 	return FALSE
 
 /obj/structure/overmap/proc/get_max_firemode()
-	if(mass < MASS_MEDIUM) //Small craft dont get a railgun
-		return FIRE_MODE_TORPEDO
-	return FIRE_MODE_MAC
+	return weapon_types[length(weapon_types)]
 
 /obj/structure/overmap/proc/select_weapon(number)
 	if(number > 0 && number <= length(weapon_numkeys_map))
@@ -96,7 +94,7 @@
 		fire_projectile(torpedo_type, target, homing = TRUE, speed=3, lateral = TRUE, ai_aim = ai_aim)
 		if(isovermap(OM) && OM.dradis)
 			OM.dradis?.relay_sound('nsv13/sound/effects/fighters/launchwarning.ogg')
-		var/datum/ship_weapon/SW = weapon_types[FIRE_MODE_TORPEDO]
+		var/datum/ship_weapon/SW = weapon_types[/datum/ship_weapon/torpedo_launcher]
 		relay_to_nearby(pick(SW.overmap_firing_sounds))
 
 		if(launches > 1)
@@ -117,7 +115,7 @@
 		fire_projectile(torpedo_type, target, homing = TRUE, speed=3, lateral = TRUE, ai_aim = ai_aim)
 		if(isovermap(OM) && OM.dradis)
 			OM.dradis?.relay_sound('nsv13/sound/effects/fighters/launchwarning.ogg')
-		var/datum/ship_weapon/SW = weapon_types[FIRE_MODE_TORPEDO]
+		var/datum/ship_weapon/SW = weapon_types[/datum/ship_weapon/torpedo_launcher]
 		relay_to_nearby(pick(SW.overmap_firing_sounds))
 
 
@@ -133,6 +131,6 @@
 		fire_projectile(/obj/item/projectile/guided_munition/missile, target, homing = TRUE, lateral = FALSE, ai_aim = ai_aim)
 		if(istype(OM, /obj/structure/overmap) && OM.dradis)
 			OM.dradis?.relay_sound('nsv13/sound/effects/fighters/launchwarning.ogg')
-		var/datum/ship_weapon/SW = weapon_types[FIRE_MODE_MISSILE]
+		var/datum/ship_weapon/SW = weapon_types[/datum/ship_weapon/missile_launcher]
 		relay_to_nearby(pick(SW.overmap_firing_sounds))
 		return TRUE

@@ -120,7 +120,7 @@
 	var/list/weapon_types = list()
 	var/list/weapon_numkeys_map = list() // I hate this
 
-	var/fire_mode = FIRE_MODE_TORPEDO //What gun do we want to fire? Defaults to railgun, with PDCs there for flak
+	var/fire_mode = 1 //What gun do we want to fire? Defaults to railgun, with PDCs there for flak
 	var/weapon_safety = FALSE //Like a gun safety. Entirely un-used except for fighters to stop brainlets from shooting people on the ship unintentionally :)
 	var/faction = null //Used for target acquisition by AIs
 
@@ -425,20 +425,20 @@ Proc to spool up a new Z-level for a player ship and assign it a treadmill.
 /obj/structure/overmap/proc/apply_weapons()
 	//Prevent fighters from getting access to the AMS.
 	if(mass <= MASS_TINY)
-		weapon_types[FIRE_MODE_ANTI_AIR] = new /datum/ship_weapon/light_cannon(src)
+		weapon_types[/datum/ship_weapon/light_cannon] = new /datum/ship_weapon/light_cannon(src)
 	//Gauss is the true PDC replacement...
 	else
-		weapon_types[FIRE_MODE_PDC] = new /datum/ship_weapon/pdc_mount(src)
+		weapon_types[/datum/ship_weapon/pdc_mount] = new /datum/ship_weapon/pdc_mount(src)
 	if(mass >= MASS_SMALL || length(occupying_levels))
-		weapon_types[FIRE_MODE_AMS] = new /datum/ship_weapon/vls(src)
-		weapon_types[FIRE_MODE_GAUSS] = new /datum/ship_weapon/gauss(src)
+		weapon_types[/datum/ship_weapon/vls] = new /datum/ship_weapon/vls(src)
+		weapon_types[/datum/ship_weapon/gauss] = new /datum/ship_weapon/gauss(src)
 	if(flak_battery_amount > 0)
-		weapon_types[FIRE_MODE_FLAK] = new /datum/ship_weapon/flak(src)
+		weapon_types[/datum/ship_weapon/flak] = new /datum/ship_weapon/flak(src)
 	if(mass > MASS_MEDIUM || length(occupying_levels))
-		weapon_types[FIRE_MODE_MAC] = new /datum/ship_weapon/mac(src)
+		weapon_types[/datum/ship_weapon/mac] = new /datum/ship_weapon/mac(src)
 	if(ai_controlled)
-		weapon_types[FIRE_MODE_MISSILE] = new/datum/ship_weapon/missile_launcher(src)
-		weapon_types[FIRE_MODE_TORPEDO] = new/datum/ship_weapon/torpedo_launcher(src)
+		weapon_types[/datum/ship_weapon/missile_launcher] = new /datum/ship_weapon/missile_launcher(src)
+		weapon_types[/datum/ship_weapon/torpedo_launcher] = new /datum/ship_weapon/torpedo_launcher(src)
 
 /obj/item/projectile/Destroy()
 	if(physics2d)

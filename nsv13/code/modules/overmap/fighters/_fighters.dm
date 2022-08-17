@@ -154,10 +154,10 @@ Been a mess since 2018, we'll fix it someday (probably)
 		//Look for any "primary" hardpoints, be those guns or utility slots
 		if(!weapon)
 			continue
-		if(weapon.fire_mode == FIRE_MODE_ANTI_AIR)
+		if(weapon.fire_mode == /datum/ship_weapon/fighter_primary)
 			data["primary_ammo"] = weapon.get_ammo()
 			data["max_primary_ammo"] = weapon.get_max_ammo()
-		if(weapon.fire_mode == FIRE_MODE_TORPEDO)
+		if(weapon.fire_mode == /datum/ship_weapon/fighter_secondary)
 			data["secondary_ammo"] = weapon.get_ammo()
 			data["max_secondary_ammo"] = weapon.get_max_ammo()
 	var/list/hardpoints_info = list()
@@ -1427,10 +1427,10 @@ Utility modules can be either one of these types, just ensure you set its slot t
 
 //Ensure we get the genericised equipment mounts.
 /obj/structure/overmap/small_craft/apply_weapons()
-	if(!weapon_types[FIRE_MODE_ANTI_AIR])
-		weapon_types[FIRE_MODE_ANTI_AIR] = new/datum/ship_weapon/fighter_primary(src)
-	if(!weapon_types[FIRE_MODE_TORPEDO])
-		weapon_types[FIRE_MODE_TORPEDO] = new/datum/ship_weapon/fighter_secondary(src)
+	if(!weapon_types[/datum/ship_weapon/fighter_primary])
+		weapon_types[/datum/ship_weapon/fighter_primary] = new /datum/ship_weapon/fighter_primary(src)
+	if(!weapon_types[/datum/ship_weapon/torpedo_launcher])
+		weapon_types[/datum/ship_weapon/torpedo_launcher] = new/datum/ship_weapon/fighter_secondary(src)
 
 //Burst arg currently unused for this proc.
 /obj/structure/overmap/proc/primary_fire(obj/structure/overmap/target, ai_aim = FALSE, burst = 1)
@@ -1454,7 +1454,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 
 //Burst arg currently unused for this proc.
 /obj/structure/overmap/proc/secondary_fire(obj/structure/overmap/target, ai_aim = FALSE, burst = 1)
-	hardpoint_fire(target, FIRE_MODE_TORPEDO)
+	hardpoint_fire(target, /datum/ship_weapon/fighter_secondary)
 
 /obj/item/fighter_component/primary/load(obj/structure/overmap/target, atom/movable/AM)
 	if(!istype(AM, accepted_ammo))
@@ -1522,7 +1522,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 /obj/item/fighter_component/secondary
 	name = "Fuck you"
 	slot = HARDPOINT_SLOT_SECONDARY
-	fire_mode = FIRE_MODE_TORPEDO
+	fire_mode = /datum/ship_weapon/fighter_secondary
 	var/overmap_firing_sounds = list(
 		'nsv13/sound/effects/ship/torpedo.ogg',
 		'nsv13/sound/effects/ship/freespace2/m_shrike.wav',
