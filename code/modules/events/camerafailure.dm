@@ -17,6 +17,8 @@
 			break
 		if (!("ss13" in C.network))
 			continue
+		if (!(C.z in target_Zs)) // NSV13 - added target_Zs list for event handling
+			continue
 		if(C.status)
 			C.toggle_cam(null, 0)
 		iterations *= 2.5

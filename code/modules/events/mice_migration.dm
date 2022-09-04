@@ -24,4 +24,4 @@
 		'sound/effects/mousesqueek.ogg')
 
 /datum/round_event/mice_migration/start()
-	SSminor_mapping.trigger_migration(rand(minimum_mice, maximum_mice))
+	SSminor_mapping.trigger_migration(rand(minimum_mice, maximum_mice), z_list=target_Zs)  // NSV13 - added target_Zs list for event handling

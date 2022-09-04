@@ -23,7 +23,7 @@
 
 /datum/round_event/asteroid_impact/start()
 	for(var/mob/living/M in GLOB.mob_list)
-		if(is_station_level(M.z) && !QDELETED(M))
+		if((M.z in target_Zs) && !QDELETED(M)) // NSV13 - added target_Zs list for event handling
 			explosion(M, 3, 4, 6, 0, FALSE)
 			qdel(M)
 			CHECK_TICK

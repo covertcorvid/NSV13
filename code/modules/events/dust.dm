@@ -12,7 +12,8 @@
 	fakeable = FALSE
 
 /datum/round_event/space_dust/start()
-	spawn_meteors(1, GLOB.meteorsC)
+	if(length(target_Zs))
+		spawn_meteors(1, GLOB.meteorsC, z = pick(target_Zs)) // NSV13 - added target_Zs list for event handling
 
 /datum/round_event_control/sandstorm
 	name = "Sandstorm"
@@ -28,4 +29,5 @@
 	fakeable = FALSE
 
 /datum/round_event/sandstorm/tick()
-	spawn_meteors(10, GLOB.meteorsC)
+	if(length(target_Zs))
+		spawn_meteors(10, GLOB.meteorsC, z = pick(target_Zs)) // NSV13 - added target_Zs list for event handling

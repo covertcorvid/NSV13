@@ -40,7 +40,7 @@
 		var/turf/T = get_turf(H)
 		if(!T)
 			continue
-		if(!is_station_level(T.z))
+		if(!(T.z in target_Zs)) // NSV13 - added target_Zs list for event handling
 			continue
 		if(!H.client)
 			continue

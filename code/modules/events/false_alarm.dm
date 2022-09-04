@@ -43,7 +43,7 @@
 	else
 		event_control = pick(events_list)
 	if(event_control)
-		var/datum/round_event/Event = new event_control.typepath()
+		var/datum/round_event/Event = new event_control.typepath(z_list = target_Zs) // NSV13 - added target_Zs list for event handling
 		message_admins("False Alarm: [Event]")
 		Event.kill() 		//do not process this event - no starts, no ticks, no ends
 		Event.announce(TRUE) 	//just announce it like it's happening

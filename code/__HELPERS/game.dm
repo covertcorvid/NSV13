@@ -602,10 +602,10 @@
 
 	return pick(possible_loc)
 
-/proc/power_fail(duration_min, duration_max)
+/proc/power_fail(duration_min, duration_max, target_Zs) // NSV13 - added target_Zs list for event handling
 	for(var/P in GLOB.apcs_list)
 		var/obj/machinery/power/apc/C = P
-		if(C.cell && SSmapping.level_trait(C.z, ZTRAIT_STATION))
+		if(C.cell && ((C.z in target_Zs) || SSmapping.level_trait(C.z, ZTRAIT_STATION)))
 			var/area/A = C.area
 			if(GLOB.typecache_powerfailure_safe_areas[A.type])
 				continue

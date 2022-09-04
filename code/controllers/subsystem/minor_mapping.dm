@@ -8,8 +8,8 @@ SUBSYSTEM_DEF(minor_mapping)
 	place_satchels()
 	return ..()
 
-/datum/controller/subsystem/minor_mapping/proc/trigger_migration(num_mice=10)
-	var/list/exposed_wires = find_exposed_wires()
+/datum/controller/subsystem/minor_mapping/proc/trigger_migration(num_mice=10, z_list=null)
+	var/list/exposed_wires = find_exposed_wires(z_list) // NSV13 - added target_Zs list for event handling
 
 	var/mob/living/simple_animal/mouse/M
 	var/turf/proposed_turf
@@ -34,11 +34,13 @@ SUBSYSTEM_DEF(minor_mapping)
 		amount--
 
 
-/proc/find_exposed_wires()
+/proc/find_exposed_wires(z_list = null) // NSV13 - added target_Zs list for event handling
 	var/list/exposed_wires = list()
 
 	var/list/all_turfs
-	for(var/z in SSmapping.levels_by_trait(ZTRAIT_STATION))
+	if(!length(z_list))
+		z_list = SSmapping.levels_by_trait(ZTRAIT_STATION)
+	for(var/z in z_list)
 		all_turfs += block(locate(1,1,z), locate(world.maxx,world.maxy,z))
 	for(var/turf/open/floor/plating/T in all_turfs)
 		if(is_blocked_turf(T))

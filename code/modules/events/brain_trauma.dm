@@ -15,7 +15,9 @@
 			continue
 		if(!H.getorgan(/obj/item/organ/brain)) // If only I had a brain
 			continue
-
+		if(!(H.z in target_Zs)) // NSV13 - added target_Zs list for event handling
+			continue
+			
 		traumatize(H)
 		announce_to_ghosts(H)
 		break

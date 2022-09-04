@@ -32,6 +32,8 @@
 /datum/round_event/ion_storm/start()
 	//AI laws
 	for(var/mob/living/silicon/ai/M in GLOB.alive_mob_list)
+		if(!(M.z in target_Zs)) // NSV13 - added target_Zs list for event handling
+			continue
 		M.laws_sanity_check()
 		if(M.stat != DEAD && M.see_in_dark != 0)
 			if(prob(replaceLawsetChance))

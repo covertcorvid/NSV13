@@ -33,7 +33,7 @@
 
 /datum/round_event/brand_intelligence/start()
 	for(var/obj/machinery/vending/V in GLOB.machines)
-		if(!is_station_level(V.z))
+		if(!(V.z in target_Zs)) // NSV13 - added target_Zs list for event handling
 			continue
 		vendingMachines.Add(V)
 	if(!vendingMachines.len)

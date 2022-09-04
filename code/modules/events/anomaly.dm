@@ -33,9 +33,9 @@
 
 	return safepick(typecache_filter_list(possible_areas,allowed_areas))
 
-/datum/round_event/anomaly/setup(var/list/Zs)
+/datum/round_event/anomaly/setup()
 	var/list/areas = list()
-	if(length(Zs))
+	if(length(target_Zs))  // NSV13 - added target_Zs list for event handling
 		for(var/z_level in Zs)
 			areas += SSmapping.areas_in_z["[z_level]"]
 	impact_area = findEventArea(areas)

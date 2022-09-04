@@ -39,11 +39,15 @@
 /datum/round_event/grey_tide/start()
 	for(var/area/A in areasToOpen)
 		for(var/obj/machinery/light/L in A)
+			if(!(L.z in target_Zs))
+				continue
 			L.flicker(10)
 
 /datum/round_event/grey_tide/end()
 	for(var/area/A in areasToOpen)
 		for(var/obj/O in A)
+			if(!(O.z in target_Zs))
+				continue
 			if(istype(O, /obj/structure/closet/secure_closet))
 				var/obj/structure/closet/secure_closet/temp = O
 				temp.locked = FALSE

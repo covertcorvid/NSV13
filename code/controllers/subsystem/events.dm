@@ -56,9 +56,8 @@ SUBSYSTEM_DEF(events)
 					event_targets[OM.current_system] = list()
 				event_targets[OM.current_system] |= OM
 
-		// For each star system, if there's a system event, apply it to the ships inside
 		for(var/datum/star_system/sys as() in event_targets)
-			if(prob(70) && length(sys.possible_events)) // System event
+			if(prob(70) && length(sys.possible_events)) // System event - apply to all ships in the system
 				var/list/target_Zs = list()
 				for(var/obj/structure/overmap/OM as() in event_targets[sys])
 					target_Zs += OM.occupying_levels

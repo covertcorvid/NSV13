@@ -20,6 +20,8 @@
 			continue
 		if(!H.getorgan(/obj/item/organ/brain))
 			continue
+		if(!(H.z in target_Zs)) // NSV13 - added target_Zs list for event handling
+			continue
 		H.gain_trauma(/datum/brain_trauma/special/obsessed)
 		announce_to_ghosts(H)
 		break

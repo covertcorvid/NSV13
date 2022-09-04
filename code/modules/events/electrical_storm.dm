@@ -19,7 +19,7 @@
 	var/list/epicentreList = list()
 
 	for(var/i=1, i <= lightsoutAmount, i++)
-		var/turf/T = find_safe_turf()
+		var/turf/T = find_safe_turf(zlevels = target_Zs) // NSV13 - added target_Zs list for event handling
 		if(istype(T))
 			epicentreList += T
 

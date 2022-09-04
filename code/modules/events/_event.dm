@@ -135,6 +135,8 @@
 	var/current_players	= 0 //Amount of of alive, non-AFK human players on server at the time of event start
 	var/fakeable = TRUE		//Can be faked by fake news event.
 
+	var/target_Zs = null //NSV13 - list of targeted Z levels
+
 //Called first before processing.
 //Allows you to setup your event, such as randomly
 //setting the startWhen and or announceWhen variables.
@@ -142,7 +144,7 @@
 //EDIT: if there's anything you want to override within the new() call, it will not be overridden by the time this proc is called.
 //It will only have been overridden by the time we get to announce() start() tick() or end() (anything but setup basically).
 //This is really only for setting defaults which can be overridden later when New() finishes.
-/datum/round_event/proc/setup(obj/structure/overmap/OM)
+/datum/round_event/proc/setup()
 	return
 
 //Called when the tick is equal to the startWhen variable.
@@ -229,7 +231,7 @@
 
 //Sets up the event then adds the event to the the list of running events
 /datum/round_event/New(my_processing = TRUE, z_list = null)
-	setup(z_list)
+	target_Zs = z_list  // NSV13 - added target_Zs list for event handling
 	processing = my_processing
 	SSevents.running += src
 	return ..()

@@ -8,6 +8,9 @@
 /datum/round_event/floor_cluwne/start()
 	var/list/spawn_locs = list()
 	for(var/X in GLOB.xeno_spawn)
+		var/atom/A = X
+		if(!(A.z in target_Zs)) // NSV13 - added target_Zs list for event handling
+			continue
 		spawn_locs += X
 
 	if(!spawn_locs.len)

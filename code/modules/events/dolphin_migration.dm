@@ -18,4 +18,6 @@
 
 /datum/round_event/dolphin_migration/start()
 	for(var/obj/effect/landmark/carpspawn/C in GLOB.landmarks_list)
+		if(!(C.z in target_Zs)) // NSV13 - added target_Zs list for event handling
+			continue
 		new /mob/living/simple_animal/hostile/retaliate/dolphin(C.loc)

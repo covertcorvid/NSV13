@@ -44,11 +44,14 @@
 					S.set_light(l_color = aurora_color)
 
 /datum/round_event/aurora_caelus/end()
-	for(var/area in GLOB.sortedAreas)
-		var/area/A = area
-		if(initial(A.dynamic_lighting) == DYNAMIC_LIGHTING_IFSTARLIGHT)
-			for(var/turf/open/space/S in A)
-				fade_to_black(S)
+	if(length(target_Zs))
+		for(var/z_level in target_Zs) // NSV13 - added target_Zs list for event handling
+			var/list/areas = SSmapping.areas_in_z["[z_level]"]
+			for(var/area in areas)
+				var/area/A = area
+				if(initial(A.dynamic_lighting) == DYNAMIC_LIGHTING_IFSTARLIGHT)
+					for(var/turf/open/space/S in A)
+						fade_to_black(S)
 	priority_announce("The aurora caelus event is now ending. Starlight conditions will slowly return to normal. When this has concluded, please return to your workplace and continue work as normal. Have a pleasant shift, [station_name()], and thank you for watching with us.",
 	sound = 'sound/misc/notice2.ogg',
 	sender_override = "Nanotrasen Meteorology Division")

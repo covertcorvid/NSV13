@@ -35,6 +35,8 @@
 	var/number_of_hostiles
 	var/mutable_appearance/storm
 
+	var/list/possible_areas = list()  // NSV13 - multi-ship event handling
+
 /datum/round_event/portal_storm/setup()
 	storm = mutable_appearance('icons/obj/tesla_engine/energy_ball.dmi', "energy_ball_fast", FLY_LAYER)
 	storm.color = "#00FF00"
@@ -48,12 +50,16 @@
 		number_of_hostiles += hostile_types[hostile]
 
 	while(number_of_bosses > boss_spawn.len)
-		boss_spawn += get_random_station_turf()
+		boss_spawn += safepick(get_area_turfs(pick(possible_areas))) // NSV13 - added target_Zs list for event handling
 
 	while(number_of_hostiles > hostiles_spawn.len)
-		hostiles_spawn += get_random_station_turf()
+		hostiles_spawn += safepick(get_area_turfs(pick(possible_areas))) // NSV13 - added target_Zs list for event handling
 
 	next_boss_spawn = startWhen + CEILING(2 * number_of_hostiles / number_of_bosses, 1)
+
+	if(length(target_Zs))  // NSV13 - added target_Zs list for event handling
+		for(var/z_level in Zs)
+			possible_areas += SSmapping.areas_in_z["[z_level]"]
 
 /datum/round_event/portal_storm/announce(fake)
 	set waitfor = 0
@@ -64,7 +70,7 @@
 	sound_to_playing_players('sound/magic/lightningbolt.ogg')
 
 /datum/round_event/portal_storm/tick()
-	spawn_effects(get_random_station_turf())
+	spawn_effects(safepick(get_area_turfs(pick(possible_areas)))) // NSV13 - added target_Zs list for event handling
 
 	if(spawn_hostile())
 		var/type = safepick(hostile_types)
