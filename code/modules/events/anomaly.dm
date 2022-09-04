@@ -22,7 +22,8 @@
 		/area/engine,
 		/area/solar,
 		/area/holodeck,
-		/area/shuttle)
+		/area/shuttle,
+		/area/space) //NSV13 - added space because that's boring
 		)
 
 		//Subtypes from the above that actually should explode.
@@ -32,10 +33,12 @@
 
 	return safepick(typecache_filter_list(possible_areas,allowed_areas))
 
-/datum/round_event/anomaly/setup(obj/structure/overmap/OM)
-	if(!OM)
-		OM = SSstar_system.find_main_overmap()
-	impact_area = findEventArea(OM.linked_areas)
+/datum/round_event/anomaly/setup(var/list/Zs)
+	var/list/areas = list()
+	if(length(Zs))
+		for(var/z_level in Zs)
+			areas += SSmapping.areas_in_z["[z_level]"]
+	impact_area = findEventArea(areas)
 	if(!impact_area)
 		CRASH("No valid areas for anomaly found.")
 	var/list/turf_test = get_area_turfs(impact_area)

@@ -43,58 +43,39 @@ SUBSYSTEM_DEF(events)
 		if (MC_TICK_CHECK)
 			return
 
+// NSV13 - changed this entire proc
 //checks if we should select a random event yet, and reschedules if necessary
 /datum/controller/subsystem/events/proc/checkEvent()
 	if(scheduled <= world.time)
-		//NSV13 - do events for multiple ships!
-		/*
-		// Get all the ships we want to have events
-		var/list/ships
-		//for(var/datum/space_level/level as() in SSmapping.levels_by_trait(ZTRAIT_BOARDABLE))
+		var/list/event_targets = list() // starsystem = list(ship, ship, ...)
+		for(var/z_level as() in SSmapping.levels_by_trait(ZTRAIT_BOARDABLE)) // Only ships that have Z levels inside
+			var/datum/space_level/level = SSmapping.get_level(z_level)
 			var/obj/structure/overmap/OM = level.linked_overmap
-			ships |= OM
-		var/list/ships_remaining = ships.Copy()
-		// Decide whether we're causing system or ship events this time
-		if(prob(70))
-			// Same system-wide event for everyone that's in the same system
-			var/list/system_weather_map
-			for(var/obj/structure/overmap/OM in ships)
-				if(OM.current_system && length(OM.current_system.possible_events))
-					if(OM.current_system not in system_weather_map)
-						system_weather_map[OM.current_system] = list(pick(OM.current_system.possible_events))
-					spawnEvent(system_weather_map[OM.current_system], OM)
-					ships_remaining -= OM
-		// Normal events if we didn't get prob(70) or if the system didn't have any event types
-		for(var/obj/structure/overmap/OM in ships_remaining)
-			spawnEvent(control, OM)
-		*/
+			if(OM?.current_system?.occupying_z)
+				if(!length(event_targets[OM.current_system]))
+					event_targets[OM.current_system] = list()
+				event_targets[OM.current_system] |= OM
 
-		//The 80% solution
-		var/obj/structure/overmap/OM = SSstar_system.find_main_overmap()
-		//  Same system-wide event for everyone that's in the same system
-		if(prob(70) && mainship.current_system && length(mainship.current_system.possible_events))
-			spawnEvent(system_weather_map[OM.current_system.possible_events)
-		//  Normal events if we didn't get prob(70) or if the system didn't have any event types
-		for(var/obj/structure/overmap/OM in ships_remaining)
-			spawnEvent(control, OM)
-
-		//The 50% solution
-		var/obj/structure/overmap/mainship = SSstar_system.find_main_overmap()
-		var/list/possible_events
-		if(prob(70) && mainship.current_system && length(mainship.current_system.possible_events))
-			spawnEvent(mainship.current_system.possible_events)
-		else
-			spawnEvent(control)
-
+		// For each star system, if there's a system event, apply it to the ships inside
+		for(var/datum/star_system/sys as() in event_targets)
+			if(prob(70) && length(sys.possible_events)) // System event
+				var/list/target_Zs = list()
+				for(var/obj/structure/overmap/OM as() in event_targets[sys])
+					target_Zs += OM.occupying_levels
+					spawnEvent(sys.possible_events, target_Zs)
+			else // Individual events for everyone
+				for(var/obj/structure/overmap/OM as() in event_targets[sys])
+					spawnEvent(control, OM.occupying_levels)
+		
 		reschedule()
 
+// NSV13 - added list of Z levels as argument
 //decides which world.time we should select another random event at.
 /datum/controller/subsystem/events/proc/reschedule()
 	scheduled = world.time + rand(frequency_lower, max(frequency_lower,frequency_upper))
 
-//NSV13 - pass in list of possible events and target ship
 //selects a random event based on whether it can occur and it's 'weight'(probability)
-/datum/controller/subsystem/events/proc/spawnEvent(var/list/possible_events, var/obj/structure/overmap/target)
+/datum/controller/subsystem/events/proc/spawnEvent(var/list/possible_events, var/list/Zs)
 	set waitfor = FALSE	//for the admin prompt
 	if(!CONFIG_GET(flag/allow_random_events))
 		return
@@ -124,16 +105,17 @@ SUBSYSTEM_DEF(events)
 		sum_of_weights -= E.weight
 
 		if(sum_of_weights <= 0)				//we've hit our goal
-			if(TriggerEvent(E))
+			if(TriggerEvent(E, Zs))
 				return
 
-/datum/controller/subsystem/events/proc/TriggerEvent(datum/round_event_control/E)
-	. = E.preRunEvent()
+// NSV13 - added list of Zs
+/datum/controller/subsystem/events/proc/TriggerEvent(datum/round_event_control/E, var/list/Zs)
+	. = E.preRunEvent(Zs)
 	if(. == EVENT_CANT_RUN)//we couldn't run this event for some reason, set its max_occurrences to 0
 		E.max_occurrences = 0
 	else if(. == EVENT_READY)
 		E.random = TRUE
-		E.runEvent()
+		E.runEvent(Zs)
 
 //allows a client to trigger an event
 //aka Badmin Central

@@ -104,8 +104,8 @@
 		log_admin_private("[key_name(usr)] cancelled event [name].")
 		SSblackbox.record_feedback("tally", "event_admin_cancelled", 1, typepath)
 
-/datum/round_event_control/proc/runEvent()
-	var/datum/round_event/E = new typepath()
+/datum/round_event_control/proc/runEvent(var/list/Zs)
+	var/datum/round_event/E = new typepath(z_list = Zs)
 	E.current_players = get_active_player_count(alive_check = 1, afk_check = 1, human_check = 1)
 	E.control = src
 	SSblackbox.record_feedback("tally", "event_ran", 1, "[E]")
@@ -228,8 +228,8 @@
 
 
 //Sets up the event then adds the event to the the list of running events
-/datum/round_event/New(my_processing = TRUE)
-	setup()
+/datum/round_event/New(my_processing = TRUE, z_list = null)
+	setup(z_list)
 	processing = my_processing
 	SSevents.running += src
 	return ..()

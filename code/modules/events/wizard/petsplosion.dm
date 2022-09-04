@@ -6,9 +6,9 @@
 	earliest_start = 0 MINUTES
 	var/mobs_to_dupe = 0
 
-/datum/round_event_control/wizard/petsplosion/preRunEvent()
+/datum/round_event_control/wizard/petsplosion/preRunEvent(var/list/Zs) //NSV13 - modified to work with list of Zs
 	for(var/mob/living/simple_animal/F in GLOB.alive_mob_list)
-		if(!ishostile(F) && is_station_level(F.z))
+		if(!ishostile(F) && LAZYFIND(Zs, F.z))
 			mobs_to_dupe++
 	if(mobs_to_dupe > 100 || !mobs_to_dupe)
 		return EVENT_CANT_RUN

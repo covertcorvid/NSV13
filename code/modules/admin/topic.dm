@@ -165,8 +165,18 @@
 			return
 		var/datum/round_event_control/E = locate(href_list["forceevent"]) in SSevents.control
 		if(E)
-			E.admin_setup(usr)
-			var/datum/round_event/event = E.runEvent()
+			//NSV13 - ship-based events
+			var/list/event_targets = list()
+			for(var/z_level as() in SSmapping.levels_by_trait(ZTRAIT_BOARDABLE)) // Only ships that have Z levels inside
+				var/datum/space_level/level = SSmapping.get_level(z_level)
+				var/obj/structure/overmap/OM = level.linked_overmap
+				event_targets |= OM
+			var/obj/structure/overmap/target = input(usr, "Choose a ship!", "Event Target", null) as null|anything in event_targets
+			if(!target)
+				return
+
+			E.admin_setup(usr, target.occupying_levels) //NSV13 - added occupying levels list
+			var/datum/round_event/event = E.runEvent(target.occupying_levels) //NSV13 - added occupying levels list
 			if(event.announceWhen>0)
 				event.processing = FALSE
 				var/prompt = alert(usr, "Would you like to alert the crew?", "Alert", "Yes", "No", "Cancel")
