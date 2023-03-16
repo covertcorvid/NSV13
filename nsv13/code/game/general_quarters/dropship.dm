@@ -27,20 +27,21 @@
 	if(OM && istype(OM) && !(SSmapping.level_trait(OM.z, ZTRAIT_OVERMAP)))
 		OM.exit(AM)
 
-/obj/structure/chair/comfy/dropship
+/obj/structure/chair/fancy/dropship
 	name = "acceleration chair"
 	desc = "A seat which clamps down onto its occupant to keep them safe during flight."
 	icon = 'nsv13/icons/obj/chairs.dmi'
 	icon_state = "shuttle_chair"
+	item_chair = null
 
-/obj/structure/chair/comfy/dropship/Initialize()
+/obj/structure/chair/fancy/dropship/Initialize(mapload)
 	. = ..()
 	update_armrest()
 
-/obj/structure/chair/comfy/dropship/GetArmrest()
+/obj/structure/chair/fancy/dropship/GetArmrest()
 	return mutable_appearance('nsv13/icons/obj/chairs.dmi', "[initial(icon_state)]_[has_buckled_mobs() ? "closed" : "open"]")
 
-/obj/structure/chair/comfy/dropship/update_armrest()
+/obj/structure/chair/fancy/dropship/update_armrest()
 	cut_overlay(armrest)
 	QDEL_NULL(armrest)
 	armrest = GetArmrest()
@@ -58,6 +59,12 @@
 	lighting_colour_bulb = "#e6af68"
 	area_flags = 0 // Not a unique area and spawns are not allowed
 	teleport_restriction = TELEPORT_ALLOW_NONE
+	var/obj/structure/overmap/small_craft/transport/linked_dropship
+
+/area/dropship/get_virtual_z(turf/T)
+	if(linked_dropship)
+		return linked_dropship.get_virtual_z_level()
+	return ..()
 
 //If we ever want to let them build these things..
 /area/dropship/generic

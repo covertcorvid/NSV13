@@ -26,12 +26,16 @@
 	name = "Mining EWAR Telemetry Scrambler (Circuit Board)"
 	build_path = /obj/machinery/computer/ship/salvage/mining
 
-/obj/machinery/computer/ship/salvage/Initialize()
+/obj/machinery/computer/ship/salvage/Initialize(mapload)
 	. = ..()
 	radio = new(src)
 	radio.keyslot = new radio_key
 	radio.listening = 0
 	radio.recalculateChannels()
+
+/obj/machinery/computer/ship/salvage/Destroy()
+	QDEL_NULL(radio)
+	. = ..()
 
 /obj/machinery/computer/ship/salvage/ui_interact(mob/user, datum/tgui/ui)
 	ui = SStgui.try_update_ui(user, src, ui)

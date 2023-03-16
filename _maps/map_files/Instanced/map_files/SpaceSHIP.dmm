@@ -602,7 +602,7 @@
 	dir = 4
 	},
 /obj/item/radio/intercom/directional/east,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "bu" = (
@@ -646,10 +646,10 @@
 	dir = 4
 	},
 /obj/structure/window/reinforced,
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 9
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 9
 	},
 /turf/open/space/basic,
@@ -760,7 +760,7 @@
 	dir = 4;
 	initialize_directions = 11
 	},
-/obj/machinery/atmospherics/components/trinary/mixer/layer1{
+/obj/machinery/atmospherics/components/trinary/mixer/layer2{
 	dir = 4;
 	name = "RBMK Plasma-Oxygen Mixer"
 	},
@@ -956,14 +956,14 @@
 /turf/open/floor/plating,
 /area/maintenance/pvp)
 "cl" = (
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2{
 	dir = 4
 	},
 /obj/machinery/meter{
 	pixel_x = -5;
 	pixel_y = -5;
-	target_layer = 1
+	target_layer = 2
 	},
 /obj/effect/turf_decal/stripes/line{
 	dir = 8
@@ -991,7 +991,7 @@
 	},
 /obj/structure/disposalpipe/segment,
 /obj/machinery/atmospherics/pipe/simple/green/visible,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
 "cq" = (
@@ -1106,7 +1106,7 @@
 	pixel_x = -6;
 	pixel_y = 26
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "cC" = (
 /obj/structure/cable{
@@ -1236,7 +1236,7 @@
 	pixel_x = -26;
 	pixel_y = -6
 	},
-/turf/open/floor/plasteel/ship,
+/turf/open/floor/durasteel,
 /area/nsv/hanger/pvp)
 "cP" = (
 /obj/structure/cable{
@@ -1405,10 +1405,10 @@
 /turf/closed/wall/r_wall,
 /area/engine/engine_room/pvp)
 "dj" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2{
 	dir = 1
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4{
 	dir = 1
 	},
 /turf/open/space/basic,
@@ -1425,7 +1425,7 @@
 /turf/open/floor/mineral/plastitanium/red,
 /area/maintenance/pvp)
 "dl" = (
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3,
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4,
 /obj/structure/cable/yellow{
 	icon_state = "4-8"
 	},
@@ -1471,7 +1471,7 @@
 /area/hallway/pvp)
 "dp" = (
 /obj/structure/chair/office/light,
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 4
 	},
 /turf/open/floor/mineral/plastitanium/red,
@@ -1584,7 +1584,7 @@
 	icon_state = "1-2"
 	},
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden,
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 4
 	},
 /turf/open/floor/plasteel/tech/grid,
@@ -1828,11 +1828,7 @@
 /turf/open/floor/plasteel/white,
 /area/medical/medbay/pvp)
 "ec" = (
-/obj/machinery/ship_weapon/gauss_gun/east{
-	pixel_x = -32;
-	pixel_y = -32;
-	bound_x = 0
-	},
+/obj/machinery/ship_weapon/gauss_gun/east,
 /turf/open/floor/plating/airless,
 /area/bridge/pvp)
 "ed" = (
@@ -2291,9 +2287,9 @@
 	pixel_y = -31
 	},
 /obj/item/radio/intercom/syndicate{
+	name = "Syndicate Channel";
 	pixel_x = -27;
-	pixel_y = -9;
-	name = "Syndicate Channel"
+	pixel_y = -9
 	},
 /turf/open/floor/circuit/red,
 /area/crew_quarters/heads/captain/pvp/admiral)
@@ -2320,7 +2316,8 @@
 /turf/open/floor/carpet,
 /area/security/brig/pvp)
 "fe" = (
-/obj/structure/chair/comfy/brown{
+/obj/structure/chair/fancy{
+	color = "#ff8400";
 	dir = 8
 	},
 /turf/open/floor/carpet,
@@ -2628,10 +2625,10 @@
 "fT" = (
 /obj/structure/lattice,
 /obj/machinery/atmospherics/pipe/heat_exchanging/simple,
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 6
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 6
 	},
 /turf/open/space/basic,
@@ -2909,7 +2906,7 @@
 /obj/machinery/atmospherics/pipe/manifold/supply/hidden{
 	dir = 1
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "gI" = (
 /turf/open/floor/mineral/plastitanium/red,
@@ -3177,10 +3174,10 @@
 /turf/open/floor/engine,
 /area/nsv/hanger/pvp)
 "hy" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2{
 	dir = 1
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4{
 	dir = 1
 	},
 /obj/structure/shuttle/engine/heater{
@@ -3764,7 +3761,7 @@
 	pixel_x = -26;
 	pixel_y = -6
 	},
-/turf/open/floor/plasteel/ship,
+/turf/open/floor/durasteel,
 /area/nsv/hanger/pvp)
 "jd" = (
 /obj/structure/cable{
@@ -3794,10 +3791,10 @@
 /turf/open/floor/engine/air,
 /area/engine/engineering/pvp)
 "jf" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4{
 	dir = 4
 	},
 /obj/structure/shuttle/engine/heater{
@@ -3941,7 +3938,7 @@
 /obj/machinery/computer/ship/dradis/minor{
 	dir = 8
 	},
-/turf/open/floor/plasteel/ship,
+/turf/open/floor/durasteel,
 /area/nsv/hanger/pvp)
 "jx" = (
 /obj/machinery/computer/security,
@@ -3956,7 +3953,7 @@
 /turf/open/floor/wood,
 /area/crew_quarters/heads/captain/pvp/admiral)
 "jz" = (
-/obj/structure/chair/comfy/black,
+/obj/structure/chair/fancy,
 /turf/open/floor/carpet,
 /area/crew_quarters/heads/hos/pvp)
 "jA" = (
@@ -4447,10 +4444,10 @@
 /turf/closed/wall/r_wall,
 /area/science/pvp)
 "kN" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2{
 	dir = 8
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4{
 	dir = 8
 	},
 /turf/open/space/basic,
@@ -4620,7 +4617,7 @@
 /turf/open/floor/carpet/red,
 /area/quartermaster/pvp)
 "li" = (
-/obj/structure/chair/comfy/black,
+/obj/structure/chair/fancy,
 /obj/machinery/light_switch{
 	pixel_x = -22;
 	pixel_y = -30
@@ -4680,7 +4677,7 @@
 "lp" = (
 /obj/structure/table,
 /obj/machinery/computer/slot_machine,
-/obj/item/stamp/qm,
+/obj/item/stamp/quartermaster,
 /obj/item/stack/spacecash/c1000,
 /obj/item/stack/spacecash/c1000,
 /obj/item/stack/spacecash/c1000,
@@ -4750,8 +4747,8 @@
 /turf/open/floor/plating,
 /area/hallway/pvp)
 "lz" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1,
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4,
 /obj/structure/shuttle/engine/huge{
 	dir = 8
 	},
@@ -5056,10 +5053,10 @@
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
 "mh" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2{
 	dir = 1
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4{
 	dir = 1
 	},
 /turf/open/space/basic,
@@ -5101,7 +5098,7 @@
 	c_tag = "Conference Room";
 	dir = 1
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "mo" = (
 /obj/structure/chair,
@@ -5281,7 +5278,7 @@
 /obj/machinery/atmospherics/components/unary/vent_pump/on{
 	dir = 8
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "mI" = (
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden{
@@ -6192,10 +6189,10 @@
 "oJ" = (
 /obj/structure/lattice,
 /obj/machinery/atmospherics/pipe/heat_exchanging/simple,
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 4
 	},
 /turf/open/space/basic,
@@ -6791,8 +6788,8 @@
 /turf/open/floor/plating,
 /area/quartermaster/pvp)
 "pY" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1,
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4,
 /turf/open/space/basic,
 /area/engine/engine_room/pvp)
 "pZ" = (
@@ -6940,10 +6937,10 @@
 /area/science/robotics/pvp)
 "qn" = (
 /obj/structure/rack,
-/obj/item/stack/packageWrap{
+/obj/item/stack/package_wrap{
 	amount = 30
 	},
-/obj/item/stack/packageWrap{
+/obj/item/stack/package_wrap{
 	amount = 30
 	},
 /obj/structure/window/reinforced{
@@ -7064,17 +7061,17 @@
 	id = "astraeus_Engineering";
 	name = "engineering security door"
 	},
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 4
 	},
 /turf/open/floor/plating,
 /area/engine/engineering/pvp)
 "qA" = (
 /obj/structure/disposalpipe/segment,
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "qB" = (
 /obj/machinery/atmospherics/pipe/manifold/supply/hidden{
@@ -7127,7 +7124,7 @@
 /area/bridge/meeting_room/pvp)
 "qG" = (
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden,
-/obj/machinery/atmospherics/components/binary/dp_vent_pump/layer1,
+/obj/machinery/atmospherics/components/binary/dp_vent_pump/layer2,
 /obj/machinery/advanced_airlock_controller/directional/east{
 	pixel_y = 24
 	},
@@ -7226,7 +7223,7 @@
 "qS" = (
 /obj/structure/closet/emcloset,
 /obj/item/radio/intercom/directional/east,
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "qT" = (
 /obj/structure/cable{
@@ -7252,7 +7249,7 @@
 /turf/open/floor/engine,
 /area/engine/engine_room/pvp)
 "qW" = (
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "qX" = (
 /obj/structure/disposalpipe/segment,
@@ -7460,10 +7457,10 @@
 /turf/open/floor/mineral/plastitanium/red,
 /area/hallway/pvp)
 "rw" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 6
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 6
 	},
 /turf/open/space/basic,
@@ -8022,7 +8019,7 @@
 	icon_state = "1-2"
 	},
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden,
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "sJ" = (
 /obj/machinery/airalarm{
@@ -8298,11 +8295,7 @@
 /turf/open/floor/plasteel/tech/grid,
 /area/hydroponics/pvp)
 "tq" = (
-/obj/machinery/ship_weapon/gauss_gun/east{
-	pixel_x = -32;
-	pixel_y = -32;
-	bound_x = 0
-	},
+/obj/machinery/ship_weapon/gauss_gun/east,
 /obj/effect/turf_decal/box/corners,
 /turf/open/floor/plating/airless,
 /area/bridge/pvp)
@@ -8388,7 +8381,7 @@
 /obj/structure/cable{
 	icon_state = "2-4"
 	},
-/obj/structure/chair/comfy/shuttle{
+/obj/structure/chair/fancy/shuttle{
 	color = "#696969";
 	dir = 1;
 	name = "bridge chair"
@@ -8453,10 +8446,10 @@
 /turf/open/floor/plating,
 /area/crew_quarters/heads/captain/pvp/admiral)
 "tG" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 4
 	},
 /obj/structure/window/reinforced{
@@ -8482,10 +8475,10 @@
 /obj/structure/window/reinforced{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 10
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 10
 	},
 /turf/open/space/basic,
@@ -8657,7 +8650,7 @@
 /obj/machinery/atmospherics/pipe/simple/green/visible{
 	dir = 9
 	},
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
 "ub" = (
@@ -9331,8 +9324,8 @@
 /turf/open/floor/engine,
 /area/engine/engine_room/pvp)
 "vB" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer1,
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer3,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer2,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer4,
 /obj/structure/shuttle/engine/huge{
 	dir = 8
 	},
@@ -9371,8 +9364,7 @@
 	tag = ""
 	},
 /obj/structure/disposalpipe/junction{
-	dir = 8;
-	icon_state = "pipe-j2"
+	dir = 8
 	},
 /obj/machinery/atmospherics/pipe/simple/supply/hidden{
 	dir = 8
@@ -9834,7 +9826,7 @@
 	name = "Shield Generator";
 	req_one_access_txt = "152;151"
 	},
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2{
 	dir = 4
 	},
 /turf/open/floor/mineral/plastitanium/red,
@@ -9888,13 +9880,13 @@
 /area/medical/medbay/pvp)
 "wO" = (
 /obj/machinery/atmospherics/pipe/simple/cyan/visible,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2{
 	dir = 4
 	},
 /obj/machinery/meter{
 	pixel_x = -5;
 	pixel_y = -5;
-	target_layer = 1
+	target_layer = 2
 	},
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
@@ -10377,8 +10369,8 @@
 /turf/open/floor/carpet/red,
 /area/crew_quarters/bar/pvp)
 "yc" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1,
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4,
 /obj/structure/shuttle/engine/heater{
 	dir = 8
 	},
@@ -10567,8 +10559,8 @@
 	},
 /obj/structure/disposalpipe/segment,
 /obj/machinery/atmospherics/pipe/simple/supply/hidden,
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1,
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3,
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2,
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4,
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "yw" = (
@@ -10612,6 +10604,7 @@
 	info = "IF YOU MAKE A BORG, BE SURE TO EMAG IT! We're using stolen NT borg tech so it'll have their stupid laws. - Steve";
 	name = "Note from Steve the scientist"
 	},
+/obj/machinery/ecto_sniffer,
 /turf/open/floor/plasteel/white,
 /area/science/robotics/pvp)
 "yA" = (
@@ -11161,7 +11154,7 @@
 /area/quartermaster/pvp)
 "zV" = (
 /obj/structure/table/reinforced,
-/obj/item/stack/packageWrap,
+/obj/item/stack/package_wrap,
 /obj/item/reagent_containers/food/condiment/enzyme,
 /turf/open/floor/plasteel/cafeteria,
 /area/crew_quarters/cafeteria/pvp)
@@ -11264,7 +11257,7 @@
 /turf/open/floor/plating,
 /area/quartermaster/pvp)
 "Aj" = (
-/obj/structure/chair/comfy/shuttle{
+/obj/structure/chair/fancy/shuttle{
 	color = "#696969";
 	dir = 1;
 	name = "bridge chair"
@@ -11322,8 +11315,8 @@
 	dir = 8;
 	layer = 2.9
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1,
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3,
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2,
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4,
 /turf/open/space/basic,
 /area/engine/engine_room/pvp)
 "Ar" = (
@@ -11668,8 +11661,8 @@
 /turf/open/floor/plasteel/tech/grid,
 /area/hallway/pvp)
 "Bl" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1,
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4,
 /turf/open/space/basic,
 /area/space)
 "Bm" = (
@@ -11866,7 +11859,7 @@
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden{
 	dir = 10
 	},
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "BI" = (
@@ -12085,15 +12078,15 @@
 /obj/machinery/light{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1,
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2,
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 10
 	},
 /obj/machinery/meter{
 	layer = 2.63;
 	pixel_x = 5;
 	pixel_y = 5;
-	target_layer = 3
+	target_layer = 4
 	},
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
@@ -12300,7 +12293,7 @@
 	pixel_y = 28
 	},
 /obj/machinery/door/window/westleft,
-/obj/structure/chair/comfy/shuttle{
+/obj/structure/chair/fancy/shuttle{
 	color = "#696969";
 	dir = 4;
 	name = "captain's chair"
@@ -12415,8 +12408,8 @@
 /obj/structure/extinguisher_cabinet{
 	pixel_x = 26
 	},
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1,
-/obj/machinery/atmospherics/components/trinary/filter/flipped/on/layer3{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2,
+/obj/machinery/atmospherics/components/trinary/filter/flipped/on/layer4{
 	filter_type = "nucleium";
 	name = "Nucleium Filter"
 	},
@@ -12622,7 +12615,7 @@
 /obj/machinery/light/small{
 	dir = 8
 	},
-/obj/structure/chair/comfy/shuttle{
+/obj/structure/chair/fancy/shuttle{
 	color = "#696969";
 	dir = 1;
 	name = "bridge chair"
@@ -12910,8 +12903,8 @@
 "Eh" = (
 /obj/structure/disposalpipe/segment,
 /obj/machinery/atmospherics/pipe/simple/supply/hidden,
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1,
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3,
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2,
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4,
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "Ei" = (
@@ -13215,7 +13208,7 @@
 "EO" = (
 /obj/structure/disposalpipe/segment,
 /obj/machinery/atmospherics/pipe/simple/supply/hidden,
-/obj/machinery/atmospherics/pipe/manifold/purple/visible/layer1{
+/obj/machinery/atmospherics/pipe/manifold/purple/visible/layer2{
 	dir = 1
 	},
 /turf/open/floor/mineral/plastitanium/red,
@@ -13284,7 +13277,7 @@
 	icon_state = "1-4"
 	},
 /obj/structure/disposalpipe/segment,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2{
 	dir = 9
 	},
 /obj/machinery/atmospherics/components/binary/pump/on{
@@ -13438,7 +13431,7 @@
 "Fu" = (
 /obj/machinery/atmospherics/pipe/manifold4w/yellow/visible,
 /obj/machinery/meter,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
 "Fv" = (
@@ -13530,7 +13523,7 @@
 /area/engine/engineering/pvp)
 "FJ" = (
 /obj/machinery/atmospherics/components/unary/vent_pump/on,
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 4
 	},
 /turf/open/floor/mineral/plastitanium/red,
@@ -13585,7 +13578,7 @@
 /obj/machinery/atmospherics/components/binary/pump{
 	dir = 1
 	},
-/obj/machinery/atmospherics/components/binary/pump/layer1{
+/obj/machinery/atmospherics/components/binary/pump/layer2{
 	dir = 1;
 	name = "Oxygen to RBMK"
 	},
@@ -13677,10 +13670,10 @@
 "Gb" = (
 /obj/structure/lattice,
 /obj/machinery/atmospherics/pipe/heat_exchanging/simple,
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 5
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 5
 	},
 /turf/open/space/basic,
@@ -14083,8 +14076,8 @@
 /turf/open/floor/plasteel/tech/grid,
 /area/hallway/pvp)
 "Hg" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer1,
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer3,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer2,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer4,
 /turf/open/space/basic,
 /area/engine/engine_room/pvp)
 "Hh" = (
@@ -14343,7 +14336,7 @@
 	name = "Admiral's Office";
 	req_one_access_txt = "151"
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/crew_quarters/heads/captain/pvp/admiral)
 "HS" = (
 /obj/structure/cable{
@@ -14953,10 +14946,10 @@
 	dir = 4
 	},
 /obj/machinery/atmospherics/pipe/simple/supply/hidden,
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 5
 	},
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 5
 	},
 /turf/open/floor/mineral/plastitanium/red,
@@ -15235,10 +15228,10 @@
 	dir = 8;
 	layer = 2.9
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2{
 	dir = 1
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4{
 	dir = 1
 	},
 /turf/open/space/basic,
@@ -15261,10 +15254,10 @@
 /obj/machinery/atmospherics/pipe/heat_exchanging/simple{
 	dir = 10
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 4
 	},
 /turf/open/space/basic,
@@ -15274,10 +15267,10 @@
 /obj/machinery/atmospherics/pipe/heat_exchanging/simple{
 	dir = 6
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 4
 	},
 /turf/open/space/basic,
@@ -15290,10 +15283,10 @@
 /obj/structure/window/reinforced{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 10
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 10
 	},
 /turf/open/space/basic,
@@ -15342,7 +15335,7 @@
 /obj/machinery/light{
 	dir = 8
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "Ku" = (
 /obj/structure/cable{
@@ -15384,7 +15377,7 @@
 	dir = 9
 	},
 /obj/machinery/meter,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2{
 	dir = 5
 	},
 /turf/open/floor/engine,
@@ -15475,10 +15468,10 @@
 /obj/structure/window/reinforced{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/junction/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/junction/layer2{
 	dir = 8
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/junction/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/junction/layer4{
 	dir = 8
 	},
 /turf/open/space/basic,
@@ -15667,7 +15660,8 @@
 /turf/open/floor/carpet/red,
 /area/crew_quarters/bar/pvp)
 "Lo" = (
-/obj/structure/chair/comfy/brown{
+/obj/structure/chair/fancy{
+	color = "#ff8400";
 	dir = 8
 	},
 /turf/open/floor/carpet/red,
@@ -15921,7 +15915,7 @@
 	id = "astraeus_Engineering";
 	name = "engineering security door"
 	},
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 4
 	},
 /turf/open/floor/plating,
@@ -15963,7 +15957,8 @@
 /turf/open/floor/plating,
 /area/maintenance/pvp)
 "Md" = (
-/obj/structure/chair/comfy/brown{
+/obj/structure/chair/fancy{
+	color = "#ff8400";
 	dir = 4
 	},
 /turf/open/floor/carpet/red,
@@ -16002,7 +15997,7 @@
 	tag = ""
 	},
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden,
-/obj/machinery/atmospherics/components/unary/portables_connector/visible/layer1{
+/obj/machinery/atmospherics/components/unary/portables_connector/visible/layer2{
 	dir = 4;
 	name = "Direct Moderator Input"
 	},
@@ -16101,7 +16096,7 @@
 /area/maintenance/pvp)
 "Mr" = (
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden,
-/obj/machinery/atmospherics/pipe/simple/supply/hidden/layer1{
+/obj/machinery/atmospherics/pipe/simple/supply/hidden/layer2{
 	dir = 1
 	},
 /obj/machinery/door/airlock/ship/external/glass{
@@ -16169,10 +16164,10 @@
 /obj/structure/window/reinforced{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 9
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 9
 	},
 /turf/open/space/basic,
@@ -16317,15 +16312,15 @@
 /obj/machinery/power/apc/auto_name/east{
 	req_access = list(150)
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "MT" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer1,
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer3,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer2,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold4w/layer4,
 /turf/open/space/basic,
 /area/space)
 "MU" = (
-/obj/structure/chair/comfy/shuttle{
+/obj/structure/chair/fancy/shuttle{
 	color = "#696969";
 	dir = 4;
 	name = "bridge chair"
@@ -16914,8 +16909,8 @@
 	layer = 2.9
 	},
 /obj/structure/window/reinforced,
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer1,
-/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer3,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer2,
+/obj/machinery/atmospherics/pipe/heat_exchanging/manifold/layer4,
 /turf/open/space/basic,
 /area/engine/engine_room/pvp)
 "Ou" = (
@@ -16929,7 +16924,7 @@
 	dir = 8
 	},
 /obj/item/paper/monitorkey,
-/obj/item/stamp/ce,
+/obj/item/stamp/chief_engineer,
 /obj/machinery/atmospherics/pipe/layer_manifold/visible{
 	dir = 4
 	},
@@ -16939,13 +16934,14 @@
 /obj/machinery/atmospherics/components/unary/vent_scrubber/on{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 4
 	},
 /turf/open/floor/mineral/plastitanium/red,
 /area/crew_quarters/heads/chief/pvp)
 "Ox" = (
-/obj/structure/chair/comfy/brown{
+/obj/structure/chair/fancy{
+	color = "#ff8400";
 	dir = 1
 	},
 /obj/machinery/atmospherics/pipe/simple/supply/hidden{
@@ -16973,7 +16969,7 @@
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 4
 	},
 /turf/open/floor/mineral/plastitanium/red,
@@ -17000,7 +16996,7 @@
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 4
 	},
 /turf/open/floor/mineral/plastitanium/red,
@@ -17027,7 +17023,7 @@
 	},
 /obj/machinery/door/firedoor/border_only/directional/east,
 /obj/machinery/door/firedoor/border_only/directional/west,
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 4
 	},
 /obj/machinery/door/airlock/ship/command/glass{
@@ -17069,7 +17065,7 @@
 /obj/machinery/atmospherics/pipe/manifold/scrubbers/hidden{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 4
 	},
 /turf/open/floor/mineral/plastitanium/red,
@@ -17095,13 +17091,13 @@
 /obj/machinery/atmospherics/pipe/manifold/supply/hidden{
 	dir = 8
 	},
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 10
 	},
 /obj/machinery/meter{
 	pixel_x = -5;
 	pixel_y = -5;
-	target_layer = 1
+	target_layer = 2
 	},
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
@@ -17160,7 +17156,7 @@
 	name = "atmos blast door"
 	},
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
 "OX" = (
@@ -17288,7 +17284,7 @@
 /obj/machinery/atmospherics/pipe/manifold/scrubbers/hidden{
 	dir = 1
 	},
-/obj/machinery/atmospherics/pipe/simple/supply/hidden/layer1{
+/obj/machinery/atmospherics/pipe/simple/supply/hidden/layer2{
 	dir = 1
 	},
 /turf/open/floor/plasteel/tech/grid,
@@ -17339,7 +17335,7 @@
 /turf/open/floor/plating,
 /area/maintenance/pvp)
 "Pr" = (
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 4
 	},
 /turf/open/floor/mineral/plastitanium/red,
@@ -17542,8 +17538,8 @@
 /obj/machinery/atmospherics/pipe/manifold/supply/hidden{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1,
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3,
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2,
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4,
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "PU" = (
@@ -17687,7 +17683,7 @@
 	dir = 5
 	},
 /obj/machinery/meter,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2{
 	dir = 4
 	},
 /turf/open/floor/engine,
@@ -17929,8 +17925,8 @@
 	dir = 4
 	},
 /obj/machinery/atmospherics/pipe/simple/supply/hidden,
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1,
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3,
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2,
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4,
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "QI" = (
@@ -18012,7 +18008,7 @@
 	dir = 4
 	},
 /obj/machinery/atmospherics/components/binary/pump,
-/obj/machinery/atmospherics/components/binary/pump/layer1{
+/obj/machinery/atmospherics/components/binary/pump/layer2{
 	name = "Plasma to RBMK"
 	},
 /turf/open/floor/engine,
@@ -18323,7 +18319,7 @@
 	dir = 8;
 	initialize_directions = 11
 	},
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2{
 	dir = 4
 	},
 /turf/open/floor/engine,
@@ -18574,7 +18570,7 @@
 /area/quartermaster/pvp)
 "Si" = (
 /obj/machinery/holopad,
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "Sj" = (
 /obj/machinery/portable_atmospherics/canister,
@@ -18607,7 +18603,7 @@
 /obj/machinery/atmospherics/components/unary/vent_pump/on{
 	dir = 1
 	},
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "Sm" = (
@@ -18653,7 +18649,7 @@
 /obj/machinery/atmospherics/pipe/manifold/supply/hidden{
 	dir = 4
 	},
-/obj/machinery/atmospherics/components/binary/pump/layer1{
+/obj/machinery/atmospherics/components/binary/pump/layer2{
 	dir = 1;
 	name = "Reactor Moderator In"
 	},
@@ -18690,7 +18686,7 @@
 	dir = 4;
 	pixel_x = -22
 	},
-/obj/machinery/atmospherics/components/unary/portables_connector/visible/layer3{
+/obj/machinery/atmospherics/components/unary/portables_connector/visible/layer4{
 	dir = 4
 	},
 /turf/open/floor/plasteel/tech/grid,
@@ -18750,10 +18746,10 @@
 	dir = 5
 	},
 /obj/structure/window/reinforced,
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 4
 	},
 /turf/open/space/basic,
@@ -18777,10 +18773,10 @@
 	dir = 9
 	},
 /obj/structure/window/reinforced,
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 4
 	},
 /turf/open/space/basic,
@@ -18790,7 +18786,7 @@
 	dir = 4;
 	name = "tactical swivel chair"
 	},
-/turf/open/floor/plasteel/ship,
+/turf/open/floor/durasteel,
 /area/nsv/hanger/pvp)
 "SF" = (
 /obj/structure/cable{
@@ -18820,7 +18816,7 @@
 /area/science/pvp)
 "SI" = (
 /obj/machinery/atmospherics/pipe/simple/green/visible,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2{
 	dir = 4
 	},
 /turf/open/floor/engine,
@@ -18941,17 +18937,17 @@
 "SS" = (
 /obj/structure/disposalpipe/segment,
 /obj/machinery/atmospherics/pipe/simple/supply/hidden,
-/obj/machinery/atmospherics/components/binary/pump/layer1{
+/obj/machinery/atmospherics/components/binary/pump/layer2{
 	name = "Cold Loop In"
 	},
-/obj/machinery/atmospherics/components/binary/pump/layer3{
+/obj/machinery/atmospherics/components/binary/pump/layer4{
 	dir = 1;
 	name = "Hot Loop Out"
 	},
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "ST" = (
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 6
 	},
 /obj/effect/turf_decal/stripes/line{
@@ -18968,7 +18964,7 @@
 /turf/open/floor/plasteel,
 /area/science/pvp)
 "SV" = (
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 4
 	},
 /obj/effect/turf_decal/stripes/line{
@@ -19021,9 +19017,9 @@
 /obj/machinery/meter{
 	pixel_x = -5;
 	pixel_y = -5;
-	target_layer = 1
+	target_layer = 2
 	},
-/obj/machinery/atmospherics/pipe/manifold/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/manifold/cyan/visible/layer2{
 	dir = 1
 	},
 /obj/structure/cable/yellow{
@@ -19035,7 +19031,7 @@
 /turf/open/floor/engine,
 /area/engine/engine_room/pvp)
 "Tb" = (
-/obj/machinery/atmospherics/components/unary/portables_connector/layer1{
+/obj/machinery/atmospherics/components/unary/portables_connector/layer2{
 	dir = 8
 	},
 /obj/machinery/portable_atmospherics/canister/toxins,
@@ -19686,10 +19682,10 @@
 /obj/machinery/atmospherics/components/unary/vent_scrubber/on{
 	dir = 8
 	},
-/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer1{
+/obj/machinery/atmospherics/pipe/simple/cyan/visible/layer2{
 	dir = 9
 	},
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 10
 	},
 /obj/effect/turf_decal/stripes/line{
@@ -19796,7 +19792,7 @@
 /obj/structure/cable{
 	icon_state = "0-8"
 	},
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 5
 	},
 /obj/effect/turf_decal/stripes/line{
@@ -19822,21 +19818,21 @@
 /turf/open/floor/plasteel,
 /area/science/robotics/pvp)
 "UT" = (
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 4
 	},
 /obj/effect/turf_decal/stripes/line,
 /turf/open/floor/engine,
 /area/engine/engine_room/pvp)
 "UU" = (
-/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer3{
+/obj/machinery/atmospherics/pipe/simple/scrubbers/visible/layer4{
 	dir = 9
 	},
 /obj/machinery/meter{
 	layer = 2.63;
 	pixel_x = 5;
 	pixel_y = 5;
-	target_layer = 3
+	target_layer = 4
 	},
 /obj/effect/turf_decal/stripes/line,
 /turf/open/floor/engine,
@@ -19957,7 +19953,7 @@
 	pixel_x = -27;
 	pixel_y = -30
 	},
-/obj/structure/chair/comfy/shuttle{
+/obj/structure/chair/fancy/shuttle{
 	color = "#696969";
 	name = "bridge chair"
 	},
@@ -20035,7 +20031,7 @@
 /turf/open/floor/mineral/plastitanium,
 /area/bridge/pvp)
 "Vn" = (
-/obj/structure/chair/comfy/shuttle{
+/obj/structure/chair/fancy/shuttle{
 	color = "#696969";
 	name = "bridge chair"
 	},
@@ -20295,7 +20291,7 @@
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden{
 	dir = 4
 	},
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "VR" = (
@@ -20414,7 +20410,7 @@
 	icon_state = "1-2"
 	},
 /obj/structure/disposalpipe/segment,
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "Wi" = (
@@ -20479,7 +20475,7 @@
 /obj/machinery/atmospherics/pipe/simple/scrubbers/hidden{
 	dir = 4
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "Wr" = (
 /obj/structure/cable{
@@ -20492,7 +20488,7 @@
 	layer = 4;
 	pixel_y = 32
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "Ws" = (
 /obj/structure/cable{
@@ -20502,7 +20498,7 @@
 	icon_state = "1-8"
 	},
 /obj/machinery/atmospherics/pipe/manifold4w/scrubbers/hidden,
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "Wt" = (
 /obj/effect/turf_decal/stripes/line,
@@ -20534,13 +20530,13 @@
 /obj/machinery/atmospherics/components/unary/vent_scrubber/on{
 	dir = 8
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "Wx" = (
 /obj/structure/disposalpipe/segment{
 	dir = 10
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "Wy" = (
 /obj/structure/lattice/catwalk,
@@ -20699,12 +20695,12 @@
 /obj/machinery/atmospherics/components/binary/pump{
 	dir = 1
 	},
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
 "WX" = (
 /obj/machinery/vending/cola,
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "WY" = (
 /obj/structure/cable{
@@ -20719,7 +20715,8 @@
 /obj/structure/cable{
 	icon_state = "4-8"
 	},
-/obj/structure/chair/comfy/brown{
+/obj/structure/chair/fancy{
+	color = "#ff8400";
 	dir = 8
 	},
 /turf/open/floor/carpet/red,
@@ -20749,7 +20746,7 @@
 	icon_state = "4-8"
 	},
 /obj/structure/disposalpipe/segment,
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "Xe" = (
 /obj/structure/lattice/catwalk,
@@ -20881,7 +20878,7 @@
 	name = "Atmospherics";
 	req_one_access_txt = "152;151"
 	},
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/mineral/plastitanium/red,
 /area/engine/engineering/pvp)
 "Xq" = (
@@ -20944,7 +20941,7 @@
 /turf/open/indestructible/sound/pool/spentfuel/wall,
 /area/engine/engine_room/pvp)
 "Xx" = (
-/obj/structure/chair/comfy/shuttle{
+/obj/structure/chair/fancy/shuttle{
 	color = "#696969";
 	dir = 1;
 	name = "bridge chair"
@@ -20988,7 +20985,7 @@
 	dir = 4
 	},
 /obj/item/book/manual/wiki/security_space_law,
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "XD" = (
 /obj/machinery/airalarm{
@@ -21018,7 +21015,7 @@
 /turf/open/floor/plating/airless,
 /area/space)
 "XH" = (
-/obj/structure/chair/comfy/shuttle{
+/obj/structure/chair/fancy/shuttle{
 	color = "#696969";
 	dir = 4;
 	name = "bridge chair"
@@ -21040,7 +21037,7 @@
 	req_access = null;
 	req_one_access_txt = "150"
 	},
-/turf/open/floor/plasteel/ship,
+/turf/open/floor/durasteel,
 /area/nsv/hanger/pvp)
 "XN" = (
 /obj/structure/cable{
@@ -21248,7 +21245,7 @@
 /obj/machinery/atmospherics/components/unary/vent_scrubber/on{
 	dir = 1
 	},
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
 "Yl" = (
@@ -21384,7 +21381,7 @@
 /area/engine/engineering/pvp)
 "YB" = (
 /obj/machinery/vending/cigarette,
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "YC" = (
 /obj/structure/disposalpipe/segment,
@@ -21399,13 +21396,13 @@
 	dir = 1;
 	pixel_y = -22
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "YF" = (
 /obj/machinery/atmospherics/pipe/simple/supply/hidden{
 	dir = 5
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "YG" = (
 /obj/structure/table,
@@ -21435,7 +21432,7 @@
 /obj/structure/disposalpipe/trunk{
 	dir = 8
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/bridge/meeting_room/pvp)
 "YK" = (
 /obj/effect/turf_decal/stripes/line{
@@ -21474,7 +21471,7 @@
 	dir = 1
 	},
 /obj/item/circuitboard/aicore,
-/obj/item/clothing/suit/toggle/labcoat/rd,
+/obj/item/clothing/suit/toggle/labcoat/research_director,
 /obj/structure/closet,
 /turf/open/floor/plasteel/cafeteria,
 /area/crew_quarters/heads/hor/pvp)
@@ -21547,10 +21544,10 @@
 /turf/open/floor/plasteel/dark,
 /area/ai_monitored/nuke_storage/pvp)
 "YY" = (
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer1{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer2{
 	dir = 5
 	},
-/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer3{
+/obj/machinery/atmospherics/pipe/heat_exchanging/simple/layer4{
 	dir = 5
 	},
 /turf/open/space/basic,
@@ -21709,7 +21706,7 @@
 	name = "Admiral's Office";
 	req_one_access_txt = "151"
 	},
-/turf/open/floor/plasteel/grid/lino,
+/turf/open/floor/durasteel/lino,
 /area/crew_quarters/heads/captain/pvp/admiral)
 "Zw" = (
 /obj/machinery/atmospherics/components/binary/pump{
@@ -21970,7 +21967,7 @@
 /obj/machinery/atmospherics/pipe/simple/green/visible{
 	dir = 10
 	},
-/obj/machinery/atmospherics/pipe/simple/purple/visible/layer1,
+/obj/machinery/atmospherics/pipe/simple/purple/visible/layer2,
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
 "ZY" = (
@@ -21988,7 +21985,7 @@
 /obj/item/taperecorder{
 	pixel_x = 3
 	},
-/obj/item/stamp/rd,
+/obj/item/stamp/research_director,
 /obj/item/folder/white,
 /obj/machinery/power/apc/auto_name/east{
 	req_access = list(150)

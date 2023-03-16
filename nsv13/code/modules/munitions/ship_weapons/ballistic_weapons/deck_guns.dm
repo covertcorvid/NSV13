@@ -8,9 +8,9 @@
 	pixel_x = -43
 	pixel_y = -64
 	bound_width = 96
-	bound_height = 128
+	bound_height = 96
 	bound_x = -32
-	bound_y = -64
+	bound_y = -32
 	semi_auto = TRUE
 	max_ammo = 1
 	obj_integrity = 500
@@ -101,7 +101,7 @@
 /obj/machinery/ship_weapon/deck_turret/animate_projectile(atom/target, lateral=TRUE)
 	var/obj/item/ship_weapon/ammunition/naval_artillery/T = chambered
 	if(T)
-		linked.fire_projectile(T.projectile_type, target,speed=T.speed, homing=TRUE, lateral=weapon_type.lateral)
+		linked.fire_projectile(T.projectile_type, target,speed=T.speed, lateral=weapon_type.lateral)
 
 /obj/machinery/ship_weapon/deck_turret/proc/rack_load(atom/movable/A)
 	if(length(ammo) < max_ammo && istype(A, ammo_type))
@@ -587,14 +587,8 @@
 	var/armed = FALSE //Do it do the big boom?
 	var/speed = 0.5 //Needs powder to increase speed.
 
-/obj/item/ship_weapon/ammunition/naval_artillery/attack_hand(mob/user)
-	return FALSE
-
-/obj/item/ship_weapon/ammunition/torpedo/attack_hand(mob/user)
-	return FALSE
-
-/obj/item/ship_weapon/ammunition/missile/attack_hand(mob/user)
-	return FALSE
+/obj/item/ship_weapon/ammunition/naval_artillery/armed //This is literally just for mail.
+	armed = TRUE
 
 /obj/item/ship_weapon/ammunition/naval_artillery/cannonball
 	name = "cannon ball"
@@ -647,9 +641,8 @@
 	. = ..()
 	. += "[(armed) ? "<span class='userdanger'>The shell is currently armed and ready to fire. </span>" : "<span class ='notice'>The shell must be armed before firing. </span>"]"
 
-/obj/item/ship_weapon/ammunition/missile/CtrlClick(mob/user)
-	. = ..()
-	to_chat(user,"<span class='warning'>[src] is far too cumbersome to carry, and dragging it around might set it off! Load it onto a munitions trolley.</span>")
+/obj/item/ship_weapon/ammunition/naval_artillery/attack_hand(mob/user)
+	return FALSE
 
 /obj/machinery/deck_turret/payload_gate
 	name = "payload loading gate"
@@ -769,7 +762,7 @@
 	dir = EAST
 	pixel_x = -30
 	pixel_y = -42
-	bound_width = 128
+	bound_width = 96
 	bound_height = 96
 	bound_x = -32
 	bound_y = -32
@@ -778,9 +771,9 @@
 	dir = WEST
 	pixel_x = -63
 	pixel_y = -42
-	bound_width = 128
+	bound_width = 96
 	bound_height = 96
-	bound_x = -64
+	bound_x = -32
 	bound_y = -32
 
 //MEGADETH TURRET
@@ -801,7 +794,7 @@
 	dir = EAST
 	pixel_x = -30
 	pixel_y = -42
-	bound_width = 128
+	bound_width = 96
 	bound_height = 96
 	bound_x = -32
 	bound_y = -32
@@ -810,9 +803,9 @@
 	dir = WEST
 	pixel_x = -63
 	pixel_y = -42
-	bound_width = 128
+	bound_width = 96
 	bound_height = 96
-	bound_x = -64
+	bound_x = -32
 	bound_y = -32
 
 /obj/machinery/ship_weapon/deck_turret/Initialize(mapload)
@@ -826,7 +819,10 @@
 	core.turret = src
 	core.update_parts()
 	if(id)
-		addtimer(CALLBACK(src, .proc/link_via_id), 10 SECONDS)
+		return INITIALIZE_HINT_LATELOAD
+
+/obj/machinery/ship_weapon/deck_turret/LateInitialize()
+	link_via_id()
 
 /obj/machinery/ship_weapon/deck_turret/RefreshParts()//using this proc to create the parts instead
 	. = ..()//because otherwise you'd need to put them in the machine frame to rebuild using a board
@@ -845,13 +841,11 @@
 			component_parts += new /obj/item/assembly/igniter
 
 /obj/machinery/ship_weapon/deck_turret/proc/link_via_id()
-	for(var/obj/machinery/deck_turret/core in GLOB.machines)
-		if(!istype(core))
-			continue
-		if(core.id && core.id == id)
-			core.turret = src
-			src.core = core
-			core.update_parts()
+	for(var/obj/machinery/deck_turret/C in GLOB.machines)
+		if(istype(C) && C?.id == id)
+			C.turret = src
+			core = C
+			C.update_parts()
 
 /obj/machinery/ship_weapon/deck_turret/setDir()
 	. = ..()
@@ -860,27 +854,27 @@
 			pixel_x = -43
 			pixel_y = -32
 			bound_width = 96
-			bound_height = 128
+			bound_height = 96
 			bound_x = -32
 			bound_y = -32
 		if(SOUTH)
 			pixel_x = -43
 			pixel_y = -64
 			bound_width = 96
-			bound_height = 128
+			bound_height = 96
 			bound_x = -32
-			bound_y = -64
+			bound_y = -32
 		if(EAST)
 			pixel_x = -30
 			pixel_y = -42
-			bound_width = 128
+			bound_width = 96
 			bound_height = 96
 			bound_x = -32
 			bound_y = -32
 		if(WEST)
 			pixel_x = -63
 			pixel_y = -42
-			bound_width = 128
+			bound_width = 96
 			bound_height = 96
-			bound_x = -64
+			bound_x = -32
 			bound_y = -32

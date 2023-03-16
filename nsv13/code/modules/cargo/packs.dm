@@ -80,6 +80,7 @@
 					/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing,
 					/obj/item/ship_weapon/parts/missile/warhead,
 					/obj/item/ship_weapon/parts/missile/warhead,
+					/obj/item/ship_weapon/parts/missile/warhead,
 					/obj/item/ship_weapon/parts/missile/guidance_system,
 					/obj/item/ship_weapon/parts/missile/guidance_system,
 					/obj/item/ship_weapon/parts/missile/guidance_system,
@@ -93,35 +94,78 @@
 
 /datum/supply_pack/munitions/torpedo_casings
 	name = "Torpedo casings"
-	desc = "A set of 5 torpedo casings, prebuilt but not pre-assembled. Ideal when used with our line of torpedo components."
+	desc = "A set of 10 torpedo casings, prebuilt but not pre-assembled. Ideal when used with our line of torpedo components."
 	cost = 750
 	contains = list(/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing,
+					/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing,
+					/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing,
+					/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing,
+					/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing,
+					/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing,
 					/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing,
 					/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing,
 					/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing,
 					/obj/item/ship_weapon/ammunition/torpedo/torpedo_casing)
 	crate_name = "Blank torpedo casings"
 
-/datum/supply_pack/munitions/torpedo_construction
-	name = "Torpedo components"
-	desc = "A set of torpedo guidance modules, propulsion units and IFF cards. Warheads sold separately!"
+/datum/supply_pack/munitions/torpedo_construction_guidance
+	name = "Payload Guidance Modules"
+	desc = "A bulk order of 10 torpedo guidance modules. Warheads sold separately!"
 	cost = 1500
 	contains = list(/obj/item/ship_weapon/parts/missile/guidance_system,
 					/obj/item/ship_weapon/parts/missile/guidance_system,
 					/obj/item/ship_weapon/parts/missile/guidance_system,
+					/obj/item/ship_weapon/parts/missile/guidance_system,
+					/obj/item/ship_weapon/parts/missile/guidance_system,
+					/obj/item/ship_weapon/parts/missile/guidance_system,
+					/obj/item/ship_weapon/parts/missile/guidance_system,
+					/obj/item/ship_weapon/parts/missile/guidance_system,
+					/obj/item/ship_weapon/parts/missile/guidance_system,
+					/obj/item/ship_weapon/parts/missile/guidance_system)
+	crate_name = "Munition Guidance Systems"
+
+/datum/supply_pack/munitions/payload_construction_propulsion
+	name = "Payload Propulsion Systems"
+	desc = "A bulk order of 10 payload propulsion units. Warheads sold separately!"
+	cost = 1500
+	contains = list(/obj/item/ship_weapon/parts/missile/propulsion_system,
 					/obj/item/ship_weapon/parts/missile/propulsion_system,
 					/obj/item/ship_weapon/parts/missile/propulsion_system,
 					/obj/item/ship_weapon/parts/missile/propulsion_system,
+					/obj/item/ship_weapon/parts/missile/propulsion_system,
+					/obj/item/ship_weapon/parts/missile/propulsion_system,
+					/obj/item/ship_weapon/parts/missile/propulsion_system,
+					/obj/item/ship_weapon/parts/missile/propulsion_system,
+					/obj/item/ship_weapon/parts/missile/propulsion_system,
+					/obj/item/ship_weapon/parts/missile/propulsion_system)
+	crate_name = "Munition Propulsion Systems"
+
+/datum/supply_pack/munitions/payload_construction_iff
+	name = "Payload IFF Cards"
+	desc = "A bulk order of 10 payload IFF cards. Warheads sold separately!"
+	cost = 1500
+	contains = list(/obj/item/ship_weapon/parts/missile/iff_card,
+					/obj/item/ship_weapon/parts/missile/iff_card,
+					/obj/item/ship_weapon/parts/missile/iff_card,
+					/obj/item/ship_weapon/parts/missile/iff_card,
+					/obj/item/ship_weapon/parts/missile/iff_card,
+					/obj/item/ship_weapon/parts/missile/iff_card,
+					/obj/item/ship_weapon/parts/missile/iff_card,
 					/obj/item/ship_weapon/parts/missile/iff_card,
 					/obj/item/ship_weapon/parts/missile/iff_card,
 					/obj/item/ship_weapon/parts/missile/iff_card)
-	crate_name = "Torpedo components"
+	crate_name = "Identify Friend of Foe Cards"
 
 /datum/supply_pack/munitions/standard_warheads
 	name = "Torpedo warheads (standard)"
-	desc = "A pack of 5 standard torpedo warheads with a 40 isotonne yield, ideal for general usage."
-	cost = 850
+	desc = "A pack of 10 standard torpedo warheads with a 40 isotonne yield, ideal for general usage."
+	cost = 1500
 	contains = list(/obj/item/ship_weapon/parts/missile/warhead/torpedo,
+					/obj/item/ship_weapon/parts/missile/warhead/torpedo,
+					/obj/item/ship_weapon/parts/missile/warhead/torpedo,
+					/obj/item/ship_weapon/parts/missile/warhead/torpedo,
+					/obj/item/ship_weapon/parts/missile/warhead/torpedo,
+					/obj/item/ship_weapon/parts/missile/warhead/torpedo,
 					/obj/item/ship_weapon/parts/missile/warhead/torpedo,
 					/obj/item/ship_weapon/parts/missile/warhead/torpedo,
 					/obj/item/ship_weapon/parts/missile/warhead/torpedo,
@@ -130,9 +174,14 @@
 
 /datum/supply_pack/munitions/bb_warheads
 	name = "Torpedo warheads (armour piercing)"
-	desc = "A pack of 5 armour piercing torpedo warheads with a 80 isotonne combined yield, these warheads excel at dealing massive damage to a target."
-	cost = 1250
+	desc = "A pack of 10 armour piercing torpedo warheads with a 80 isotonne combined yield, these warheads excel at dealing massive damage to a target."
+	cost = 2500
 	contains = list(/obj/item/ship_weapon/parts/missile/warhead/bunker_buster,
+					/obj/item/ship_weapon/parts/missile/warhead/bunker_buster,
+					/obj/item/ship_weapon/parts/missile/warhead/bunker_buster,
+					/obj/item/ship_weapon/parts/missile/warhead/bunker_buster,
+					/obj/item/ship_weapon/parts/missile/warhead/bunker_buster,
+					/obj/item/ship_weapon/parts/missile/warhead/bunker_buster,
 					/obj/item/ship_weapon/parts/missile/warhead/bunker_buster,
 					/obj/item/ship_weapon/parts/missile/warhead/bunker_buster,
 					/obj/item/ship_weapon/parts/missile/warhead/bunker_buster,
@@ -155,6 +204,16 @@
 					/obj/item/ship_weapon/parts/missile/warhead/decoy)
 	crate_name = "Decoy missile warheads"
 
+/datum/supply_pack/munitions/freight_warheads
+	name = "Torpedo warheads (freight)"
+	desc = "A pack of 3 freight torpedo warheads for delivering cargo to trade stations."
+	cost = 350
+	contains = list(/obj/item/ship_weapon/parts/missile/warhead/freight,
+					/obj/item/ship_weapon/parts/missile/warhead/freight,
+					/obj/item/ship_weapon/parts/missile/warhead/freight)
+	crate_type = /obj/structure/closet/crate/wooden
+	crate_name = "Freight torpedo warheads"
+
 /datum/supply_pack/munitions/pilot_outfitting
 	name = "Pilot Outfitting Crate"
 	desc = "A full set of of gear for a new pilot"
@@ -165,6 +224,7 @@
 					/obj/item/clothing/head/beret/ship/pilot,
 					/obj/item/radio/headset/munitions/pilot,
 					/obj/item/clothing/suit/space/hardsuit/pilot)
+	crate_name = "Pilot outfitting crate"
 
 /datum/supply_pack/munitions/missile_warheads
 	name = "Missile Warheads"
@@ -232,6 +292,7 @@
 					/obj/item/fighter_component/docking_computer,
 					/obj/item/fighter_component/battery,
 					/obj/item/fighter_component/primary/cannon)
+	crate_name = "Light fighter starter kit"
 
 /datum/supply_pack/munitions/fighter_construction/heavy
 	name = "Heavy Fighter Starter Kit"
@@ -251,6 +312,7 @@
 					/obj/item/fighter_component/secondary/ordnance_launcher/torpedo,
 					/obj/item/fighter_component/battery,
 					/obj/item/fighter_component/primary/cannon/heavy)
+	crate_name = "Heavy fighter starter kit"
 
 /datum/supply_pack/munitions/fighter_construction/utility
 	name = "Utility Fighter Starter Kit"
@@ -270,6 +332,7 @@
 					/obj/item/fighter_component/secondary/utility/hold,
 					/obj/item/fighter_component/primary/utility/refuel,
 					/obj/item/fighter_component/countermeasure_dispenser)
+	crate_name = "Utility fighter starter kit"
 
 /datum/supply_pack/munitions/light_cannon
 	name = "Light Cannon Ammunition"
@@ -302,6 +365,65 @@
 					/obj/item/ammo_box/magazine/nsv/heavy_cannon,
 					/obj/item/ammo_box/magazine/nsv/heavy_cannon)
 	crate_name = "Heavy cannon ammunition crate"
+
+/datum/supply_pack/munitions/broadside_casings
+	name = "Empty Broadside Casings"
+	desc = "15 empty casings for broadside shells."
+	cost = 1000
+	contains = list(/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing)
+	crate_name = "Empty broadside casings crate"
+
+/datum/supply_pack/munitions/broadside_loads
+	name = "Broadside Loads"
+	desc = "15 loads for broadside shells."
+	cost = 1000
+	contains = list(/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load)
+	crate_name = "Broadside loads crate"
+
+/datum/supply_pack/munitions/broadside_pack
+	name = "Broadside Pack"
+	desc = "Enough casings, loads, and powder for one full load of an SNBC."
+	cost = 1000
+	contains = list(/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_load,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/ship_weapon/parts/broadside_casing,
+					/obj/item/powder_bag)
+	crate_name = "Broadside Full Load Crate"
 
 /datum/supply_pack/security/armory/peacekeeper_rifles
 	name = "M2A45 pulse rifles (x3)"
@@ -414,6 +536,7 @@
 	desc = "One cryogenic Tyrosene fuel pump, capable of fully refuelling 3 fighters. Handle with care."
 	cost = 1500
 	contains = list(/obj/structure/reagent_dispensers/fueltank/cryogenic_fuel)
+	crate_name = "Fighter fuel crate"
 
 /datum/supply_pack/engineering/control_rods
 	name = "Nanocarbon Reactor Control Rods (x5)"
@@ -487,6 +610,7 @@
 					/obj/item/ammo_box/magazine/smgm9mm,
 					/obj/item/ammo_box/c9mm,
 					/obj/item/ammo_box/c9mm)
+	crate_name = "MP-16A4 ammo crate"
 
 /datum/supply_pack/security/armory/marine_rifle
 	name = "M4A-16A1 Assault Rifle Crate"
@@ -505,6 +629,7 @@
 					/obj/item/ammo_box/magazine/m556,
 					/obj/item/ammo_box/magazine/m556,
 					/obj/item/ammo_box/magazine/m556)
+	crate_name = "M4A-16A1 ammo crate"
 
 /datum/supply_pack/engineering/hulljuice
 	name = "Hulljuice Tank Crate"
@@ -643,3 +768,12 @@
 					/obj/item/reagent_containers/glass/bottle/sacid,
 					/obj/item/reagent_containers/glass/bottle/sacid)
 	crate_name = "Chemical Supply Crate - Chalcogens"
+
+/datum/supply_pack/engineering/plasma_canister //Purely used for the Serendipity's plasma caster
+	name = "Replacement Plasma Canister"
+	desc = "A single can of phoron gas, for all your plasma needs!"
+	cost = 2500
+	contains = list(
+		/obj/machinery/portable_atmospherics/canister/toxins)
+	hidden = TRUE
+	crate_name = "Phoron Portable Gas Canister"

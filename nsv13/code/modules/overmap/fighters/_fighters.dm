@@ -36,6 +36,7 @@ Been a mess since 2018, we'll fix it someday (probably)
 	pixel_collision_size_y = 32 //Avoid center tile viewport jank
 	req_one_access = list(ACCESS_COMBAT_PILOT)
 	var/start_emagged = FALSE
+	max_paints = 1 // Only one target per fighter
 	var/max_passengers = 0 //Change this per fighter.
 	//Component to handle the fighter's loadout, weapons, parts, the works.
 	var/loadout_type = LOADOUT_DEFAULT_FIGHTER
@@ -46,12 +47,15 @@ Been a mess since 2018, we'll fix it someday (probably)
 	var/list/components = list() //What does this fighter start off with? Use this to set what engine tiers and whatever it gets.
 	var/maintenance_mode = FALSE //Munitions level IDs can change this.
 	var/dradis_type =/obj/machinery/computer/ship/dradis/internal
+	autotarget = TRUE
+	no_gun_cam = TRUE
 	var/obj/machinery/computer/ship/navigation/starmap = null
 	var/resize_factor = 1 //How far down should we scale when we fly onto the overmap?
 	var/escape_pod_type = /obj/structure/overmap/small_craft/escapepod
 	var/mutable_appearance/canopy
 	var/random_name = TRUE
 	overmap_verbs = list(.verb/toggle_brakes, .verb/toggle_inertia, .verb/toggle_safety, .verb/show_dradis, .verb/cycle_firemode, .verb/show_control_panel, .verb/change_name, .verb/countermeasure)
+	var/busy = FALSE
 
 /obj/structure/overmap/small_craft/Destroy()
 	var/mob/last_pilot = pilot // Old pilot gets first shot
@@ -111,7 +115,7 @@ Been a mess since 2018, we'll fix it someday (probably)
 	data["weapon_safety"] = weapon_safety
 	data["master_caution"] = master_caution
 	data["rwr"] = (enemies.len) ? TRUE : FALSE
-	data["target_lock"] = (target_painted.len) ? TRUE : FALSE
+	data["target_lock"] = (length(target_painted)) ? TRUE : FALSE
 	data["fuel_warning"] = get_fuel() <= get_max_fuel()*0.4
 	data["fuel"] = get_fuel()
 	data["max_fuel"] = get_max_fuel()
@@ -285,6 +289,7 @@ Been a mess since 2018, we'll fix it someday (probably)
 			return
 		if("target_lock")
 			relay('nsv13/sound/effects/fighters/switch.ogg')
+			dump_locks()
 			return
 		if("mag_release")
 			if(!mag_lock)
@@ -354,7 +359,7 @@ Been a mess since 2018, we'll fix it someday (probably)
 
 /obj/structure/overmap/small_craft/combat/light
 	name = "Su-818 Rapier"
-	desc = "An Su-818 Rapier space superiorty fighter craft. Designed for high maneuvreability and maximum combat effectivness against other similar weight classes."
+	desc = "An Su-818 Rapier space superiorty fighter craft. Designed for high maneuvreability and maximum combat effectiveness against other similar weight classes."
 	icon = 'nsv13/icons/overmap/nanotrasen/fighter.dmi'
 	armor = list("melee" = 60, "bullet" = 60, "laser" = 60, "energy" = 30, "bomb" = 30, "bio" = 100, "rad" = 90, "fire" = 90, "acid" = 80, "overmap_light" = 10, "overmap_medium" = 5, "overmap_heavy" = 90)
 	sprite_size = 32
@@ -406,9 +411,8 @@ Been a mess since 2018, we'll fix it someday (probably)
 						/obj/item/fighter_component/battery,
 						/obj/item/fighter_component/countermeasure_dispenser)
 
-
 /obj/structure/overmap/small_craft/escapepod/stop_piloting(mob/living/M, eject_mob=TRUE, force=FALSE)
-	if(!SSmapping.level_trait(z, ZTRAIT_BOARDABLE))
+	if(!force && !SSmapping.level_trait(z, ZTRAIT_BOARDABLE))
 		return FALSE
 	return ..()
 
@@ -484,7 +488,7 @@ Been a mess since 2018, we'll fix it someday (probably)
 
 /obj/structure/overmap/small_craft/attackby(obj/item/W, mob/user, params)
 	if(operators && LAZYFIND(operators, user))
-		to_chat(user, "<span class='warning'>You can't reach [src]'s exterior from in here..</span>")
+		to_chat(user, "<span class='warning'>You can't reach [src]'s exterior from in here.</span>")
 		return FALSE
 	for(var/slot in loadout.equippable_slots)
 		var/obj/item/fighter_component/FC = loadout.get_slot(slot)
@@ -500,24 +504,35 @@ Been a mess since 2018, we'll fix it someday (probably)
 	. = ..()
 	if(!isliving(user))
 		return FALSE
-	for(var/slot in loadout.equippable_slots)
-		var/obj/item/fighter_component/FC = loadout.get_slot(slot)
-		if(FC?.load(src, target))
+	if(isobj(target))
+		if(operators && LAZYFIND(operators, user))
+			to_chat(user, "<span class='warning'>You can't reach [src]'s exterior from in here..</span>")
 			return FALSE
-	if(allowed(user))
-		if(!canopy_open)
-			playsound(src, 'sound/effects/glasshit.ogg', 75, 1)
-			user.visible_message("<span class='warning'>You bang on the canopy.</span>", "<span class='warning'>[user] bangs on [src]'s canopy.</span>")
-			return FALSE
-		if(operators.len >= max_passengers)
-			to_chat(user, "<span class='warning'>[src]'s passenger compartment is full!")
-			return FALSE
-		to_chat(target, "[(user == target) ? "You start to climb into [src]'s passenger compartment" : "[user] starts to lift you into [src]'s passenger compartment"]")
-		if(do_after(user, 2 SECONDS, target=src))
-			start_piloting(user, "observer")
-			enter(user)
-	else
-		to_chat(user, "<span class='warning'>Access denied.</span>")
+		for(var/slot in loadout.equippable_slots)
+			var/obj/item/fighter_component/FC = loadout.get_slot(slot)
+			if(FC?.load(src, target))
+				return FALSE
+	else if(isliving(target))
+		if(allowed(user))
+			if(!canopy_open)
+				playsound(src, 'sound/effects/glasshit.ogg', 75, 1)
+				user.visible_message("<span class='warning'>You bang on the canopy.</span>", "<span class='warning'>[user] bangs on [src]'s canopy.</span>")
+				return FALSE
+			if(operators.len >= max_passengers)
+				to_chat(user, "<span class='warning'>[src]'s passenger compartment is full!")
+				return FALSE
+			to_chat(target, "[(user == target) ? "You start to climb into [src]'s passenger compartment" : "[user] starts to lift you into [src]'s passenger compartment"]")
+			if(do_after(user, 2 SECONDS, target=src))
+				start_piloting(user, OVERMAP_USER_ROLE_OBSERVER)
+				enter(user)
+		else
+			to_chat(user, "<span class='warning'>Access denied.</span>")
+
+/obj/structure/overmap/small_craft/finish_lockon(obj/structure/overmap/target, data_link)
+	if(disruption)
+		to_chat(pilot, "<span class='warning'>ERROR: TGP NOT READY.</span>")
+		return FALSE
+	. = ..()
 
 /obj/structure/overmap/small_craft/proc/enter(mob/user)
 	var/obj/structure/overmap/OM = user.get_overmap()
@@ -525,7 +540,8 @@ Been a mess since 2018, we'll fix it someday (probably)
 		OM.mobs_in_ship -= user
 	user.forceMove(src)
 	mobs_in_ship |= user
-	if((user.client?.prefs.toggles & SOUND_AMBIENCE) && user.can_hear_ambience() && engines_active()) //Disable ambient sounds to shut up the noises.
+	user.last_overmap = src //Allows update_overmap to function properly when the pilot leaves their fighter
+	if((user.client?.prefs.toggles & PREFTOGGLE_SOUND_AMBIENCE) && user.can_hear_ambience() && engines_active()) //Disable ambient sounds to shut up the noises.
 		SEND_SOUND(user, sound('nsv13/sound/effects/fighters/cockpit.ogg', repeat = TRUE, wait = 0, volume = 50, channel=CHANNEL_SHIP_ALERT))
 
 /obj/structure/overmap/small_craft/stop_piloting(mob/living/M, eject_mob=TRUE, force=FALSE)
@@ -590,7 +606,7 @@ Been a mess since 2018, we'll fix it someday (probably)
 
 		if(last_pilot && !last_pilot.incapacitated())
 			last_pilot.doMove(escape_pod)
-			escape_pod.start_piloting(last_pilot, "pilot")
+			escape_pod.start_piloting(last_pilot, OVERMAP_USER_ROLE_PILOT)
 			escape_pod.attack_hand(last_pilot) // Bring up UI
 			mobs_in_ship -= last_pilot
 			escape_pod.mobs_in_ship |= last_pilot
@@ -599,10 +615,10 @@ Been a mess since 2018, we'll fix it someday (probably)
 		for(var/mob/M as() in mobs_in_ship)
 			M.doMove(escape_pod)
 			if(!escape_pod.pilot || escape_pod.pilot.incapacitated()) // Someone please drive this thing
-				escape_pod.start_piloting(M, "pilot")
+				escape_pod.start_piloting(M, OVERMAP_USER_ROLE_PILOT)
 				escape_pod.ui_interact(M)
 			else
-				escape_pod.start_piloting(M, "observer")
+				escape_pod.start_piloting(M, OVERMAP_USER_ROLE_OBSERVER)
 			escape_pod.mobs_in_ship |= M
 			M.overmap_ship = escape_pod
 	mobs_in_ship.Cut()
@@ -617,7 +633,7 @@ Been a mess since 2018, we'll fix it someday (probably)
 			return FALSE
 		if(do_after(user, 2 SECONDS, target=src))
 			enter(user)
-			start_piloting(user, "all_positions")
+			start_piloting(user, (OVERMAP_USER_ROLE_PILOT | OVERMAP_USER_ROLE_GUNNER))
 			to_chat(user, "<span class='notice'>You climb into [src]'s cockpit.</span>")
 			ui_interact(user)
 			to_chat(user, "<span class='notice'>Small craft use directional keys (WASD in hotkey mode) to accelerate/decelerate in a given direction and the mouse to change the direction of craft.\
@@ -638,7 +654,7 @@ Been a mess since 2018, we'll fix it someday (probably)
 		canopy_open = TRUE
 		playsound(src, 'nsv13/sound/effects/fighters/canopy.ogg', 100, 1)
 	for(var/mob/M in mobs_in_ship)
-		stop_piloting(M, force)
+		stop_piloting(M, TRUE, force)
 		M.forceMove(get_turf(src))
 		to_chat(M, "<span class='warning'>You have been remotely ejected from [src]!.</span>")
 		. += M
@@ -736,15 +752,27 @@ Been a mess since 2018, we'll fix it someday (probably)
 	relay('nsv13/sound/effects/ship/reactor/gasmask.ogg', "<span class='warning'>The air around you rushes out of the breached canopy!</span>", loop = FALSE, channel = CHANNEL_SHIP_ALERT)
 
 /obj/structure/overmap/small_craft/welder_act(mob/living/user, obj/item/I)
-	. = ..()
+	if(user.a_intent == INTENT_HARM)
+		return FALSE
 	if(obj_integrity >= max_integrity)
 		to_chat(user, "<span class='notice'>[src] isn't in need of repairs.</span>")
-		return FALSE
-	to_chat(user, "<span class='notice'>You start welding some dents out of [src]'s hull...</span>")
-	if(I.use_tool(src, user, 4 SECONDS, volume=100))
-		to_chat(user, "<span class='notice'>You weld some dents out of [src]'s hull.</span>")
-		obj_integrity += min(10, max_integrity-obj_integrity)
 		return TRUE
+	if(busy)
+		to_chat(user, "<span class='warning'>Someone's already repairing [src]!</span>")
+		return TRUE
+	busy = TRUE
+	to_chat(user, "<span class='notice'>You start welding some dents out of [src]'s hull...</span>")
+	while(obj_integrity < max_integrity)
+		if(!I.use_tool(src, user, 1 SECONDS, volume=100))
+			busy = FALSE
+			return TRUE
+		obj_integrity += 25
+		if(obj_integrity >= max_integrity)
+			obj_integrity = max_integrity
+			break
+	to_chat(user, "<span class='notice'>You finish welding[obj_integrity == max_integrity ? "" : " some of"] the dents out of [src]'s hull.</span>")
+	busy = FALSE
+	return TRUE
 
 /obj/structure/overmap/small_craft/InterceptClickOn(mob/user, params, atom/target)
 	if(user.incapacitated() || !isliving(user))
@@ -873,7 +901,7 @@ due_to_damage: Was this called voluntarily (FALSE) or due to damage / external c
 /obj/item/fighter_component/proc/get_max_ammo()
 	return FALSE
 
-/obj/item/fighter_component/Initialize()
+/obj/item/fighter_component/Initialize(mapload)
 	.=..()
 	AddComponent(/datum/component/two_handed, require_twohands=TRUE) //These all require two hands to pick up
 
@@ -951,18 +979,31 @@ due_to_damage: If the removal was caused voluntarily (FALSE), or if it was cause
 	obj_integrity = 250
 	max_integrity = 250
 	armor = list("melee" = 50, "bullet" = 40, "laser" = 80, "energy" = 50, "bomb" = 50, "bio" = 100, "rad" = 100, "fire" = 100, "acid" = 80) //Armour's pretty tough.
+	var/repair_speed = 25 // How much integrity you can repair per second
+	var/busy = FALSE
 
 //Sometimes you need to repair your physical armour plates.
 /obj/item/fighter_component/armour_plating/welder_act(mob/living/user, obj/item/I)
-	. = ..()
+	if(user.a_intent == INTENT_HARM)
+		return FALSE
 	if(obj_integrity >= max_integrity)
 		to_chat(user, "<span class='notice'>[src] isn't in need of repairs.</span>")
-		return FALSE
-	to_chat(user, "<span class='notice'>You start welding some dents out of [src]...</span>")
-	if(I.use_tool(src, user, 4 SECONDS, volume=100))
-		to_chat(user, "<span class='notice'>You weld some dents out of [src].</span>")
-		obj_integrity += min(10, max_integrity-obj_integrity)
 		return TRUE
+	if(busy)
+		to_chat(user, "<span class='warning'>Someone's already repairing [src]!</span>")
+		return TRUE
+	busy = TRUE
+	to_chat(user, "<span class='notice'>You start welding some dents out of [src]...</span>")
+	while(obj_integrity < max_integrity)
+		if(!I.use_tool(src, user, 1 SECONDS, volume=100))
+			busy = FALSE
+			return TRUE
+		obj_integrity += 25
+		if(obj_integrity >= max_integrity)
+			obj_integrity = max_integrity
+			break
+	to_chat(user, "<span class='notice'>You finish welding[obj_integrity == max_integrity ? "" : " some of"] the dents out of [src].</span>")
+	busy = FALSE
 
 /obj/item/fighter_component/armour_plating/tier2
 	name = "ultra heavy fighter armour"
@@ -1124,7 +1165,7 @@ due_to_damage: If the removal was caused voluntarily (FALSE), or if it was cause
 	return FALSE
 
 /obj/structure/overmap/small_craft/can_move()
-	return (engines_active())
+	return engines_active()
 
 /obj/structure/overmap/small_craft/escapepod/can_move()
 	return TRUE
@@ -1149,7 +1190,7 @@ due_to_damage: If the removal was caused voluntarily (FALSE), or if it was cause
 	var/fuel_capacity = 1000
 	slot = HARDPOINT_SLOT_FUEL
 
-/obj/item/fighter_component/fuel_tank/Initialize()
+/obj/item/fighter_component/fuel_tank/Initialize(mapload)
 	. = ..()
 	create_reagents(fuel_capacity, DRAINABLE | AMOUNT_VISIBLE)
 	reagents.chem_temp = 40
@@ -1176,6 +1217,10 @@ due_to_damage: If the removal was caused voluntarily (FALSE), or if it was cause
 	active = FALSE
 	var/rpm = 0
 	var/flooded = FALSE
+
+/obj/item/fighter_component/engine/flooded //made just so I can put it in pilot-specific mail
+	desc = "A mighty engine capable of propelling small spacecraft to high speeds. Something doesn't seem right, though..."
+	flooded = TRUE
 
 /obj/item/fighter_component/engine/screwdriver_act(mob/living/user, obj/item/I)
 	. = ..()
@@ -1409,6 +1454,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	var/list/ammo = list()
 	var/burst_size = 1
 	var/fire_delay = 0
+	var/allowed_roles = OVERMAP_USER_ROLE_GUNNER
 	var/bypass_safety = FALSE
 
 /obj/item/fighter_component/primary/dump_contents()
@@ -1437,7 +1483,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	hardpoint_fire(target, FIRE_MODE_ANTI_AIR)
 
 /obj/structure/overmap/proc/hardpoint_fire(obj/structure/overmap/target, fireMode)
-	if(istype(src, /obj/structure/overmap/small_craft) && !pilot.incapacitated())
+	if(istype(src, /obj/structure/overmap/small_craft))
 		var/obj/structure/overmap/small_craft/F = src
 		for(var/slot in F.loadout.equippable_slots)
 			var/obj/item/fighter_component/weapon = F.loadout.hardpoint_slots[slot]
@@ -1496,6 +1542,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	SW.overmap_select_sound = overmap_select_sound
 	SW.burst_size = burst_size
 	SW.fire_delay = fire_delay
+	SW.allowed_roles = allowed_roles
 
 /obj/item/fighter_component/primary/remove_from(obj/structure/overmap/target)
 	. = ..()
@@ -1535,6 +1582,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	var/max_ammo = 5
 	var/burst_size = 1 //Cluster torps...UNLESS?
 	var/fire_delay = 0.25 SECONDS
+	var/allowed_roles = OVERMAP_USER_ROLE_GUNNER
 	var/bypass_safety = FALSE
 
 /obj/item/fighter_component/secondary/dump_contents()
@@ -1559,6 +1607,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	SW.overmap_select_sound = overmap_select_sound
 	SW.burst_size = burst_size
 	SW.fire_delay = fire_delay
+	SW.allowed_roles = allowed_roles
 
 /obj/item/fighter_component/secondary/remove_from(obj/structure/overmap/target)
 	. = ..()
@@ -1574,7 +1623,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	name = "upgraded fighter missile rack"
 	icon_state = "missilerack_tier2"
 	tier = 2
-	max_ammo = 5
+	max_ammo = 10
 
 /obj/item/fighter_component/secondary/ordnance_launcher/tier3
 	name = "\improper A-11 'Spacehog' Cluster-Freedom Launcher"
@@ -1647,10 +1696,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	if(proj_type)
 		var/sound/chosen = pick('nsv13/sound/effects/ship/torpedo.ogg','nsv13/sound/effects/ship/freespace2/m_shrike.wav','nsv13/sound/effects/ship/freespace2/m_stiletto.wav','nsv13/sound/effects/ship/freespace2/m_tsunami.wav','nsv13/sound/effects/ship/freespace2/m_wasp.wav')
 		F.relay_to_nearby(chosen)
-		if(proj_type == /obj/item/projectile/guided_munition/missile/dud) //Refactor this to something less trash sometime I guess
-			F.fire_projectile(proj_type, target, homing = FALSE, speed=proj_speed, lateral = FALSE)
-		else
-			F.fire_projectile(proj_type, target, homing = TRUE, speed=proj_speed, lateral = FALSE)
+		F.fire_projectile(proj_type, target, speed=proj_speed, lateral = FALSE)
 	return TRUE
 
 //Utility modules.
@@ -1658,6 +1704,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 /obj/item/fighter_component/primary/utility
 	name = "No :)"
 	slot = HARDPOINT_SLOT_UTILITY_PRIMARY
+	allowed_roles = OVERMAP_USER_ROLE_PILOT | OVERMAP_USER_ROLE_GUNNER
 
 /obj/item/fighter_component/primary/utility/fire(obj/structure/overmap/target)
 	return FALSE
@@ -1666,6 +1713,7 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	name = "Utility Module"
 	slot = HARDPOINT_SLOT_UTILITY_SECONDARY
 	power_usage = 200
+	allowed_roles = OVERMAP_USER_ROLE_PILOT | OVERMAP_USER_ROLE_GUNNER
 
 /obj/structure/overmap/small_craft/proc/update_visuals()
 	if(canopy)
@@ -1730,4 +1778,4 @@ Utility modules can be either one of these types, just ensure you set its slot t
 /obj/structure/overmap/small_craft/proc/toggle_canopy()
 	canopy_open = !canopy_open
 	playsound(src, 'nsv13/sound/effects/fighters/canopy.ogg', 100, 1)
- 
+

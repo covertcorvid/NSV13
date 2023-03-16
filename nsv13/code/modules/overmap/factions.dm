@@ -75,7 +75,7 @@ Set up relationships.
 		current_system = SSstar_system.ships[main_ship]["current_system"]
 	var/list/possible_spawns = list()
 	for(var/datum/star_system/starsys in SSstar_system.systems)
-		if(starsys != current_system && !starsys.hidden && (lowertext(starsys.alignment) == lowertext(src.name) || starsys.alignment == "unaligned")) //Find one of our base systems and try to send a fleet out from there.
+		if(starsys != current_system && !starsys.hidden && (lowertext(starsys.alignment) == lowertext(src.name) || starsys.alignment == "unaligned" || starsys.alignment == "uncharted")) //Find one of our base systems and try to send a fleet out from there.
 			possible_spawns += starsys
 	if(!possible_spawns.len && !override)
 		message_admins("Failed to spawn a [name] fleet because that faction doesn't own a single system :(")
@@ -136,7 +136,7 @@ Set up relationships.
 	for(var/client/C in GLOB.clients)
 		if(!C.mob || !SSmapping.level_trait(C.mob.z, ZTRAIT_BOARDABLE))
 			continue
-		SSmedals.UnlockMedal(MEDAL_CREW_COMPETENT,C)
+		C.give_award(/datum/award/achievement/misc/crew_competent)
 	priority_announce("Attention [station_name()]. You have completed your assigned patrol and are now eligible for a crew transfer. \
 	Your navigational computers have been programmed with the coordinates of the nearest starbase where you may claim your allotted shore leave. \
 	You are under no obligation to remain in this sector, and you have been taken off of active patrol status. If you wish to continue with exploratory missions or other activities you are free to do so.", "Naval Command")

@@ -57,11 +57,11 @@
 	density = TRUE
 	var/obj/machinery/mineral/processing_unit/machine = null
 	var/machinedir = EAST
-	var/link_id = null //NSV13
+	var/link_id = null
 
-/obj/machinery/mineral/processing_unit_console/Initialize()
+/obj/machinery/mineral/processing_unit_console/Initialize(mapload)
 	. = ..()
-	if(link_id) //NSV13
+	if(link_id)
 		return INITIALIZE_HINT_LATELOAD
 	else
 		machine = locate(/obj/machinery/mineral/processing_unit, get_step(src, machinedir))
@@ -70,58 +70,61 @@
 		else
 			return INITIALIZE_HINT_QDEL
 
-/obj/machinery/mineral/processing_unit_console/LateInitialize() //NSV13
-	if(link_id) //If mappers set an ID)
-		for(var/obj/machinery/mineral/processing_unit/PU in GLOB.machines)
-			if(PU.link_id == link_id)
-				machine = PU
-				machine.CONSOLE = src
+// Only called if mappers set ID
+/obj/machinery/mineral/processing_unit_console/LateInitialize()
+	for(var/obj/machinery/mineral/processing_unit/PU in GLOB.machines)
+		if(PU.link_id == link_id)
+			machine = PU
+			machine.CONSOLE = src
+			return
 
-/obj/machinery/mineral/processing_unit_console/ui_interact(mob/user)
+//NSV13 - Furnace TGUI - Start
+/obj/machinery/mineral/processing_unit_console/ui_interact(mob/user, datum/tgui/ui)
+	ui = SStgui.try_update_ui(user, src, ui)
+	if(!ui)
+		ui = new(user, src, "Smelter")
+		ui.open()
+		ui.set_autoupdate(TRUE) // Material amounts
+
+/obj/machinery/mineral/processing_unit_console/ui_data(mob/user)
 	. = ..()
+	var/list/data = list()
 	if(!machine)
 		return
 
-	var/dat = machine.get_machine_data()
+	data = machine.get_machine_data()
+	return data
 
-	var/datum/browser/popup = new(user, "processing", "Smelting Console", 300, 500)
-	popup.set_content(dat)
-	popup.open()
-
-/obj/machinery/mineral/processing_unit_console/Topic(href, href_list)
+/obj/machinery/mineral/processing_unit_console/ui_act(action, params)
 	if(..())
 		return
-	usr.set_machine(src)
-	add_fingerprint(usr)
 
-	if(href_list["material"])
-		var/datum/material/new_material = locate(href_list["material"])
-		if(istype(new_material))
-			machine.selected_material = new_material
-			machine.selected_alloy = null
-
-	if(href_list["alloy"])
-		machine.selected_material = null
-		machine.selected_alloy = href_list["alloy"]
-
-	if(href_list["set_on"])
-		machine.on = (href_list["set_on"] == "on")
-		machine.begin_processing()
-
-	//NSV13 points
-	if(href_list["redeem"])
-		var/mob/M = usr
-		var/obj/item/card/id/I = M.get_idcard(TRUE)
-		if(machine.points)
-			if(I?.mining_points += machine.points)
-				machine.points = 0
-			else
+	switch(action)
+		if("Redeem")
+			var/mob/M = usr
+			var/obj/item/card/id/I = M.get_idcard(TRUE)
+			if(!I)
 				to_chat(usr, "<span class='warning'>No ID detected.</span>")
-		else
-			to_chat(usr, "<span class='warning'>No points to claim.</span>")
+				return
+			if(!machine.points)
+				to_chat(usr, "<span class='warning'>No points to claim.</span>")
+				return
+			I.mining_points += machine.points
+			machine.points = 0
 
-	updateUsrDialog()
-	return
+		if("Toggle_on")
+			machine.toggle_on()
+
+		if("Material")
+			var/datum/material/new_material = locate(params["id"])
+			if(istype(new_material))
+				machine.selected_material = new_material
+				machine.selected_alloy = null
+
+		if("Alloy")
+			machine.selected_material = null
+			machine.selected_alloy = params["id"]
+//NSV13 - Furnace TGUI - Stop
 
 /obj/machinery/mineral/processing_unit_console/Destroy()
 	machine = null
@@ -142,10 +145,14 @@
 	var/datum/material/selected_material = null
 	var/selected_alloy = null
 	var/datum/techweb/stored_research
-	var/link_id = null //NSV13
-	var/points = 0 //NSV13
+	var/link_id = null
+	var/points = 0
+	var/allow_point_redemption = FALSE
 
-/obj/machinery/mineral/processing_unit/Initialize()
+/obj/machinery/mineral/processing_unit/laborcamp
+	allow_point_redemption = FALSE
+
+/obj/machinery/mineral/processing_unit/Initialize(mapload)
 	. = ..()
 	proximity_monitor = new(src, 1)
 	AddComponent(/datum/component/material_container, list(/datum/material/iron, /datum/material/glass, /datum/material/copper, /datum/material/silver, /datum/material/gold, /datum/material/diamond, /datum/material/plasma, /datum/material/uranium, /datum/material/bananium, /datum/material/titanium, /datum/material/bluespace), INFINITY, TRUE, /obj/item/stack)
@@ -165,57 +172,51 @@
 	if(!materials.has_space(material_amount))
 		unload_mineral(O)
 	else
-		points += O.points * O.amount //NSV13
+		if(allow_point_redemption)
+			points += O.points * O.amount
 		materials.insert_item(O)
 		qdel(O)
+		/* NSV13 - Disabled due to our TGUI version
 		if(CONSOLE)
 			CONSOLE.updateUsrDialog()
+		*/
 
+//NSV13 - Furnace TGUI - Start
 /obj/machinery/mineral/processing_unit/proc/get_machine_data()
-	var/dat = "<b>Smelter control console</b><br><br>"
+	var/list/data = list()
+	data["on"] = on
+	data["allowredeem"] = allow_point_redemption
 
-	//NSV13 moved this up here
-	dat += "Machine is currently "
-	if (on)
-		dat += "<A href='?src=[REF(CONSOLE)];set_on=off'>On</A> "
-	else
-		dat += "<A href='?src=[REF(CONSOLE)];set_on=on'>Off</A> "
+	//Points
+	if(allow_point_redemption)
+		data["points"] = points
 
-	//NSV13 points
-	dat += "<br><br>"
-	dat += "Stored points: [points] "
-	dat += "<A href='?src=[REF(CONSOLE)];redeem=1'><b>Redeem</b></A> "
-	dat += "<br><br>"
-
+	data["materials"] = list()
 	var/datum/component/material_container/materials = GetComponent(/datum/component/material_container)
 	for(var/datum/material/M in materials.materials)
 		var/amount = materials.materials[M]
-		dat += "<span class=\"res_name\">[M.name]: </span>[amount] cm&sup3;"
-		if (selected_material == M)
-			dat += " <i>Smelting</i>"
-		else
-			dat += " <A href='?src=[REF(CONSOLE)];material=[REF(M)]'><b>Not Smelting</b></A> "
-		dat += "<br>"
+		var/sheet_amount = amount / MINERAL_MATERIAL_AMOUNT
+		var/ref = REF(M)
+		data["materials"] += list(list("name" = M.name, "id" = ref, "amount" = sheet_amount, "smelting" = (selected_material == M)))
 
-	dat += "<br><br>"
-	dat += "<b>Smelt Alloys</b><br>"
-
+	data["alloys"] = list()
 	for(var/v in stored_research.researched_designs)
 		var/datum/design/D = SSresearch.techweb_design_by_id(v)
-		dat += "<span class=\"res_name\">[D.name] "
-		if (selected_alloy == D.id)
-			dat += " <i>Smelting</i>"
-		else
-			dat += " <A href='?src=[REF(CONSOLE)];alloy=[D.id]'><b>Not Smelting</b></A> "
-		dat += "<br>"
+		data["alloys"] += list(list("name" = D.name, "id" = D.id, "smelting" = (selected_alloy == D.id), "amount" = can_smelt(D)))
 
-	return dat
+	return data
+//NSV13 - Furnace TGUI - Stop
 
 /obj/machinery/mineral/processing_unit/pickup_item(datum/source, atom/movable/target, atom/oldLoc)
 	if(QDELETED(target))
 		return
 	if(istype(target, /obj/item/stack/ore))
 		process_ore(target)
+
+/obj/machinery/mineral/processing_unit/proc/toggle_on()
+	on = !on
+	if(on)
+		begin_processing()
 
 /obj/machinery/mineral/processing_unit/process(delta_time)
 	if(on)
@@ -225,9 +226,10 @@
 		else if(selected_alloy)
 			smelt_alloy(delta_time)
 
-
+		/* NSV13 - Disabled due to our TGUI version
 		if(CONSOLE)
 			CONSOLE.updateUsrDialog()
+		*/
 	else
 		end_processing()
 
