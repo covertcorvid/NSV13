@@ -48,14 +48,16 @@ SUBSYSTEM_DEF(events)
 /datum/controller/subsystem/events/proc/checkEvent()
 	if(scheduled <= world.time)
 		var/list/event_targets = list() // starsystem = list(ship, ship, ...)
-		for(var/z_level as() in SSmapping.levels_by_trait(ZTRAIT_BOARDABLE)) // Only ships that have Z levels inside
+		for(var/z_level as() in SSmapping.levels_by_trait(ZTRAIT_BOARDABLE)) // Only ships that have interior Zs
 			var/datum/space_level/level = SSmapping.get_level(z_level)
 			var/obj/structure/overmap/OM = level.linked_overmap
+			// Build a list of systems and the ships that are in them
 			if(OM?.current_system?.occupying_z)
 				if(!length(event_targets[OM.current_system]))
 					event_targets[OM.current_system] = list()
 				event_targets[OM.current_system] |= OM
 
+		// For each system figure out what kind of event they get
 		for(var/datum/star_system/sys as() in event_targets)
 			if(prob(70) && length(sys.possible_events)) // System event - apply to all ships in the system
 				var/list/target_Zs = list()
@@ -65,7 +67,7 @@ SUBSYSTEM_DEF(events)
 			else // Individual events for everyone
 				for(var/obj/structure/overmap/OM as() in event_targets[sys])
 					spawnEvent(control, OM.occupying_levels)
-		
+
 		reschedule()
 
 // NSV13 - added list of Z levels as argument
