@@ -261,12 +261,3 @@
 	data["repair_records"] = repair_records
 	data["quadrant"] = quadrant
 	return data
-
-/obj/item/circuitboard/machine/armour_plating_nanorepair_pump
-	name = "Armour Plating Nano-repair Pump (Machine Board)"
-	build_path = /obj/machinery/armour_plating_nanorepair_pump
-	req_components = list(
-		/obj/item/stock_parts/manipulator = 10,
-		/obj/item/stock_parts/scanning_module = 5,
-		/obj/item/stock_parts/capacitor = 5,
-		/obj/item/stock_parts/micro_laser = 6)

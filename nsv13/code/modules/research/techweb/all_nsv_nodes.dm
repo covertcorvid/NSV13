@@ -1,13 +1,4 @@
 //Ship tech
-/datum/techweb_node/ship_shield_tech
-	id = "ship_shield_tech"
-	display_name = "Experimental Shield Technology"
-	description = "Highly experimental shield technology to vastly increase survivability in ships. Although Nanotrasen researchers have had access to this technology for quite some time, the incredible amount of power required to maintain shields has proven to be the greatest challenge in implementing them."
-	design_ids = list("shield_fan", "shield_capacitor", "shield_modulator", "shield_interface", "shield_frame")
-	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 1000)
-	export_price = 5000
-	hidden = TRUE
-
 /datum/techweb_node/ship_circuits
 	id = "ship_circuitry"
 	display_name = "Ship computer circuitry"

@@ -307,3 +307,23 @@
 	)
 	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | UNACIDABLE | ACID_PROOF | FREEZE_PROOF
 	build_path = /obj/machinery/ship_weapon/plasma_caster
+
+//APNW and APNP
+/obj/item/circuitboard/machine/armour_plating_nanorepair_well
+	name = "Armour Plating Nano-repair Well (Machine Board)"
+	build_path = /obj/machinery/armour_plating_nanorepair_well
+	req_components = list(
+		/obj/item/stock_parts/matter_bin = 10,
+		/obj/item/stock_parts/manipulator = 5,
+		/obj/item/stock_parts/scanning_module = 2,
+		/obj/item/stock_parts/capacitor = 8,
+		/obj/item/stock_parts/micro_laser = 2)
+
+/obj/item/circuitboard/machine/armour_plating_nanorepair_pump
+	name = "Armour Plating Nano-repair Pump (Machine Board)"
+	build_path = /obj/machinery/armour_plating_nanorepair_pump
+	req_components = list(
+		/obj/item/stock_parts/manipulator = 10,
+		/obj/item/stock_parts/scanning_module = 5,
+		/obj/item/stock_parts/capacitor = 5,
+		/obj/item/stock_parts/micro_laser = 6)
