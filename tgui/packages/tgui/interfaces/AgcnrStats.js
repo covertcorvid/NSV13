@@ -6,28 +6,23 @@ import { toFixed } from 'common/math';
 import { pureComponentHooks } from 'common/react';
 import { Component, Fragment } from 'inferno';
 import { Box, Button, Chart, ColorBox, Flex, Icon, LabeledList, ProgressBar, Section, Table } from '../components';
-import { NtosWindow } from '../layouts';
+import { Window } from '../layouts';
 import { useBackend, useLocalState } from '../backend';
 
-export const NtosRbmkStats = (props, context) => {
+export const AgcnrStats = (props, context) => {
   const { act, data } = useBackend(context);
   const powerData = data.powerData.map((value, i) => [i, value]);
   const psiData = data.psiData.map((value, i) => [i, value]);
   const tempInputData = data.tempInputData.map((value, i) => [i, value]);
   const tempOutputdata = data.tempOutputdata.map((value, i) => [i, value]);
   return (
-    <NtosWindow
+    <Window
       resizable
-      width={440}
-      height={650}>
-      <NtosWindow.Content>
-
-        <Section title="Legend:" buttons={
-          <Button
-            icon="search"
-            onClick={() => act('swap_reactor')}
-            content="Change Reactor" />
-        }>
+      theme="ntos"
+      width={350}
+      height={500}>
+      <Window.Content>
+        <Section title="Legend:">
           Reactor Power (%):
           <ProgressBar
             value={data.power}
@@ -90,7 +85,7 @@ export const NtosRbmkStats = (props, context) => {
             strokeColor="rgba(255, 0, 0 , 1)"
             fillColor="rgba(255, 0, 0 , 0.1)" />
         </Section>
-      </NtosWindow.Content>
-    </NtosWindow>
+      </Window.Content>
+    </Window>
   );
 };

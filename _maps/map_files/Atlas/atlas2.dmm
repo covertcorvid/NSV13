@@ -9853,7 +9853,7 @@
 /area/hallway/nsv/deck1/hallway)
 "Uh" = (
 /obj/structure/closet/secure_closet/engineering_chief,
-/obj/item/book/manual/wiki/rbmk,
+/obj/item/book/manual/wiki/agcnr,
 /obj/item/bedsheet/ce,
 /turf/open/floor/monotile/steel,
 /area/crew_quarters/heads/chief)

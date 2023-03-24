@@ -1236,7 +1236,7 @@ Control Rods
 //////// Reactor Computer////////
 
 /obj/machinery/computer/ship/reactor_control_computer
-	name = "Seegson model RBMK reactor control console"
+	name = "Seegson model storm drive reactor control console"
 	desc = "A state of the art terminal which is linked to a nuclear storm drive reactor. It has several buttons labelled 'AZ' on the keyboard."
 	icon_screen = "reactor_control"
 	density = TRUE
@@ -1417,7 +1417,7 @@ Control Rods
 
 /datum/techweb_node/stormdrive_reactor_control
 	id = "sd_r_c_c"
-	display_name = "Seegson RBMK RCC"
+	display_name = "Seegson Storm Drive RCC"
 	description = "Seegson's latest and greatest (within your budget range) reactor control design!"
 	prereq_ids = list("adv_engi", "adv_power")
 	design_ids = list("sd_r_c_c")

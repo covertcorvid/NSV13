@@ -4,18 +4,20 @@
 #define MODERATOR_INPUT_GATE airs[2]
 #define COOLANT_OUTPUT_GATE airs[3]
 
-#define RBMK_TEMPERATURE_OPERATING 640 //Celsius
-#define RBMK_TEMPERATURE_CRITICAL 800 //At this point the entire ship is alerted to a meltdown. This may need altering
-#define RBMK_TEMPERATURE_MELTDOWN 900
+#define AGCNR_TEMPERATURE_OPERATING 640 //Celsius
+#define AGCNR_TEMPERATURE_CRITICAL 800 //At this point the entire ship is alerted to a meltdown. This may need altering
+#define AGCNR_TEMPERATURE_MELTDOWN 900
 
-#define RBMK_NO_COOLANT_TOLERANCE 5 //How many process()ing ticks the reactor can sustain without coolant before slowly taking damage
+#define AGCNR_NO_COOLANT_TOLERANCE 5 //How many process()ing ticks the reactor can sustain without coolant before slowly taking damage
 
-#define RBMK_PRESSURE_OPERATING 1000 //PSI
-#define RBMK_PRESSURE_CRITICAL 1469.59 //PSI
+#define AGCNR_PRESSURE_OPERATING 1000 //PSI
+#define AGCNR_PRESSURE_CRITICAL 1469.59 //PSI
 
-#define RBMK_MAX_CRITICALITY 3 //No more criticality than N for now.
+#define AGCNR_MAX_CRITICALITY 3 //No more criticality than N for now.
 
-#define RBMK_POWER_FLAVOURISER 8000 //To turn those KWs into something usable
+#define AGCNR_POWER_FLAVOURISER 8000 //To turn those KWs into something usable
+
+#define FREQ_AGCNR_CONTROL 1439.69
 
 //Reference: Heaters go up to 500K.
 //Hot plasmaburn: 14164.95 C.
@@ -86,7 +88,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 			L.client.last_ambience = ambient_buzz
 	return TRUE
 
-/obj/item/book/manual/wiki/rbmk
+/obj/item/book/manual/wiki/agcnr
 	name = "\improper Haynes nuclear reactor owner's manual"
 	icon_state ="bookEngineering2"
 	author = "CogWerk Engineering Reactor Design Department"
@@ -96,7 +98,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 /obj/machinery/atmospherics/components/trinary/nuclear_reactor
 	name = "\improper Advanced Gas-Cooled Nuclear Reactor"
 	desc = "A tried and tested design which can output stable power at an acceptably low risk. The moderator can be changed to provide different effects."
-	icon = 'nsv13/icons/obj/machinery/rbmk.dmi'
+	icon = 'nsv13/icons/obj/machinery/agcnr.dmi'
 	icon_state = "reactor_map"
 	pixel_x = -32
 	pixel_y = -32
@@ -126,7 +128,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	var/next_warning = 0 //To avoid spam.
 	var/last_power_produced = 0 //For logging purposes
 	var/next_flicker = 0 //Light flicker timer
-	var/base_power_modifier = RBMK_POWER_FLAVOURISER
+	var/base_power_modifier = AGCNR_POWER_FLAVOURISER
 	var/slagged = FALSE //Is this reactor even usable any more?
 	//Console statistics.
 	var/last_coolant_temperature = 0
@@ -284,7 +286,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	else
 		if(has_fuel())
 			no_coolant_ticks++
-			if(no_coolant_ticks > RBMK_NO_COOLANT_TOLERANCE)
+			if(no_coolant_ticks > AGCNR_NO_COOLANT_TOLERANCE)
 				temperature += temperature / 500 //This isn't really harmful early game, but when your reactor is up to full power, this can get out of hand quite quickly.
 				vessel_integrity -= temperature / 200 //Think fast loser.
 				take_damage(10) //Just for the sound effect, to let you know you've fucked up.
@@ -294,7 +296,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	coolant_output.set_temperature(CELSIUS_TO_KELVIN(temperature)) //Heat the coolant output gas that we just had pass through us.
 	last_output_temperature = KELVIN_TO_CELSIUS(coolant_output.return_temperature())
 	pressure = KPA_TO_PSI(coolant_output.return_pressure())
-	power = (temperature / RBMK_TEMPERATURE_CRITICAL) * 100
+	power = (temperature / AGCNR_TEMPERATURE_CRITICAL) * 100
 	var/radioactivity_spice_multiplier = 1 //Some gasses make the reactor a bit spicy.
 	var/depletion_modifier = 0.035 //How rapidly do your rods decay
 	gas_absorption_effectiveness = gas_absorption_constant
@@ -353,7 +355,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 		else if(desired_k < K)
 			K -= difference
 
-	K = CLAMP(K, 0, RBMK_MAX_CRITICALITY)
+	K = CLAMP(K, 0, AGCNR_MAX_CRITICALITY)
 	if(has_fuel())
 		temperature += K
 	else
@@ -404,9 +406,9 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	if(K <= 0 && temperature <= 0)
 		shut_down()
 	//First alert condition: Overheat
-	if(temperature >= RBMK_TEMPERATURE_CRITICAL)
+	if(temperature >= AGCNR_TEMPERATURE_CRITICAL)
 		alert = TRUE
-		if(temperature >= RBMK_TEMPERATURE_MELTDOWN)
+		if(temperature >= AGCNR_TEMPERATURE_MELTDOWN)
 			var/temp_damage = min(temperature/100, initial(vessel_integrity)/40)	//40 seconds to meltdown from full integrity, worst-case. Bit less than blowout since it's harder to spike heat that much.
 			vessel_integrity -= temp_damage
 			if(vessel_integrity <= temp_damage) //It wouldn't be able to tank another hit.
@@ -420,7 +422,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	else
 		color = null
 	//Second alert condition: Overpressurized (the more lethal one)
-	if(pressure >= RBMK_PRESSURE_CRITICAL)
+	if(pressure >= AGCNR_PRESSURE_CRITICAL)
 		alert = TRUE
 		shake_animation(0.5)
 		playsound(loc, 'sound/machines/clockcult/steam_whoosh.ogg', 100, TRUE)
@@ -448,7 +450,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 			return
 		next_warning = world.time + 30 SECONDS //To avoid engis pissing people off when reaaaally trying to stop the meltdown or whatever.
 		warning = TRUE //Start warning the crew of the imminent danger.
-		OM.relay('nsv13/sound/effects/rbmk/alarm.ogg', null, loop=TRUE, channel = CHANNEL_REACTOR_ALERT)
+		OM.relay('nsv13/sound/effects/agcnr/alarm.ogg', null, loop=TRUE, channel = CHANNEL_REACTOR_ALERT)
 		set_light(0)
 		light_color = LIGHT_COLOR_RED
 		set_light(10)
@@ -465,7 +467,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	AddComponent(/datum/component/radioactive, 15000 , src)
 	var/obj/effect/landmark/nuclear_waste_spawner/NSW = new /obj/effect/landmark/nuclear_waste_spawner/strong(get_turf(src))
 	var/obj/structure/overmap/OM = get_overmap()
-	OM.relay('nsv13/sound/effects/rbmk/meltdown.ogg', "<span class='userdanger'>You hear a horrible metallic hissing.</span>")
+	OM.relay('nsv13/sound/effects/agcnr/meltdown.ogg', "<span class='userdanger'>You hear a horrible metallic hissing.</span>")
 	OM?.stop_relay(CHANNEL_REACTOR_ALERT)
 	NSW.fire() //This will take out engineering for a decent amount of time as they have to clean up the sludge.
 	for(var/obj/machinery/power/apc/A in GLOB.apcs_list)
@@ -514,13 +516,13 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	switch(temperature)
 		if(0 to 200)
 			icon_state = "reactor_on"
-		if(200 to RBMK_TEMPERATURE_OPERATING)
+		if(200 to AGCNR_TEMPERATURE_OPERATING)
 			icon_state = "reactor_hot"
-		if(RBMK_TEMPERATURE_OPERATING to 750)
+		if(AGCNR_TEMPERATURE_OPERATING to 750)
 			icon_state = "reactor_veryhot"
-		if(750 to RBMK_TEMPERATURE_CRITICAL) //Point of no return.
+		if(750 to AGCNR_TEMPERATURE_CRITICAL) //Point of no return.
 			icon_state = "reactor_overheat"
-		if(RBMK_TEMPERATURE_CRITICAL to INFINITY)
+		if(AGCNR_TEMPERATURE_CRITICAL to INFINITY)
 			icon_state = "reactor_meltdown"
 	if(!has_fuel())
 		icon_state = "reactor_off"
@@ -537,7 +539,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	desired_k = 1
 	set_light(10)
 	var/area/AR = get_area(src)
-	AR.set_looping_ambience('nsv13/sound/effects/rbmk/reactor_hum.ogg')
+	AR.set_looping_ambience('nsv13/sound/effects/agcnr/reactor_hum.ogg')
 	var/startup_sound = pick('nsv13/sound/effects/ship/reactor/startup.ogg', 'nsv13/sound/effects/ship/reactor/startup2.ogg')
 	playsound(loc, startup_sound, 100)
 	SSblackbox.record_feedback("tally", "engine_stats", 1, "agcnr")
@@ -584,12 +586,10 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 			return TRUE
 	return FALSE
 
-#define FREQ_RBMK_CONTROL 1439.69
-
 /obj/machinery/computer/reactor/control_rods
 	name = "control rod management computer"
 	desc = "A computer which can remotely raise / lower the control rods of a reactor."
-	icon_screen = "rbmk_rods"
+	icon_screen = "agcnr_rods"
 
 /obj/machinery/computer/reactor/control_rods/attack_hand(mob/living/user)
 	. = ..()
@@ -598,7 +598,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 /obj/machinery/computer/reactor/control_rods/ui_interact(mob/user, datum/tgui/ui)
 	ui = SStgui.try_update_ui(user, src, ui)
 	if(!ui)
-		ui = new(user, src, "RbmkControlRods")
+		ui = new(user, src, "AgcnrControlRods")
 		ui.open()
 		ui.set_autoupdate(TRUE)
 
@@ -625,7 +625,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 /obj/machinery/computer/reactor/stats
 	name = "reactor statistics console"
 	desc = "A console for monitoring the statistics of a nuclear reactor."
-	icon_screen = "rbmk_stats"
+	icon_screen = "agcnr_stats"
 	var/next_stat_interval = 0
 	var/list/psiData = list()
 	var/list/powerData = list()
@@ -639,7 +639,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 /obj/machinery/computer/reactor/stats/ui_interact(mob/user, datum/tgui/ui)
 	ui = SStgui.try_update_ui(user, src, ui)
 	if(!ui)
-		ui = new(user, src, "RbmkStats")
+		ui = new(user, src, "AgcnrStats")
 		ui.open()
 		ui.set_autoupdate(TRUE)
 
@@ -674,7 +674,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 /obj/machinery/computer/reactor/fuel_rods
 	name = "Reactor Fuel Management Console"
 	desc = "A console which can remotely raise fuel rods out of nuclear reactors."
-	icon_screen = "rbmk_fuel"
+	icon_screen = "agcnr_fuel"
 
 /obj/machinery/computer/reactor/fuel_rods/attack_hand(mob/living/user)
 	. = ..()
@@ -689,29 +689,29 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	var/atom/movable/fuel_rod = input(usr, "Select a fuel rod to remove", "[src]", null) as null|anything in reactor.fuel_rods
 	if(!fuel_rod)
 		return
-	playsound(src, pick('nsv13/sound/effects/rbmk/switch.ogg','nsv13/sound/effects/rbmk/switch2.ogg','nsv13/sound/effects/rbmk/switch3.ogg'), 100, FALSE)
+	playsound(src, pick('nsv13/sound/effects/agcnr/switch.ogg','nsv13/sound/effects/agcnr/switch2.ogg','nsv13/sound/effects/agcnr/switch3.ogg'), 100, FALSE)
 	playsound(reactor, 'nsv13/sound/effects/ship/freespace2/crane_1.wav', 100, FALSE)
 	fuel_rod.forceMove(get_turf(reactor))
 	reactor.fuel_rods -= fuel_rod
 
 //Preset pumps for mappers. You can also set the id tags yourself.
-/obj/machinery/atmospherics/components/binary/pump/rbmk_input
-	id = "rbmk_input"
-	frequency = FREQ_RBMK_CONTROL
+/obj/machinery/atmospherics/components/binary/pump/agcnr_input
+	id = "agcnr_input"
+	frequency = FREQ_AGCNR_CONTROL
 
-/obj/machinery/atmospherics/components/binary/pump/rbmk_output
-	id = "rbmk_output"
-	frequency = FREQ_RBMK_CONTROL
+/obj/machinery/atmospherics/components/binary/pump/agcnr_output
+	id = "agcnr_output"
+	frequency = FREQ_AGCNR_CONTROL
 
-/obj/machinery/atmospherics/components/binary/pump/rbmk_moderator
-	id = "rbmk_moderator"
-	frequency = FREQ_RBMK_CONTROL
+/obj/machinery/atmospherics/components/binary/pump/agcnr_moderator
+	id = "agcnr_moderator"
+	frequency = FREQ_AGCNR_CONTROL
 
 /obj/machinery/computer/reactor/pump
 	name = "reactor inlet valve computer"
 	desc = "A computer which controls valve settings on an advanced gas cooled reactor. Alt click it to remotely set pump pressure."
-	icon_screen = "rbmk_input"
-	id = "rbmk_input"
+	icon_screen = "agcnr_input"
+	id = "agcnr_input"
 	var/datum/radio_frequency/radio_connection
 	var/on = FALSE
 
@@ -735,21 +735,21 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	. = ..()
 	if(!is_operational)
 		return FALSE
-	playsound(loc, pick('nsv13/sound/effects/rbmk/switch.ogg','nsv13/sound/effects/rbmk/switch2.ogg','nsv13/sound/effects/rbmk/switch3.ogg'), 100, FALSE)
+	playsound(loc, pick('nsv13/sound/effects/agcnr/switch.ogg','nsv13/sound/effects/agcnr/switch2.ogg','nsv13/sound/effects/agcnr/switch3.ogg'), 100, FALSE)
 	visible_message("<span class='notice'>[src]'s switch flips [on ? "off" : "on"].</span>")
 	on = !on
 	signal(on)
 
 /obj/machinery/computer/reactor/pump/Initialize(mapload, obj/item/circuitboard/C)
 	. = ..()
-	radio_connection = SSradio.add_object(src, FREQ_RBMK_CONTROL,filter=RADIO_ATMOSIA)
+	radio_connection = SSradio.add_object(src, FREQ_AGCNR_CONTROL,filter=RADIO_ATMOSIA)
 
 /obj/machinery/computer/reactor/pump/proc/signal(power, set_output_pressure=null)
 	var/datum/signal/signal
 	if(!set_output_pressure) //Yes this is stupid, but technically if you pass through "set_output_pressure" onto the signal, it'll always try and set its output pressure and yeahhh...
 		signal = new(list(
 			"tag" = id,
-			"frequency" = FREQ_RBMK_CONTROL,
+			"frequency" = FREQ_AGCNR_CONTROL,
 			"timestamp" = world.time,
 			"power" = power,
 			"sigtype" = "command"
@@ -757,7 +757,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	else
 		signal = new(list(
 			"tag" = id,
-			"frequency" = FREQ_RBMK_CONTROL,
+			"frequency" = FREQ_AGCNR_CONTROL,
 			"timestamp" = world.time,
 			"power" = power,
 			"set_output_pressure" = set_output_pressure,
@@ -766,20 +766,20 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	radio_connection.post_signal(src, signal, filter=RADIO_ATMOSIA)
 
 //Preset subtypes for mappers
-/obj/machinery/computer/reactor/pump/rbmk_input
+/obj/machinery/computer/reactor/pump/agcnr_input
 	name = "Reactor inlet valve computer"
-	icon_screen = "rbmk_input"
-	id = "rbmk_input"
+	icon_screen = "agcnr_input"
+	id = "agcnr_input"
 
-/obj/machinery/computer/reactor/pump/rbmk_output
+/obj/machinery/computer/reactor/pump/agcnr_output
 	name = "Reactor output valve computer"
-	icon_screen = "rbmk_output"
-	id = "rbmk_output"
+	icon_screen = "agcnr_output"
+	id = "agcnr_output"
 
-/obj/machinery/computer/reactor/pump/rbmk_moderator
+/obj/machinery/computer/reactor/pump/agcnr_moderator
 	name = "Reactor moderator valve computer"
-	icon_screen = "rbmk_moderator"
-	id = "rbmk_moderator"
+	icon_screen = "agcnr_moderator"
+	id = "agcnr_moderator"
 
 //SPENT FUEL POOL
 //FINALLY WE CAN RECREATE THE ROBLOX NUCLEAR DISASTER - 18/08/2020
@@ -795,7 +795,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 
 //Monitoring program.
 /datum/computer_file/program/nuclear_monitor
-	filename = "rbmkmonitor"
+	filename = "agcnrmonitor"
 	filedesc = "Nuclear Reactor Monitoring"
 	ui_header = "smmon_0.gif"
 	program_icon_state = "smmon_0"
@@ -803,9 +803,9 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	requires_ntnet = TRUE
 	transfer_access = ACCESS_CONSTRUCTION
 	category = PROGRAM_CATEGORY_ENGI
-	network_destination = "rbmk monitoring system"
+	network_destination = "agcnr monitoring system"
 	size = 2
-	tgui_id = "NtosRbmkStats"
+	tgui_id = "NtosAgcnrStats"
 	var/active = TRUE //Easy process throttle
 	var/next_stat_interval = 0
 	var/list/psiData = list()
@@ -824,11 +824,11 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 		stage = 1
 	if(reactor.power >= 40)
 		stage = 2
-	if(reactor.temperature >= RBMK_TEMPERATURE_OPERATING)
+	if(reactor.temperature >= AGCNR_TEMPERATURE_OPERATING)
 		stage = 3
-	if(reactor.temperature >= RBMK_TEMPERATURE_CRITICAL)
+	if(reactor.temperature >= AGCNR_TEMPERATURE_CRITICAL)
 		stage = 4
-	if(reactor.temperature >= RBMK_TEMPERATURE_MELTDOWN)
+	if(reactor.temperature >= AGCNR_TEMPERATURE_MELTDOWN)
 		stage = 5
 		if(reactor.vessel_integrity <= 100) //Bye bye! GET OUT!
 			stage = 6

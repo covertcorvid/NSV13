@@ -47,16 +47,16 @@
 	explanation_text = "Maintain production of x MW in the engine until the end of the shift."
 	jobs = "chiefengineer,stationengineer,atmospherictechnician"
 	var/obj/machinery/atmospherics/components/binary/stormdrive_reactor/SD
-	var/obj/machinery/atmospherics/components/trinary/nuclear_reactor/RBMK
+	var/obj/machinery/atmospherics/components/trinary/nuclear_reactor/AGCNR
 
 /datum/objective/crew/power_generation/New()
 	. = ..()
 	SD = locate() in GLOB.machines
-	RBMK = locate() in GLOB.machines
+	AGCNR = locate() in GLOB.machines
 	var/base_target_power
 	if(SD)
 		base_target_power = 13000000
-	else if(RBMK)
+	else if(AGCNR)
 		base_target_power = 10000000
 	else
 		base_target_power = 5000000
@@ -71,6 +71,6 @@
 /datum/objective/crew/power_generation/check_completion()
 	if(SD.last_power_produced >= target_amount)
 		return TRUE
-	if(RBMK.last_power_produced >= target_amount)
+	if(AGCNR.last_power_produced >= target_amount)
 		return TRUE
 	return FALSE

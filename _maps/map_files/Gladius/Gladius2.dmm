@@ -620,7 +620,7 @@
 /area/hallway/secondary/exit/departure_lounge)
 "auR" = (
 /obj/effect/turf_decal/ship/shutoff,
-/obj/machinery/atmospherics/components/binary/pump/rbmk_output{
+/obj/machinery/atmospherics/components/binary/pump/agcnr_output{
 	dir = 1;
 	name = "Coolant Outlet"
 	},
@@ -1932,7 +1932,7 @@
 	dir = 1
 	},
 /obj/structure/table/reinforced,
-/obj/item/book/manual/wiki/rbmk,
+/obj/item/book/manual/wiki/agcnr,
 /obj/machinery/computer/reactor/stats,
 /turf/open/floor/plating,
 /area/engine/engineering/reactor_core)
@@ -4223,7 +4223,7 @@
 	dir = 8
 	},
 /obj/effect/turf_decal/ship/shutoff,
-/obj/machinery/atmospherics/components/binary/pump/rbmk_input{
+/obj/machinery/atmospherics/components/binary/pump/agcnr_input{
 	name = "Coolant inlet"
 	},
 /turf/open/floor/durasteel/techfloor_grid,
@@ -6764,7 +6764,7 @@
 /area/maintenance/nsv/deck2/port/fore)
 "euY" = (
 /obj/structure/table/reinforced,
-/obj/machinery/computer/reactor/pump/rbmk_moderator,
+/obj/machinery/computer/reactor/pump/agcnr_moderator,
 /obj/machinery/firealarm/directional/north,
 /turf/open/floor/plasteel/techmaint,
 /area/engine/engineering/reactor_core)
@@ -6912,7 +6912,7 @@
 /area/engine/engineering/hangar)
 "ezS" = (
 /obj/structure/table/reinforced,
-/obj/machinery/computer/reactor/pump/rbmk_output,
+/obj/machinery/computer/reactor/pump/agcnr_output,
 /obj/item/radio/intercom/directional/east,
 /turf/open/floor/plasteel/techmaint,
 /area/engine/engineering/reactor_core)
@@ -15013,7 +15013,7 @@
 "iRZ" = (
 /obj/structure/table/reinforced,
 /obj/machinery/newscaster/directional/east,
-/obj/item/book/manual/wiki/rbmk,
+/obj/item/book/manual/wiki/agcnr,
 /turf/open/floor/plasteel/grid/steel,
 /area/engine/engineering/reactor_control)
 "iSm" = (
@@ -17602,7 +17602,7 @@
 	icon_state = "1-2"
 	},
 /obj/effect/turf_decal/ship/techfloor,
-/obj/machinery/atmospherics/components/binary/pump/rbmk_moderator{
+/obj/machinery/atmospherics/components/binary/pump/agcnr_moderator{
 	dir = 1;
 	name = "Moderator Inlet"
 	},
@@ -25934,7 +25934,7 @@
 /area/hallway/nsv/deck2/frame1/starboard)
 "pnV" = (
 /obj/structure/table/reinforced,
-/obj/machinery/computer/reactor/pump/rbmk_input,
+/obj/machinery/computer/reactor/pump/agcnr_input,
 /obj/machinery/camera/autoname,
 /obj/machinery/door/firedoor/border_only{
 	dir = 8
@@ -30063,7 +30063,7 @@
 /obj/structure/table,
 /obj/item/stack/sheet/mineral/titanium/fifty,
 /obj/item/stack/sheet/iron/fifty,
-/obj/item/book/manual/wiki/rbmk,
+/obj/item/book/manual/wiki/agcnr,
 /turf/open/floor/plasteel/techmaint,
 /area/engine/engineering/reactor_core)
 "rwR" = (

@@ -10754,7 +10754,7 @@
 "hbz" = (
 /obj/machinery/atmospherics/components/binary/pump/layer2{
 	frequency = 1439.69;
-	id = "rbmk_moderator";
+	id = "agcnr_moderator";
 	name = "Nuclear Reactor Fuel Tank to Nuclear Reactor Moderator"
 	},
 /obj/machinery/atmospherics/components/binary/pump{
@@ -12003,7 +12003,7 @@
 /obj/machinery/atmospherics/components/binary/pump{
 	dir = 8;
 	frequency = 1439.69;
-	id = "rbmk_input";
+	id = "agcnr_input";
 	name = "Space to Nuclear Reactor Coolant"
 	},
 /turf/open/floor/engine,
@@ -30578,21 +30578,21 @@
 	output_tag = "nuclear_out";
 	sensors = list("nuclear_sensor"="Nuclear Reactor Gas Mix Tank")
 	},
-/obj/machinery/computer/reactor/pump/rbmk_output{
+/obj/machinery/computer/reactor/pump/agcnr_output{
 	density = 0;
 	icon = 'icons/obj/stationobjs.dmi';
 	icon_state = "doorctrl";
 	pixel_x = -26;
 	pixel_y = -25
 	},
-/obj/machinery/computer/reactor/pump/rbmk_moderator{
+/obj/machinery/computer/reactor/pump/agcnr_moderator{
 	density = 0;
 	icon = 'icons/obj/stationobjs.dmi';
 	icon_state = "doorctrl";
 	pixel_x = -26;
 	pixel_y = -14
 	},
-/obj/machinery/computer/reactor/pump/rbmk_input{
+/obj/machinery/computer/reactor/pump/agcnr_input{
 	density = 0;
 	icon = 'icons/obj/stationobjs.dmi';
 	icon_state = "doorctrl";
@@ -31496,7 +31496,7 @@
 /obj/machinery/atmospherics/components/binary/pump{
 	dir = 8;
 	frequency = 1439.69;
-	id = "rbmk_output";
+	id = "agcnr_output";
 	name = "Nuclear Reactor Output to Space"
 	},
 /turf/open/floor/engine,

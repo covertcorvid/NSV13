@@ -5067,7 +5067,7 @@
 /area/tcommsat/server)
 "amB" = (
 /obj/structure/table/reinforced,
-/obj/machinery/computer/reactor/pump/rbmk_input,
+/obj/machinery/computer/reactor/pump/agcnr_input,
 /obj/machinery/firealarm/directional/north,
 /turf/open/floor/durasteel/lino,
 /area/engine/engineering/reactor_control)
@@ -6103,7 +6103,7 @@
 	},
 /obj/structure/closet/radiation,
 /obj/item/radio/intercom/directional/west,
-/obj/item/book/manual/wiki/rbmk,
+/obj/item/book/manual/wiki/agcnr,
 /turf/open/floor/monotile/dark,
 /area/engine/engine_smes)
 "apE" = (
@@ -8058,7 +8058,7 @@
 /area/space/nearstation)
 "awa" = (
 /obj/structure/table/reinforced,
-/obj/machinery/computer/reactor/pump/rbmk_output,
+/obj/machinery/computer/reactor/pump/agcnr_output,
 /turf/open/floor/durasteel/lino,
 /area/engine/engineering/reactor_control)
 "awc" = (
@@ -8472,7 +8472,7 @@
 /obj/machinery/power/apc/auto_name/north{
 	pixel_y = 24
 	},
-/obj/machinery/computer/reactor/pump/rbmk_moderator,
+/obj/machinery/computer/reactor/pump/agcnr_moderator,
 /turf/open/floor/durasteel/lino,
 /area/engine/engineering/reactor_control)
 "ayW" = (
@@ -16477,7 +16477,7 @@
 	})
 "aSr" = (
 /obj/structure/closet/secure_closet/engineering_chief,
-/obj/item/book/manual/wiki/rbmk,
+/obj/item/book/manual/wiki/agcnr,
 /turf/open/floor/monotile/steel,
 /area/crew_quarters/heads/chief)
 "aSs" = (
@@ -40045,7 +40045,7 @@
 	dir = 1
 	},
 /obj/item/analyzer,
-/obj/item/book/manual/wiki/rbmk,
+/obj/item/book/manual/wiki/agcnr,
 /turf/open/floor/plasteel/ridged/steel,
 /area/engine/engineering/reactor_core)
 "ddD" = (
@@ -46006,7 +46006,7 @@
 /turf/open/floor/plasteel/grid/steel,
 /area/quartermaster/storage)
 "lAf" = (
-/obj/machinery/atmospherics/components/binary/pump/rbmk_input{
+/obj/machinery/atmospherics/components/binary/pump/agcnr_input{
 	dir = 1;
 	name = "Coolant inlet"
 	},
@@ -48024,7 +48024,7 @@
 /turf/open/floor/monotile/steel,
 /area/engine/engineering/reactor_core)
 "oAP" = (
-/obj/machinery/atmospherics/components/binary/pump/rbmk_output{
+/obj/machinery/atmospherics/components/binary/pump/agcnr_output{
 	dir = 1;
 	name = "Coolant Outlet"
 	},
@@ -50218,7 +50218,7 @@
 /turf/open/floor/monotile/dark,
 /area/crew_quarters/theatre)
 "sfI" = (
-/obj/machinery/atmospherics/components/binary/pump/rbmk_moderator{
+/obj/machinery/atmospherics/components/binary/pump/agcnr_moderator{
 	dir = 8;
 	name = "Moderator Inlet"
 	},

@@ -762,7 +762,7 @@
 	},
 /obj/machinery/atmospherics/components/trinary/mixer/layer2{
 	dir = 4;
-	name = "RBMK Plasma-Oxygen Mixer"
+	name = "AGCNR Plasma-Oxygen Mixer"
 	},
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
@@ -13580,7 +13580,7 @@
 	},
 /obj/machinery/atmospherics/components/binary/pump/layer2{
 	dir = 1;
-	name = "Oxygen to RBMK"
+	name = "Oxygen to AGCNR"
 	},
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
@@ -18009,7 +18009,7 @@
 	},
 /obj/machinery/atmospherics/components/binary/pump,
 /obj/machinery/atmospherics/components/binary/pump/layer2{
-	name = "Plasma to RBMK"
+	name = "Plasma to AGCNR"
 	},
 /turf/open/floor/engine,
 /area/engine/engineering/pvp)
@@ -18385,7 +18385,7 @@
 	},
 /obj/structure/table/reinforced,
 /obj/machinery/computer/reactor/stats{
-	id = "astraeus_rbmk"
+	id = "astraeus_agcnr"
 	},
 /obj/effect/turf_decal/stripes/line{
 	dir = 1
@@ -18400,7 +18400,7 @@
 	},
 /obj/structure/table/reinforced,
 /obj/machinery/computer/reactor/control_rods{
-	id = "astraeus_rbmk"
+	id = "astraeus_agcnr"
 	},
 /obj/effect/turf_decal/stripes/line{
 	dir = 1
@@ -18417,7 +18417,7 @@
 	},
 /obj/structure/table/reinforced,
 /obj/machinery/computer/reactor/fuel_rods{
-	id = "astraeus_rbmk"
+	id = "astraeus_agcnr"
 	},
 /obj/effect/turf_decal/stripes/line{
 	dir = 1
@@ -19379,7 +19379,7 @@
 "TQ" = (
 /obj/machinery/atmospherics/components/trinary/nuclear_reactor{
 	dir = 2;
-	id = "astraeus_rbmk"
+	id = "astraeus_agcnr"
 	},
 /obj/structure/cable/yellow,
 /obj/structure/cable/yellow{

@@ -5,7 +5,7 @@ import { useBackend, useLocalState } from '../backend';
 import { Section, ProgressBar, Slider } from '../components';
 import { Window } from '../layouts';
 
-export const RbmkControlRods = (props, context) => {
+export const AgcnrControlRods = (props, context) => {
   const { act, data } = useBackend(context);
   const control_rods = data.control_rods;
   const k = data.k;
