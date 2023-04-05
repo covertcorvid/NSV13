@@ -56,50 +56,53 @@ SUBSYSTEM_DEF(vote)
 			if (!C || C.is_afk())
 				non_voters -= non_voter_ckey
 		if(non_voters.len > 0)
-			switch(mode)
-				if("restart")
-					choices["Continue Playing"] += non_voters.len
-					if(choices["Continue Playing"] >= greatest_votes)
-						greatest_votes = choices["Continue Playing"]
-				if("gamemode")
-					if(GLOB.master_mode in choices)
-						choices[GLOB.master_mode] += non_voters.len
-						if(choices[GLOB.master_mode] >= greatest_votes)
-							greatest_votes = choices[GLOB.master_mode]
-				if("map")
-					for (var/non_voter_ckey in non_voters)
-						var/client/C = non_voters[non_voter_ckey]
-						if(C.prefs.preferred_map)
-							var/preferred_map = C.prefs.preferred_map
-							choices[preferred_map] += 1
-							greatest_votes = max(greatest_votes, choices[preferred_map])
-						else if(global.config.defaultmap)
-							var/default_map = global.config.defaultmap.map_name
-							choices[default_map] += 1
-							greatest_votes = max(greatest_votes, choices[default_map])
-				if("transfer")
-					var/factor = 1 // factor defines how non-voters are weighted towards calling the shuttle
-					switch(world.time / (1 MINUTES))
-						if(0 to 60)
-							factor = 0.5
-						if(61 to 120)
-							factor = 0.8
-						if(121 to 240)
-							factor = 1
-						if(241 to 300)
-							factor = 1.2
-						else
-							factor = 1.4
-					choices["Initiate Crew Transfer"] += round(non_voters.len * factor)
-				if("Press On Or Return Home?") //NSV13 - Round extension vote
-					var/datum/star_system/target = SSstar_system.return_system
-					choices["Return to [target.name]]"] += non_voters.len
-					if(choices["Return to [target.name]]"] >= greatest_votes)
-						greatest_votes = choices["Return to [target.name]"]
-				if("hardmode") //NSV13 - Hardmode vote
-					choices["Play a normal round"] += non_voters.len
-					if(choices["Play a normal round"] >= greatest_votes) //You need an absolute majority
-						greatest_votes = choices["Play a normal round"]
+			if(mode == "restart")
+				choices["Continue Playing"] += non_voters.len
+				if(choices["Continue Playing"] >= greatest_votes)
+					greatest_votes = choices["Continue Playing"]
+			else if(mode == "gamemode")
+				if(GLOB.master_mode in choices)
+					choices[GLOB.master_mode] += non_voters.len
+					if(choices[GLOB.master_mode] >= greatest_votes)
+						greatest_votes = choices[GLOB.master_mode]
+			else if(mode == "map")
+				for (var/non_voter_ckey in non_voters)
+					var/client/C = non_voters[non_voter_ckey]
+					if(C.prefs.preferred_map)
+						var/preferred_map = C.prefs.preferred_map
+						choices[preferred_map] += 1
+						greatest_votes = max(greatest_votes, choices[preferred_map])
+					else if(global.config.defaultmap)
+						var/default_map = global.config.defaultmap.map_name
+						choices[default_map] += 1
+						greatest_votes = max(greatest_votes, choices[default_map])
+			else if(mode == "transfer")
+				var/factor = 1 // factor defines how non-voters are weighted towards calling the shuttle
+				switch(world.time / (1 MINUTES))
+					if(0 to 60)
+						factor = 0.5
+					if(61 to 120)
+						factor = 0.8
+					if(121 to 240)
+						factor = 1
+					if(241 to 300)
+						factor = 1.2
+					else
+						factor = 1.4
+				choices["Initiate Crew Transfer"] += round(non_voters.len * factor)
+			else if("Press On Or Return Home?") //NSV13 - Round extension vote
+				var/datum/star_system/target = SSstar_system.return_system
+				choices["Return to [target.name]]"] += non_voters.len
+				if(choices["Return to [target.name]]"] >= greatest_votes)
+					greatest_votes = choices["Return to [target.name]"]
+			else if("hardmode") //NSV13 - Hardmode vote
+				choices["Play a normal round"] += non_voters.len
+				if(choices["Play a normal round"] >= greatest_votes) //You need an absolute majority
+					greatest_votes = choices["Play a normal round"]
+	. = list()
+	if(mode == "map")
+		. += pick_weight(choices) //map is chosen by drawing votes from a hat, instead of automatically going to map with the most votes.
+		return .
 	//get all options with that many votes and return them in a list
 	. = list()
 	if(greatest_votes)

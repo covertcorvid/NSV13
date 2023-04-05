@@ -308,7 +308,7 @@
 				continue	//we have a live body we are tied to
 			candidates += M.ckey
 		if(candidates.len)
-			ckey = input("Pick the player you want to respawn as a xeno.", "Suitable Candidates") as null|anything in sortKey(candidates)
+			ckey = input("Pick the player you want to respawn as a xeno.", "Suitable Candidates") as null|anything in sort_key(candidates)
 		else
 			to_chat(usr, "<span class='danger'>Error: create_xeno(): no suitable candidates.</span>")
 	if(!istext(ckey))
@@ -922,7 +922,7 @@ Traitors and the like can also be revived with the previous role mostly intact.
 	if(!holder)
 		return
 
-	var/weather_type = input("Choose a weather", "Weather")  as null|anything in sortList(subtypesof(/datum/weather), GLOBAL_PROC_REF(cmp_typepaths_asc))
+	var/weather_type = input("Choose a weather", "Weather")  as null|anything in sort_list(subtypesof(/datum/weather), GLOBAL_PROC_REF(cmp_typepaths_asc))
 	if(!weather_type)
 		return
 
@@ -1089,20 +1089,48 @@ Traitors and the like can also be revived with the previous role mostly intact.
 	var/list/punishment_list = list(ADMIN_PUNISHMENT_LIGHTNING, ADMIN_PUNISHMENT_BRAINDAMAGE, ADMIN_PUNISHMENT_GIB, ADMIN_PUNISHMENT_BSA, ADMIN_PUNISHMENT_FIREBALL, ADMIN_PUNISHMENT_ROD, ADMIN_PUNISHMENT_SUPPLYPOD_QUICK, ADMIN_PUNISHMENT_SUPPLYPOD, ADMIN_PUNISHMENT_MAZING, ADMIN_PUNISHMENT_FLOORCLUWNE, ADMIN_PUNISHMENT_CLUWNE, ADMIN_PUNISHMENT_IMMERSE, ADMIN_PUNISHMENT_GHOST, ADMIN_PUNISHMENT_DEMOCRACY, ADMIN_PUNISHMENT_ANARCHY, ADMIN_PUNISHMENT_TOE, ADMIN_PUNISHMENT_TOEPLUS, ADMIN_PUNISHMENT_CRYO, ADMIN_PUNISHMENT_ENTRAPPED, ADMIN_PUNISHMENT_DOCK) //NSV13 - added entrapped + Dock
 	if(istype(target, /mob/living/carbon))
 		punishment_list += ADMIN_PUNISHMENT_NUGGET
-	var/punishment = input("Choose a punishment", "DIVINE SMITING") as null|anything in sortList(punishment_list)
+	if(ishuman(target))
+		punishment_list += ADMIN_PUNISHMENT_FLOORCLUWNE
+		punishment_list += ADMIN_PUNISHMENT_FLOORCLUWNE_STALKER
+		punishment_list += ADMIN_PUNISHMENT_STALKER
+		punishment_list += ADMIN_PUNISHMENT_TOE
+		punishment_list += ADMIN_PUNISHMENT_TOEPLUS
+
+	var/punishment = input("Choose a punishment", "DIVINE SMITING") as null|anything in sort_list(punishment_list)
 
 	if(QDELETED(target) || !punishment)
 		return
 
 	switch(punishment)
-		if(ADMIN_PUNISHMENT_ENTRAPPED) //NSV13 start
-			for(var/turf/T in (orange(1, target) - target.loc))
-				new /obj/item/ship_weapon/ammunition/naval_artillery/cannonball/admin(T)
-			target.playsound_local(get_turf(target), 'sound/magic/clockwork/invoke_general.ogg', 200, pressure_affected = FALSE)
-			to_chat(target, "<span class='narsiesmall'>Entrapped.</span>")
-		if(ADMIN_PUNISHMENT_DOCK)
-			if(!iscarbon(target))
-				to_chat(usr,"<span class='warning'>This must be used on a carbon mob.</span>")
+		if(ADMIN_PUNISHMENT_AHEAL)
+			target.revive(full_heal = 1, admin_revive = 1)
+
+		if(ADMIN_PUNISHMENT_ANIMALIZE)
+			target.Animalize()
+
+		if(ADMIN_PUNISHMENT_BRAINDAMAGE)
+			target.adjustOrganLoss(ORGAN_SLOT_BRAIN, 199, 199)
+
+		if(ADMIN_PUNISHMENT_BSA)
+			bluespace_artillery(target)
+
+		if(ADMIN_PUNISHMENT_CLUWNE)
+			target.cluwne()
+
+		if(ADMIN_PUNISHMENT_COOKIE)
+			var/mob/living/carbon/H = target
+			H.give_cookie(usr)
+			admin_ticket_log(target, "[key_name_admin(usr)] gave [key_name_admin(target)] a cookie.")
+			return //We return here because punish_log() is handled by /mob/living/carbon/human/proc/give_cookie()
+
+		if(ADMIN_PUNISHMENT_CRYO)
+			forcecryo(target)
+
+		if(ADMIN_PUNISHMENT_DAMAGE)
+			var/list/damage_list = list(BRUTE, BURN, CLONE, OXY, STAMINA, TOX)
+			var/damage_punishment = input("Choose a damage type") as null|anything in sort_list(damage_list)
+			var/damage_amount = input("Choose an amount") as null|num
+			if(isnull(damage_punishment) || isnull(damage_amount)) //The user pressed "Cancel"
 				return
 			var/mob/living/carbon/dude = target
 			var/obj/item/card/id/card = dude.get_idcard(TRUE)

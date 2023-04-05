@@ -77,7 +77,7 @@ GLOBAL_LIST_INIT(color_list_ethereal, list(
 GLOBAL_LIST_INIT(ghost_forms_with_directions_list, list("ghost")) //stores the ghost forms that support directional sprites
 GLOBAL_LIST_INIT(ghost_forms_with_accessories_list, list("ghost")) //stores the ghost forms that support hair and other such things
 
-GLOBAL_LIST_INIT(ai_core_display_screens, sortList(list(
+GLOBAL_LIST_INIT(ai_core_display_screens, sort_list(list(
 	":thinking:",
 	"Alien",
 	"Angel",
@@ -130,10 +130,18 @@ GLOBAL_LIST_INIT(ai_core_display_screens, sortList(list(
 			return "ai-portrait" //just take this until they decide
 		return "ai-[lowertext(input)]"
 
-GLOBAL_LIST_INIT(security_depts_prefs, sortList(list(SEC_DEPT_RANDOM, SEC_DEPT_NONE, SEC_DEPT_ENGINEERING, SEC_DEPT_MEDICAL, SEC_DEPT_SCIENCE, SEC_DEPT_SUPPLY, SEC_DEPT_MUNITIONS)))
-
-	//NSV13 Pilots
+//NSV13 Pilots
 GLOBAL_LIST_INIT(pilot_role_prefs, sortList(list(PILOT_COMBAT, PILOT_TRANSPORT)))
+
+GLOBAL_LIST_INIT(security_depts_prefs, sort_list(list(
+	SEC_DEPT_ENGINEERING,
+	SEC_DEPT_MEDICAL,
+	SEC_DEPT_NONE,
+	SEC_DEPT_RANDOM,
+	SEC_DEPT_SCIENCE,
+	SEC_DEPT_SUPPLY,
+	SEC_DEPT_MUNITIONS //NSV13 - munitions
+)))
 
 
 GLOBAL_LIST_INIT(backbaglist, list(DBACKPACK, DSATCHEL, DDUFFELBAG, GBACKPACK, GSATCHEL, GDUFFELBAG, LSATCHEL))

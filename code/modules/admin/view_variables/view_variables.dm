@@ -207,21 +207,19 @@
 	sleep(1 TICKS)
 
 	var/list/variable_html = list()
-	switch(debug_output_style)
-		if(STYLE_DATUM)
-			varname_list = sort_list(varname_list)
-			for(var/each_varname in varname_list)
-				if(thing.can_vv_get(each_varname))
-					variable_html += thing.vv_get_var(each_varname)
-		if(STYLE_APPEARANCE)
-			varname_list = sort_list(varname_list)
-			for(var/each_varname in varname_list)
-				variable_html += debug_variable_appearance(each_varname, thing)
-		if(STYLE_LIST, STYLE_SPECIAL_LIST, STYLE_READ_ONLY_LIST)
-			// There is only VV_READ_ONLY for now
-			var/list_flags = (read_only_special_list ? VV_READ_ONLY : null)
-			// If TRUE, instead of sending actual '/special_list' instance, we send 'vv_spectre' which delegates that /special_list
-			var/should_delegate_list = (special_list_secure_level ? TRUE : FALSE)
+	if(islist)
+		var/list/L = D
+		for(var/i in 1 to L.len)
+			var/key = L[i]
+			var/value
+			if(IS_NORMAL_LIST(L) && IS_VALID_ASSOC_KEY(key))
+				value = L[key]
+			variable_html += debug_variable(i, value, 0, L)
+	else
+		names = sort_list(names)
+		for(var/V in names)
+			if(D.can_vv_get(V))
+				variable_html += D.vv_get_var(V)
 
 			var/list/list_value = thing
 			for(var/i in 1 to list_value.len)

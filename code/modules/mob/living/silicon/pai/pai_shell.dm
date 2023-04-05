@@ -63,11 +63,19 @@
 	holoform = FALSE
 	set_resting(resting)
 
+/**
+  * Sets a new holochassis skin based on a pAI's choice
+  */
 /mob/living/silicon/pai/proc/choose_chassis()
 	if(!isturf(loc) && loc != card)
 		to_chat(src, "<span class='boldwarning'>You can not change your holochassis composite while not on the ground or in your card!</span>")
 		return FALSE
-	var/choice = input(src, "What would you like to use for your holochassis composite?") as null|anything in sortList(possible_chassis)
+	var/list/skins = list()
+	for(var/holochassis_option in possible_chassis)
+		var/image/item_image = image(icon = src.icon, icon_state = holochassis_option)
+		skins += list("[holochassis_option]" = item_image)
+	sort_list(skins)
+	var/choice = input(src, "What would you like to use for your holochassis composite?") as null|anything in skins
 	if(!choice)
 		return FALSE
 	chassis = choice

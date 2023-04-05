@@ -36,7 +36,7 @@
 	if(!SSdbcore.IsConnected())
 		// TODO - Loading of sane defaults
 		if (!length(key_bindings))
-			key_bindings = deepCopyList(GLOB.keybinding_list_by_key)
+			key_bindings = deep_copy_list(GLOB.keybinding_list_by_key)
 
 		return
 
@@ -117,9 +117,27 @@
 	pda_color		= sanitize_hexcolor(pda_color, 6, TRUE, initial(pda_color))
 	preferred_syndie_role = sanitize_text(preferred_syndie_role, CONQUEST_ROLE_GRUNT) //NSV13
 
-	key_bindings 	= sanitize_islist(key_bindings, deepCopyList(GLOB.keybinding_list_by_key))
+	key_bindings 	= sanitize_islist(key_bindings, deep_copy_list(GLOB.keybinding_list_by_key))
 	if (!length(key_bindings))
-		key_bindings = deepCopyList(GLOB.keybinding_list_by_key)
+		key_bindings = deep_copy_list(GLOB.keybinding_list_by_key)
+	else
+		var/any_changed = FALSE
+		for(var/key_name in GLOB.keybindings_by_name)
+			var/datum/keybinding/keybind = GLOB.keybindings_by_name[key_name]
+			var/in_binds = FALSE
+			for(var/bind in key_bindings)
+				if(key_name in key_bindings[bind])
+					in_binds = TRUE
+					break
+			if(in_binds)
+				continue
+			any_changed = TRUE
+			if(!islist(key_bindings[keybind.key]))
+				key_bindings[keybind.key] = list(key_name)
+			else
+				key_bindings[keybind.key] += key_name
+		if(any_changed)
+			save_keybinds()
 
 	if(!purchased_gear)
 		purchased_gear = list()
