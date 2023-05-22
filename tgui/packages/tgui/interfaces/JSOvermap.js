@@ -4,7 +4,6 @@ import { flow } from 'common/fp';
 import { useBackend, useLocalState } from '../backend';
 import { Button, Section, Modal, Dropdown, Tabs, Box, Input, Flex, ProgressBar, Collapsible, Icon, Divider, Tooltip } from '../components';
 import { Window, NtosWindow } from '../layouts';
-import {Ship} from '../assets/ship.png';
 
 /**
  * Camera by @robashton returns Camera object.
@@ -246,7 +245,7 @@ const backend_tick_rate = 100;
 //Which gives us this many FPS if we don't do any interpolation.
 const backend_fps = 1000/backend_tick_rate;
 //We want to interpolate UP to this framerate. The client MUST be capable of running at least this fast.
-const target_fps = 30;
+const target_fps = 60;//30;
 //Which means we have this many ticks per actual game tick
 const interpolation_mult = target_fps/backend_fps;
 //Giving us a tick rate as such. This is the delay for framerate we have to use.
@@ -350,20 +349,59 @@ export const JSOvermap = (props, context) => {
         Camera.zoomTo(zoomLevel)
         act('scroll', {key: -1});
         break;
+      case(32):
+        //TODO: fill out the weapon to be whatever active weapon we have. I don't care right now for the demo :)
+        //Also todo: mouse aiming!
+        act('fire', {weapon: -1, coords: {x: -1, y: -1, angle:-1}});
+        break;
     }
   }
+  /**
+   * Get an angle, in degrees, between two points.
+   * Degrees are what BYOND likes!
+   * @param {*} x1
+   * @param {*} y1
+   * @param {*} x2
+   * @param {*} y2
+   * @returns
+   */
+  function get_angle(x1, y1, x2, y2){
+    return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+  }
+
   function HandleKeyUp(e) {
     act('keyup', {key: e.keyCode});
   }
   function HandleScroll(e){
     act('scroll', {key: e.deltaY});
   }
+  let canvas_rect = null;
+  function HandleMouseDown(e){
+    if(canvas_rect == null){
+      return;
+    }
+    let xy = Camera.screenToWorld(e.clientX - canvas_rect.left, Camera.screenToWorld(e.clientY - canvas_rect.top));
+
+    act('fire', {weapon: -1, coords: {x: xy.x, y: xy.y, angle:get_angle(xy.x, xy.y, active_ship.x, active_ship.y)}});
+  }
 
     let last_process_time = 0;
 
     //Called every tick that the browser can handle.
     function _render({time, delta, ctx}){
-
+        let process = (time - last_process_time >= tick_rate);
+        //Initial draw batch.
+        if(last_process_time == 0){
+          Camera.constructor(ctx);
+          Camera.moveTo(active_ship.x, active_ship.y);
+          Camera.zoomTo(data.client_zoom);
+          canvas_rect = ctx.canvas.getBoundingClientRect();
+        }
+        //Slave clientside update to ROUGHLY server speed.
+        if(!process){
+          return;
+        }
+        last_process_time = time;
         function draw(image, x, y, degrees) {
           let w = image.width;
           let h = image.height;
@@ -378,12 +416,36 @@ export const JSOvermap = (props, context) => {
           ctx.rotate(-degrees);
           ctx.translate(-x - w / 2, -y - h / 2);
         }
+
+        //TODO: does not work
+        function renderFiringArc(image, x, y, angle, start, end, colour="green",radius=300,){
+          let w = image.width;
+          let h = image.height;
+          ctx.strokeStyle = colour;
+          ctx.save();
+          ctx.translate(x + w / 2, y + h / 2);
+
+          ctx.rotate(angle+start);
+          ctx.beginPath();
+          ctx.moveTo(0,0);
+          ctx.lineTo(-radius,0);
+          ctx.rotate(angle+end);
+          ctx.beginPath();
+          ctx.moveTo(0,0);
+          ctx.lineTo(-radius,0);
+
+          ctx.translate(-x - w / 2, -y - h / 2);
+          ctx.restore()
+          ctx.stroke();
+
+
+        }
+
         //TODO: set ctx in SetState? Then avoid redraws...
         //TODO: is this thing ACTUALLY re-rendering? I don't think it is!
         function drawCircle(image, x, y, radius){
           let w = image.width;
           let h = image.height;
-          ctx.strokeStyle = "green";
           ctx.beginPath();
           //ctx.arc((this.position.x - camera.x()) + w/2, (this.position.y-camera.y())+h/2, radius/scale, 0, 2 * Math.PI);
           ctx.arc((x) + w/2, (y)+h/2, radius, 0, 2 * Math.PI);
@@ -393,19 +455,7 @@ export const JSOvermap = (props, context) => {
         ctx.clearRect(0, 0, 1280, 720);
         //ctx.fillStyle = "transparent";
         //ctx.fillRect(0, 0, canvas.width, canvas.height);
-        let process = false;
-        //Initial draw batch.
-        if(last_process_time == 0){
-          Camera.constructor(ctx);
-          Camera.moveTo(active_ship.x, active_ship.y);
-          Camera.zoomTo(data.client_zoom);
-        }
-        //We get FOUR process frames per cycle.
-        //We do not go above this.
-        if(time - last_process_time >= tick_rate){
-          process = true;
-          last_process_time = time;
-        }
+
 
         if(Camera.distance >= 3000){
           ctx.beginPath();
@@ -429,7 +479,7 @@ export const JSOvermap = (props, context) => {
           }
           ctx.stroke();
       }
-
+      ctx.strokeStyle = "green";
       Camera.begin();
       //TODO: maybe needs map, here?
       //Didn't break when just displaying static sprites.
@@ -440,12 +490,16 @@ export const JSOvermap = (props, context) => {
         let y = ship.y;
         if(x <= Camera.viewport.width+Camera.viewport.left && y <= Camera.viewport.height+Camera.viewport.top){
           draw(ship.icon, ship.x,ship.y, ship.angle-90);
-          drawCircle(ship.icon, ship.x, ship.y, ship.sensor_range);
+          if(ship.sensor_range > 0){
+            drawCircle(ship.icon, ship.x, ship.y, ship.sensor_range);
+            //TODO: firing arcs! You get one for now :)
+
+            //renderFiringArc(ship.icon, ship.x, ship.y, ship.angle-90, 315, 40);
+
+          }
         }
-        //Slave clientside update to ROUGHLY server speed.
-        if(process){
-          ship.process();
-        }
+        ship.process();
+
       }
       Camera.moveTo(active_ship.x, active_ship.y);
       Camera.end();
@@ -463,7 +517,11 @@ export const JSOvermap = (props, context) => {
             HandleKeyUp(e);
           }}
         >
-          <InfernoCanvasComponent draw={_render} realtime width={1280} height={720}></InfernoCanvasComponent>
+          <InfernoCanvasComponent
+          onMouseDown={(e) => {
+            HandleMouseDown(e);
+          }}
+          draw={_render} realtime width={1280} height={720}></InfernoCanvasComponent>
         </Window.Content>
       </Window>
   )}

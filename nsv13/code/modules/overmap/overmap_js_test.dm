@@ -57,6 +57,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	var/icon_state = ""
 	var/icon_base64 = ""
 	var/mass = MASS_SMALL
+	var/name = "Overmap Object"
 	//TODO, temp.
 	var/thruster_power = 0.01
 	var/rotation_power = 0.001
@@ -65,6 +66,21 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	var/cos_r = 0
 	var/sin_r = 0
 	var/base_sensor_range = 1000
+	var/collision_radius = 96
+
+/datum/overmap/projectile
+	mass = MASS_TINY
+	icon = 'nsv13/icons/obj/projectiles_nsv.dmi'
+	icon_state = "pdc"
+	base_sensor_range = 0
+/**
+	Anything that's considered a "ship".
+	This will have functionality for subsystems, weapons, etc.
+*/
+/datum/overmap/ship
+	icon = 'nsv13/icons/overmap/nanotrasen/light_cruiser.dmi'
+	icon_state = "cruiser-100"
+	name = "Space SHIP"
 
 /**
 	Return the sensor range for an overmap.
@@ -73,6 +89,9 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 */
 /datum/overmap/proc/get_sensor_range()
 	return base_sensor_range
+
+/datum/overmap/projectile/get_sensor_range()
+	return 0
 
 /**
 	Constructor for overmap objects. Pre-bakes some maths for you and initialises processing.
@@ -83,10 +102,19 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	//TODO this should inversely scale!
 	thruster_power = (mass / 10)
 	rotation_power = (mass / 10)
+	//todo maths shit to make the shit work.
+	cos_r = cos(position.angle)
+	sin_r = sin(position.angle)
 	//TODO: Tie this into sensors subsystem!
 	base_sensor_range = 2*(mass * 1000)
 	//TODO: replace this.
 	START_PROCESSING(SSJSOvermap, src)
+
+/datum/overmap/proc/fire_projectile(angle = src.position.angle)
+	//TODO: magic number "10".
+	//We scromble the position so it originates from the centre of the ship.
+	SSJSOvermap.register(new /datum/overmap/projectile(position.x + (collision_radius/2),position.y + (collision_radius/2), position.z, angle, position.velocity+10))
+	//to_chat(world, "Fire missile.")
 
 /datum/overmap/Destroy()
 	STOP_PROCESSING(SSJSOvermap, src)
@@ -105,11 +133,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	//Okay.. BYOND cos uses degrees, not radians. Good to know!
 	cos_r = cos(position.angle)
 	sin_r = sin(position.angle)
-
-//TODO: game coords to canvas coords! major desync issues, here.
-/datum/overmap/process()
-	position.x -= cos_r * position.velocity
-	position.y -= sin_r * position.velocity
+	//TODO: Mark everything dirty when we rotate, as we change heading.
+	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, src)
 
 /**
 	Apply thrust to an overmap. TODO mostly.
@@ -123,6 +148,14 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		if(-1)
 			//TODO: unrealistic, OK for now
 			position.velocity *= 0.99
+	//TODO: Mark everything dirty when we rotate, as we change heading.
+	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, src)
+
+//TODO: game coords to canvas coords! major desync issues, here.
+/datum/overmap/process()
+	position.x -= cos_r * position.velocity
+	position.y -= sin_r * position.velocity
+
 
 /**
 	Component to give the pilot a view of the overmap, and steer a ship.
@@ -139,6 +172,18 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	src.ui = ui
 	RegisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, PROC_REF(mark_dirty)) //Don't do this for turfs, because we don't care
 
+/datum/component/overmap_piloting/proc/process_fire(weapon_type, coords)
+
+	//TODO: Ignore for now!
+	var/_x = coords["x"]
+	var/_y = coords["y"]
+	var/angle = coords["angle"]
+	if(angle == -1)
+		angle = target.position.angle
+	//to_chat(world, _x)
+	//TODO: Check if theyre the gunner. Roles... I don't care for now!
+	target.fire_projectile(angle)
+
 /datum/component/overmap_piloting/Destroy()
 	UnregisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE)
 	. = ..()
@@ -147,10 +192,16 @@ Mark our linked TGUI as requiring update.
 The server will send the new positions and state of the physics world.
 Usually called when anything is added to the overmap, removed from it, or a collision occurs.
 */
-/datum/component/overmap_piloting/proc/mark_dirty()
+/datum/component/overmap_piloting/proc/mark_dirty(datum/source, datum/overmap/target)
 	SIGNAL_HANDLER
+	//If they're not on our Z, ignore..
+
+	if(target.position.z != src.target.position.z)
+		return
 	to_chat(world, "Overmap UI marked dirty.")
-	src.ui.needs_update = TRUE
+	//src.ui.needs_update = TRUE
+	//HACK: instant UI update. Take your delay and get out.
+	src.ui.src_object.ui_interact(ui.user, ui)
 
 /**
 	Zoom the client's view by a delta value.
@@ -184,13 +235,7 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 			return
 
 
-/**
-	Anything that's considered a "ship".
-	This will have functionality for subsystems, weapons, etc.
-*/
-/datum/overmap/ship
-	icon = 'nsv13/icons/overmap/nanotrasen/light_cruiser.dmi'
-	icon_state = "cruiser-100"
+
 
 /obj/machinery/computer/ship/js_overmap
 	name = "HAHA"
@@ -223,7 +268,7 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 /obj/machinery/computer/ship/js_overmap/ui_interact(mob/user, datum/tgui/ui)
 	//TODO: need a UI handler for this to REMOVE their piloting component!
 
-	to_chat(world, "Overmap: UI update...")
+	//to_chat(world, "Overmap: UI update...")
 	ui = SStgui.try_update_ui(user, src, ui)
 	if(!ui)
 		ui = new(user, src, "JSOvermap")
@@ -254,6 +299,9 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 	switch(action)
 		if("scroll")
 			C.zoom(params["key"])
+			return;
+		if("fire")
+			C.process_fire(params["weapon"], params["coords"])
 			return;
 		if("keyup")
 			return;
