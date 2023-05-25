@@ -24,27 +24,3 @@
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 1000)
 	export_price = 5000
 	hidden = TRUE
-
-
-/obj/item/circuitboard/machine/pdc_mount
-/obj/item/ship_weapon/parts/firing_electronics
-
-/obj/item/circuitboard/computer/anti_air
-/obj/item/circuitboard/machine/anti_air
-
-/obj/item/circuitboard/computer/deckgun
-/obj/item/circuitboard/machine/deck_gun
-/obj/item/circuitboard/machine/deck_gun/powder
-/obj/item/circuitboard/machine/deck_gun/payload
-/obj/item/circuitboard/machine/deck_turret
-
-/obj/item/circuitboard/machine/broadside
-/obj/item/ship_weapon/parts/broadside_casing
-/obj/item/ship_weapon/parts/broadside_load
-
-/obj/item/circuitboard/machine/gauss_turret
-/obj/item/circuitboard/machine/gauss_dispenser
-
-/obj/item/ship_weapon/parts/loading_tray
-/obj/item/ship_weapon/parts/mac_barrel
-/obj/item/ship_weapon/parts/railgun_rail
