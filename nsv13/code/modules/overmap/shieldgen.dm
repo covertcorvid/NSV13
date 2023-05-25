@@ -21,26 +21,6 @@
 	var/hasInterface = FALSE
 	var/componentsDone = FALSE
 
-
-/obj/item/disk/design_disk/overmap_shields
-	name = "SolGov Experimental Shielding Technology Disk"
-	desc = "This disk is the property of SolGov, unlawful use of the data contained on this disk is prohibited."
-	icon_state = "datadisk2"
-	max_blueprints = 5
-
-/obj/item/disk/design_disk/overmap_shields/Initialize(mapload)
-	. = ..()
-	var/datum/design/shield_fan/A = new
-	var/datum/design/shield_capacitor/B = new
-	var/datum/design/shield_modulator/C = new
-	var/datum/design/shield_interface/D = new
-	var/datum/design/shield_frame/E = new
-	blueprints[1] = A
-	blueprints[2] = B
-	blueprints[3] = C
-	blueprints[4] = D
-	blueprints[5] = E
-
 /obj/structure/shieldgen_frame/attackby(obj/item/I, mob/living/user, params)
 	if(state != 11)
 		return FALSE

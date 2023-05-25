@@ -7,11 +7,29 @@
 	export_price = 5000
 	hidden = TRUE
 
-/datum/techweb_node/ship_armour_tech
-	id = "ship_armour_tech"
-	display_name = "Experimental Nano-Repair Technology"
+/datum/techweb_node/apnw_load
+	id = "apnw_load"
+	display_name = "Experimental Nano-Repair Load Inhibitor"
 	description = "Devices that alter the operational parameters of the APNW. May void the warranty."
-	design_ids = list("apnw_oc_power", "apnw_oc_load", "apnw_oc_cooling")
+	design_ids = list("apnw_oc_load")
+	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 1000)
+	export_price = 5000
+	hidden = TRUE
+
+/datum/techweb_node/apnw_power
+	id = "apnw_power"
+	display_name = "Experimental Nano-Repair Power Module"
+	description = "Devices that alter the operational parameters of the APNW. May void the warranty."
+	design_ids = list("apnw_oc_power")
+	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 1000)
+	export_price = 5000
+	hidden = TRUE
+
+/datum/techweb_node/apnw_cooling
+	id = "apnw_cooling"
+	display_name = "Experimental Nano-Repair Cooling Module"
+	description = "Devices that alter the operational parameters of the APNW. May void the warranty."
+	design_ids = list("apnw_oc_cooling")
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 1000)
 	export_price = 5000
 	hidden = TRUE
