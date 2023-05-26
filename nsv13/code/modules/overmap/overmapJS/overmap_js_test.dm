@@ -1,5 +1,4 @@
-#define KM * 1000
-#define JS_OVERMAP_TACMAP_TILE_SIZE 2 KM
+
 /**
 	The overmap JS subsystem. Not to be confused with overmap!
 	Why? because it's WIP!, experimental, WIPPPP
@@ -18,6 +17,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 /datum/controller/subsystem/processing/JSOvermap/proc/unregister(datum/overmap/target)
 	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, target)
 	physics_world -= target
+	STOP_PROCESSING(SSJSOvermap, target)
 	return
 
 /datum/controller/subsystem/processing/JSOvermap/proc/ui_data_for(mob/user, datum/overmap/target)
@@ -42,7 +42,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 /obj/machinery/computer/ship/js_overmap/Initialize(mapload)
 	. = ..()
-	active_ship = SSJSOvermap.register(new /datum/overmap/ship(500,100, 1, 0, 0))
+	active_ship = SSJSOvermap.register(new /datum/overmap/ship/player(600,100, 1, 0, 0))
+	SSJSOvermap.register(new /datum/overmap/ship/syndicate(450,100, 1, 0, 0))
 
 /obj/machinery/computer/ship/js_overmap/attack_hand(mob/user)
 	. = ..()
