@@ -49,7 +49,7 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 	Zoom the client's view by a delta value.
 */
 /datum/component/overmap_piloting/proc/zoom(delta_y)
-	var/zoom_level = zoom_distance + (delta_y * 50)
+	var/zoom_level = zoom_distance + (delta_y * 100)
 	if(zoom_level <= 100)
 		zoom_level = 100
 	src.zoom_distance = zoom_level

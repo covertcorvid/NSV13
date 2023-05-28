@@ -47,6 +47,26 @@
 	qdel(P)
 	THROW_NEW_NOTIMPLEMENTED_EXCEPTION
 
+/datum/armour_quadrant
+	var/integrity = 100
+	var/max_integrity = 100
+	var/datum/overmap/holder = null
+
+/datum/armour_quadrant/New(integrity)
+	. = ..()
+	src.max_integrity = integrity
+	src.integrity = src.max_integrity
+
+/**
+	Take a hit to a specified armour quadrant.
+	Returns TRUE if the armour absorbed the projectile fully.
+*/
+/datum/armour_quadrant/proc/take_damage(amount)
+	integrity -= amount
+	if(integrity <= 0)
+		integrity = 0
+	return integrity > 0
+
 /datum/overmap
 	var/datum/vec5/position
 	var/icon = null
@@ -72,6 +92,7 @@
 	var/datum/component/overmap_interior/interior = null
 	var/integrity = 100
 	var/max_integrity = 100
+	var/list/armour_quadrants = null
 
 
 /**
@@ -85,8 +106,12 @@
 	icon_base64 = icon2base64(I)
 	collision_radius = I.Width()
 	//TODO this should inversely scale!
-	thruster_power = (mass / 10)
-	rotation_power = (mass / 10)
+	//thruster_power = (mass / 10)
+	//rotation_power = (mass / 10)
+
+	thruster_power = 1 / (mass)
+	rotation_power = 1 / (mass)
+
 	//todo maths shit to make the shit work.
 	cos_r = cos(position.angle)
 	sin_r = sin(position.angle)
@@ -118,19 +143,19 @@
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 90, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 20, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 10, \
-			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
+			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
 		if(MASS_MEDIUM_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 95, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 25, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 15, \
-			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
+			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
 		if(MASS_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 98, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 25, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 15, \
-			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
+			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 35, \
 			)
 		if(MASS_TITAN)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 100, \
@@ -139,11 +164,15 @@
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 40, \
 			)
 
-/datum/overmap/proc/fire_projectile(angle = src.position.angle)
+
+/datum/overmap/proc/fire_projectile(angle = src.position.angle, projectile_type=/datum/overmap/projectile/shell, burst_size=1)
 	//TODO: magic number "10".
 	//We scromble the position so it originates from the centre of the ship.
-	var/datum/overmap/O = SSJSOvermap.register(new /datum/overmap/projectile(position.x + (collision_radius/2),position.y + (collision_radius/2), position.z, angle, position.velocity+10))
-	O.faction = faction
+	for(var/i = 1; i <= burst_size; i++)
+		var/datum/overmap/projectile/O = new projectile_type(position.x + (collision_radius/2),position.y + (collision_radius/2), position.z, angle, position.velocity)
+		O.position.velocity += O.speed
+		O.faction = faction
+		SSJSOvermap.register(O)
 	//to_chat(world, "Fire missile.")
 
 /datum/overmap/Destroy()
@@ -179,7 +208,10 @@
 			position.velocity += thruster_power
 		if(-1)
 			//TODO: unrealistic, OK for now
-			position.velocity *= 0.99
+			//position.velocity *= 0.99
+			position.velocity -= thruster_power
+			if(position.velocity < 0)
+				position.velocity = 0
 	//TODO: Mark everything dirty when we rotate, as we change heading.
 	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, src)
 

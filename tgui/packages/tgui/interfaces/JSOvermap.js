@@ -253,7 +253,7 @@ const interpolation_mult = target_fps/backend_fps;
 const tick_rate = backend_tick_rate / interpolation_mult;
 
 class overmapEntity{
-  constructor(x,y,z,angle,velocity, icon, thruster_power, rotation_power, sensor_range){
+  constructor(x,y,z,angle,velocity, icon, thruster_power, rotation_power, sensor_range, armour_quadrants){
     this.x = x;
     this.y = y;
     this.z = z;
@@ -265,6 +265,7 @@ class overmapEntity{
     this.sensor_range = sensor_range;
     //Pre-calculate radians.
     this.r = (this.angle) * (Math.PI / 180);
+    this.armour_quadrants = armour_quadrants;
   }
   //The following procs are mirrored from the backend.
   //They attempt to model where the ship "ought" to be, based on input.
@@ -285,7 +286,9 @@ class overmapEntity{
       this.velocity += this.thruster_power
     }
     else{
-      this.velocity *= 0.99
+      this.velocity -= this.thruster_power
+      if(this.velocity < 0)
+        this.velocity = 0
     }
   }
 };
@@ -309,7 +312,7 @@ export const JSOvermap = (props, context) => {
       let ship = data.physics_world[I];
       const sprite = new Image();
       sprite.src = `data:image/jpeg;base64,${ship.icon}`
-      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range);
+      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants);
       if(ship.active){
         active_ship = world[I];
       }
@@ -333,7 +336,7 @@ export const JSOvermap = (props, context) => {
         break;
       //Q to zoom out
       case(81):
-        zoomLevel = Camera.distance + (1 * 50);
+        zoomLevel = Camera.distance + (1 * 100);
         if (zoomLevel <= 100) {
             zoomLevel = 100;
         }
@@ -342,7 +345,7 @@ export const JSOvermap = (props, context) => {
         break;
       //E to zoom in
       case(69):
-        zoomLevel = Camera.distance + (-1 * 50);
+        zoomLevel = Camera.distance + (-1 * 100);
         if (zoomLevel <= 100) {
           zoomLevel = 100;
         }
@@ -440,10 +443,88 @@ export const JSOvermap = (props, context) => {
 
 
         }
+        function radians(d) {
+          return d * Math.PI / 180;
+      }
+
+
+      function drawArmourQuadrants(image, x, y, radius, offset, segments, size){
+        let w = image.width;
+        let h = image.height;
+
+        dashedCircle(x + w / 2,y + h / 2,w,offset,segments,size);
+
+      }
+
+        /**
+         * ctx - context
+         * x / y = center
+         * radius = of circle
+         * offset = rotation in angle (radians)
+         * How many segments circle should be in
+         * Size of each segment (of one segment) [0.0, 1.0]
+         *
+         * CC-Attr: Ken Fyrstenberg
+         * Modified by: Kmc2000
+        */
+        function dashedCircle(x, y, radius, offset, segments, size) {
+
+          var pi2 = 2 * Math.PI,
+              segs = pi2 / segments.length,
+              len = segs * size,
+              i = 0,
+              ax, ay;
+          let segment_count = 0;
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(offset);
+          ctx.translate(-x, -y);
+          for(; i < pi2; i += segs) {
+              ctx.beginPath();
+              ax = x + radius * Math.cos(i);
+              ay = y + radius * Math.sin(i);
+              ctx.moveTo(ax, ay);
+              let quad = segments[segment_count];
+              let max_integrity = quad[1];
+              ctx.lineWidth = 1;
+              if(max_integrity >= 250){
+                ctx.lineWidth = 2.5;
+              }
+              if(max_integrity >= 500){
+                ctx.lineWidth = 5;
+              }
+              if(max_integrity >= 1000){
+                ctx.lineWidth = 10;
+              }
+
+              let integrity = quad[0] / max_integrity * 100;
+
+              if(integrity <= 0){
+                ctx.strokeStyle = "rgba(0,0,0,0)";
+              }
+              else if(integrity < 30){
+                ctx.strokeStyle = "red";
+              }
+              if(integrity >= 30){
+                ctx.strokeStyle = "orange";
+              }
+              if(integrity >= 50){
+                ctx.strokeStyle = "yellow";
+              }
+              if(integrity >= 70){
+                ctx.strokeStyle = "green";
+              }
+              segment_count++;
+              ctx.arc(x, y, radius, i, i + len);
+              ctx.stroke();
+          }
+          ctx.restore();
+        }
 
         //TODO: set ctx in SetState? Then avoid redraws...
         //TODO: is this thing ACTUALLY re-rendering? I don't think it is!
         function drawCircle(image, x, y, radius){
+          ctx.strokeStyle = "green";
           let w = image.width;
           let h = image.height;
           ctx.beginPath();
@@ -483,6 +564,7 @@ export const JSOvermap = (props, context) => {
       Camera.begin();
       //TODO: maybe needs map, here?
       //Didn't break when just displaying static sprites.
+
       for(let I = 0; I < world.length; I++){
         let ship = world[I];
         //TODO: Is visible checks... we can use frustrum culling
@@ -490,6 +572,10 @@ export const JSOvermap = (props, context) => {
         let y = ship.y;
         if(x <= Camera.viewport.width+Camera.viewport.left && y <= Camera.viewport.height+Camera.viewport.top){
           draw(ship.icon, ship.x,ship.y, ship.angle-90);
+
+          if(ship.armour_quadrants.length > 0){
+            drawArmourQuadrants(ship.icon, ship.x, ship.y, 180, radians(ship.angle-90), ship.armour_quadrants, 0.8)
+          }
           if(ship.sensor_range > 0){
             drawCircle(ship.icon, ship.x, ship.y, ship.sensor_range);
             //TODO: firing arcs! You get one for now :)

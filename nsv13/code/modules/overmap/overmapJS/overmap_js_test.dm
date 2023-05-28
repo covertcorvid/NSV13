@@ -9,10 +9,25 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	stat_tag = "JS"
 	var/list/physics_world = list()
 
+/**
+	Register "target" with the overmap.
+	Pass in a newly created overmap object, and it will be tracked.
+*/
 /datum/controller/subsystem/processing/JSOvermap/proc/register(datum/overmap/target)
 	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, target)
 	physics_world += target
 	return target
+
+/**
+	Register a list of overmaps as one processing "batch".
+	This means the UI is only marked dirty ONCE, as the ships are pushed in.
+*/
+/datum/controller/subsystem/processing/JSOvermap/proc/register_batch(list/targets)
+	if(!targets)
+		return
+	for(var/datum/overmap/O in targets)
+		physics_world += O
+	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, targets[1])
 
 /datum/controller/subsystem/processing/JSOvermap/proc/unregister(datum/overmap/target)
 	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, target)
@@ -24,12 +39,18 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	. = list()
 	.["physics_world"] = list()
 	for(var/datum/overmap/O in physics_world)
+		var/list/quads = list()
+		if(O.armour_quadrants)
+			quads = new(4)
+			for(var/I = 1; I <=4; I++)
+				quads[I] = list(O.armour_quadrants[I].integrity, O.armour_quadrants[I].max_integrity)
 		var/list/data = list(
 			icon = O.icon_base64,
 			active = (target == O),
 			thruster_power = O.thruster_power,
 			rotation_power = O.rotation_power,
 			sensor_range = O.get_sensor_range(),
+			armour_quadrants = quads,
 			position = list(O.position.x, O.position.y, O.position.z, O.position.angle, O.position.velocity)
 		)
 		.["physics_world"] += list(data)
@@ -42,8 +63,10 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 /obj/machinery/computer/ship/js_overmap/Initialize(mapload)
 	. = ..()
-	active_ship = SSJSOvermap.register(new /datum/overmap/ship/player(600,100, 1, 0, 0))
-	SSJSOvermap.register(new /datum/overmap/ship/syndicate(450,100, 1, 0, 0))
+	active_ship = SSJSOvermap.register(new /datum/overmap/ship/player(600,200, 1, 0, 0))
+	SSJSOvermap.register(new /datum/overmap/ship/syndicate(450,100, 1, 180, 0))
+	SSJSOvermap.register(new /datum/overmap/ship/syndicate/frigate(800,100, 1, 180, 0.05))
+	SSJSOvermap.register(new /datum/overmap/ship/syndicate/cruiser(1500,1000, 1, 90, 0))
 
 /obj/machinery/computer/ship/js_overmap/attack_hand(mob/user)
 	. = ..()

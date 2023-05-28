@@ -18,6 +18,31 @@
 	///Distance this projectile may travel before it's auto-deleted / culled.
 	var/range = 1 KM
 	var/distance_travelled = 0
+	var/speed = 10 //m/s
+
+/datum/overmap/projectile/slug
+	name = "railgun slug"
+	icon_state = "railgun"
+	damage = 25
+	damage_type = OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL
+	range = 25 KM
+	unstoppable = TRUE
+	speed = 50
+/datum/overmap/projectile/shell
+	name = "cannon shell"
+	icon_state = "mac"
+	damage = 50
+	damage_type = OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL
+	range = 25 KM
+	speed = 25
+
+/datum/overmap/projectile/warhead
+	name = "conventional missile"
+	icon_state = "torpedo"
+	damage = 75
+	damage_type = OVERMAP_DAMAGE_TYPE_EXPLOSIVE
+	range = 52 KM
+	speed = 50
 
 /datum/overmap/projectile/on_move()
 	..()
@@ -32,16 +57,53 @@
 	if(!resistance || prob(armour_penetration_factor))
 		resistance = 0
 	var/amount = abs(damage - (damage * (resistance / 100)))
+	//Attempt to absorb the hit into a quadrant. If they block us, our life ends here..
 	if(target.take_quadrant_hit(src, amount, angle))
-		return
+		goto die
 	//Do we have an interior? If so, let that handle the hit!
 	if(target.interior)
 		return target.interior.take_damage(src, angle)
 
 	. = target.take_damage(amount, damage_type)
 	//Unstoppable projectiles rip straight through everything. IE: railgun slugs. Line 'em up!
+	die:
 	if(!unstoppable)
 		qdel(src)
+
+/datum/overmap/proc/get_angle_to(datum/overmap/O)
+	return ATAN2((O.position.y - position.y), (O.position.x - position.x))
+
+/datum/overmap/proc/radians(d)
+	return (d * PI) / 180;
+
+/datum/overmap/proc/get_armour_quadrant_for_impact(datum/overmap/O)
+	RETURN_TYPE(/datum/armour_quadrant)
+	//Process the impact to our armour, normalized.
+	//var/shield_angle_hit = SIMPLIFY_DEGREES(get_angle_to(O)) - SIMPLIFY_DEGREES(position.angle-90)
+	//var/offset = SIMPLIFY_DEGREES(position.angle)
+	//Correct screen angle to actual angle.
+	//var/normal = SIMPLIFY_DEGREES(offset - 180)
+	//var/shield_angle_hit = SIMPLIFY_DEGREES(get_angle_to(O) - normal)
+
+	//Our angles are flipped. so we do this backwards nonsense.
+	var/shield_angle_hit = SIMPLIFY_DEGREES(get_angle_to(O) - (position.angle-90))
+
+	to_chat(world, "[shield_angle_hit]")
+	//ignore this, the circle is cursed and backwards!!!
+	//we are off by about 180 degrees.
+	switch(shield_angle_hit)
+		if(0 to 89)
+			return armour_quadrants[ARMOUR_QUADRANT_SOUTH_EAST]
+			//return armour_quadrants[ARMOUR_QUADRANT_NORTH_EAST]
+		if(90 to 179)
+			return armour_quadrants[ARMOUR_QUADRANT_NORTH_EAST]
+			//return armour_quadrants[ARMOUR_QUADRANT_SOUTH_EAST]
+		if(180 to 269)
+			return armour_quadrants[ARMOUR_QUADRANT_NORTH_WEST]
+			//return armour_quadrants[ARMOUR_QUADRANT_NORTH_WEST]
+		if(270 to 360)
+			return armour_quadrants[ARMOUR_QUADRANT_SOUTH_WEST]
+			//return armour_quadrants[ARMOUR_QUADRANT_NORTH_WEST]
 
 /**
 	Attempt to absorb a bullet's damage into the ship's armour quadrants.
@@ -50,10 +112,14 @@
 /datum/overmap/proc/take_quadrant_hit(datum/overmap/projectile/P, amount, angle)
 	//The shot bypassed the armour entirely. This is totes how AP works ;)
 	//@Karmic, todo definitely here.. this is stupid(?) I don't know!
-	if(prob(P.armour_penetration_factor))
+	if(!armour_quadrants)
 		return FALSE
-	//TODO: Armour quadrants logic goes here!
-	return FALSE
+	var/datum/armour_quadrant/Q = get_armour_quadrant_for_impact(P)
+	//If the shot penetrates, absorb half the damage into the plate, and let the shot past.
+	if(prob(P.armour_penetration_factor))
+		Q?.take_damage(amount/2)
+		return FALSE
+	return Q && Q.take_damage(amount)
 
 /**
 	What happens when an overmap object physically takes damage, from any source.

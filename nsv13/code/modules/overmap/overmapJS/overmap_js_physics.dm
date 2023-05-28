@@ -23,7 +23,6 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 /datum/controller/subsystem/processing/physics_processing/proc/AddToChunk(datum/component/physics2d/P, list/chunk)
 	var/_x = 1 + round((P.holder.collision_radius + P.holder.position.x) / 2000)
 	var/_y = 1 + round((P.holder.collision_radius + P.holder.position.y) / 2000)
-	to_chat(world, "Added to chunk: [_x], [_y]")
 	P.last_chunk = chunk[_x][_y]
 	P.last_chunk.Add(P)
 	/*
@@ -46,8 +45,6 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 	var/z_str = "[z]"
 	if(!physics_levels[z_str])
 		//Set up this grid.
-
-		to_chat(world, "New physics level.")
 		var/rows = (JS_OVERMAP_TACMAP_TOTAL_SQUARES)
 		var/cols = (JS_OVERMAP_TACMAP_TOTAL_SQUARES)
 		physics_levels[z_str] = new(cols)
@@ -72,7 +69,6 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 	var/_y = 1 + round((P.holder.collision_radius + P.holder.position.y) / 2000)
 	var/next_chunk = chunk[_x][_y]
 	if(next_chunk != P.last_chunk)
-		to_chat(world, "New chunk: [_x],[_y]")
 		if(P.last_chunk)
 			P.last_chunk -= P
 		AddToChunk(P, chunk)
