@@ -163,10 +163,10 @@
 	var/datum/overmap/nw = new /datum/overmap(-5, 5, 0, 0, 0)
 	TEST_ASSERT_EQUAL(source.get_armour_quadrant_for_impact(nw), ARMOUR_QUADRANT_NORTH_WEST, "n impct coming from the top left, should hit the north west quadrant.")
 	// Test south west
-	var/datum/overmap/se = new /datum/overmap(-5, -5, 0, 0, 0)
+	var/datum/overmap/sw = new /datum/overmap(-5, -5, 0, 0, 0)
 	TEST_ASSERT_EQUAL(source.get_armour_quadrant_for_impact(sw), ARMOUR_QUADRANT_SOUTH_WEST, "n impct coming from the bottom left, should hit the south west quadrant.")
 	// Test south west
-	var/datum/overmap/sw = new /datum/overmap(5, -5, 0, 0, 0)
+	var/datum/overmap/se = new /datum/overmap(5, -5, 0, 0, 0)
 	TEST_ASSERT_EQUAL(source.get_armour_quadrant_for_impact(se), ARMOUR_QUADRANT_SOUTH_EAST, "n impct coming from the bottom right, should hit the south est quadrant.")
 	// Modify the ngle so tht we re now pointing 90 degrees to the left
 	// Test rotated 90 degrees to the left. This means our armour quadrants will also be 90 degrees rotated
