@@ -88,11 +88,11 @@
 
 	//Our angles are flipped. so we do this backwards nonsense.
 	// Get the ngle towrds ourselves from the object tht is colliding with us.
-	var/shield_angle_hit = SIMPLIFY_DEGREES(O.get_angle_to(src) - (position.angle-90) + 360)
+	// Bacon maths hack: The angle of the projectile, inverted, is always the collision angle. Just trust him / me.. he showed me on a whiteboard :)
+	var/shield_angle_hit = SIMPLIFY_DEGREES((position.angle) - (O.position.angle+90) + 360)
 
-	to_chat(world, "[shield_angle_hit]")
-	//ignore this, the circle is cursed and backwards!!!
-	//we are off by about 180 degrees.
+	//to_chat(world, "[shield_angle_hit]")
+	//Convert angle of hit into relevent armour segment.
 	switch(shield_angle_hit)
 		if(0 to 89)
 			return armour_quadrants[ARMOUR_QUADRANT_NORTH_EAST]
