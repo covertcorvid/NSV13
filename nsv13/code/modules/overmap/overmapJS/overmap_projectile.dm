@@ -71,11 +71,12 @@
 		qdel(src)
 
 /datum/overmap/proc/get_angle_to(datum/overmap/O)
-	return ATAN2((O.position.y - position.y), (O.position.x - position.x))
+	return ATAN2((O.position.x - position.x), (O.position.y - position.y))
 
 /datum/overmap/proc/radians(d)
 	return (d * PI) / 180;
 
+/// The provided target is the object impacting with src.
 /datum/overmap/proc/get_armour_quadrant_for_impact(datum/overmap/O)
 	RETURN_TYPE(/datum/armour_quadrant)
 	//Process the impact to our armour, normalized.
@@ -86,24 +87,23 @@
 	//var/shield_angle_hit = SIMPLIFY_DEGREES(get_angle_to(O) - normal)
 
 	//Our angles are flipped. so we do this backwards nonsense.
-	var/shield_angle_hit = SIMPLIFY_DEGREES(get_angle_to(O) - (position.angle-90))
+	// Get the ngle towrds ourselves from the object tht is colliding with us.
+	var/shield_angle_hit = SIMPLIFY_DEGREES(O.get_angle_to(src) - (position.angle-90) + 360)
 
 	to_chat(world, "[shield_angle_hit]")
 	//ignore this, the circle is cursed and backwards!!!
 	//we are off by about 180 degrees.
 	switch(shield_angle_hit)
 		if(0 to 89)
-			return armour_quadrants[ARMOUR_QUADRANT_SOUTH_EAST]
-			//return armour_quadrants[ARMOUR_QUADRANT_NORTH_EAST]
-		if(90 to 179)
 			return armour_quadrants[ARMOUR_QUADRANT_NORTH_EAST]
-			//return armour_quadrants[ARMOUR_QUADRANT_SOUTH_EAST]
-		if(180 to 269)
+		if(90 to 179)
 			return armour_quadrants[ARMOUR_QUADRANT_NORTH_WEST]
-			//return armour_quadrants[ARMOUR_QUADRANT_NORTH_WEST]
-		if(270 to 360)
+		if(180 to 269)
 			return armour_quadrants[ARMOUR_QUADRANT_SOUTH_WEST]
-			//return armour_quadrants[ARMOUR_QUADRANT_NORTH_WEST]
+		if(270 to 360)
+			return armour_quadrants[ARMOUR_QUADRANT_SOUTH_EAST]
+	// Throw an error for investigtive purposes
+	CRASH("Invalid shield angle provided inside of get_armour_quadrant_for_impact, got [shield_angle_hit], expected a value between 0 and 360.")
 
 /**
 	Attempt to absorb a bullet's damage into the ship's armour quadrants.
