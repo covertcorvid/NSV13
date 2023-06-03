@@ -32,3 +32,24 @@
 #define ARMOUR_QUADRANT_NORTH_WEST 3
 #define ARMOUR_QUADRANT_SOUTH_WEST 2
 #define ARMOUR_QUADRANT_SOUTH_EAST 1
+//This ship is assigned to a chosen map layout. No need to load any interior.
+#define OVERMAP_ROLE_PRIMARY 1
+//This ship needs its interior loading in manually.
+#define OVERMAP_ROLE_SECONDARY 2
+
+#define OVERMAP_ARMOUR_THICKNESS_NONE 0
+#define OVERMAP_ARMOUR_THICKNESS_LIGHT 250
+#define OVERMAP_ARMOUR_THICKNESS_MEDIUM 500
+#define OVERMAP_ARMOUR_THICKNESS_HEAVY 1000
+#define OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY 1500
+#define OVERMAP_ARMOUR_THICKNESS_ABLATIVE 2000
+#define OVERMAP_ARMOUR_THICKNESS_GIGA 2500
+
+///User has NO rights and may only observe the ship.
+#define OVERMAP_CONTROL_RIGHTS_NONE 0
+///User is able to steer the ship.
+#define OVERMAP_CONTROL_RIGHTS_HELM 1 << 0
+///User is able to fire the ship's weaponry.
+#define OVERMAP_CONTROL_RIGHTS_GUNNER 1 << 1
+
+#define OVERMAP_CONTROL_RIGHTS_FULL OVERMAP_CONTROL_RIGHTS_HELM | OVERMAP_CONTROL_RIGHTS_GUNNER

@@ -16,37 +16,6 @@
 	src.angle = angle
 	src.velocity = velocity
 
-/**
-	Component declaring the interior of an overmap ship.
-	The mere existence of this denotes that a ship uses the SUPER_LEGIT_DAMAGE system.
-*/
-/datum/component/overmap_interior
-	var/datum/overmap/holder = null
-	var/list/interior = list(
-		OVERMAP_INTERIOR_METRIC_MOBS = list(),\
-		OVERMAP_INTERIOR_METRIC_Z_LEVELS = list(),\
-		OVERMAP_INTERIOR_METRIC_AREAS = list()
-	)
-	var/interior_type = OVERMAP_INTERIOR_TYPE_CAPITAL
-
-/**
-	Ships with tiny interiors use the standard damage system, but with added effects.
-	We may add certain effects like a chance to smack the pilot with a bullet (through canopy?)
-*/
-/datum/component/overmap_interior/tiny
-	interior_type = OVERMAP_INTERIOR_TYPE_TINY
-
-/datum/component/overmap_interior/Initialize()
-	. = ..()
-	holder = parent
-	if(!istype(holder))
-		return COMPONENT_INCOMPATIBLE //Precondition: This is a subtype of overmap.
-
-/datum/component/overmap_interior/proc/take_damage(datum/overmap/projectile/P, angle)
-	//TODO! Transfer the projectile to the overmap's interior.
-	qdel(P)
-	THROW_NEW_NOTIMPLEMENTED_EXCEPTION
-
 /datum/armour_quadrant
 	var/integrity = 100
 	var/max_integrity = 100
@@ -93,6 +62,7 @@
 	var/integrity = 100
 	var/max_integrity = 100
 	var/list/armour_quadrants = null
+	var/role = OVERMAP_ROLE_SECONDARY
 
 
 /**
@@ -102,8 +72,11 @@
 	if(collision_positions == null)
 		collision_positions = GLOB.projectile_hitbox
 	position = new /datum/vec5(x,y,z,angle,velocity)
+	//If the overmap JS subsystem does not contain our type's icon, add it.
 	var/icon/I = icon(icon,icon_state,SOUTH)
-	icon_base64 = icon2base64(I)
+	if(!SSJSOvermap.overmap_icons["[src.type]"])
+		SSJSOvermap.overmap_icons["[src.type]"] = icon2base64(I)
+	icon_base64 = SSJSOvermap.overmap_icons["[src.type]"]
 	collision_radius = I.Width()
 	//TODO this should inversely scale!
 	//thruster_power = (mass / 10)

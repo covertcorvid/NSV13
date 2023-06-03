@@ -19,6 +19,7 @@
 	var/range = 1 KM
 	var/distance_travelled = 0
 	var/speed = 10 //m/s
+	var/physical_projectile_type = /obj/item/projectile/bullet
 
 /datum/overmap/projectile/slug
 	name = "railgun slug"

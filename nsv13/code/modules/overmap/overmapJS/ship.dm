@@ -8,22 +8,81 @@
 	name = "Space SHIP"
 	armour_quadrants = list(
 		//North East
-		new /datum/armour_quadrant(400),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
 		//North West
-		new /datum/armour_quadrant(400),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
 		//South West
-		new /datum/armour_quadrant(400),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
 		//South East
-		new /datum/armour_quadrant(400)
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM)
 	)
-	integrity = 400
-	max_integrity = 400
+	integrity = OVERMAP_ARMOUR_THICKNESS_MEDIUM
+	max_integrity = OVERMAP_ARMOUR_THICKNESS_MEDIUM
 
 /datum/overmap/ship/player
-	name = "NSV Stupidity"
+	name = "NSV Rocinante"
 	faction = OVERMAP_FACTION_PLAYER
 	interior_type = /datum/component/overmap_interior
+	role = OVERMAP_ROLE_PRIMARY
 	//collision_positions = list(new /matrix/vector(-8,46), new /matrix/vector(-17,33), new /matrix/vector(-25,2), new /matrix/vector(-14,-45), new /matrix/vector(9,-46), new /matrix/vector(22,4), new /matrix/vector(14,36))
+
+/datum/overmap/ship/player/cruiser
+	name = "NSV Tycoon"
+	faction = OVERMAP_FACTION_PLAYER
+	icon = 'nsv13/icons/overmap/nanotrasen/battlecruiser.dmi'
+	icon_state = "battlecruiser"
+	mass = MASS_MEDIUM_LARGE
+	armour_quadrants = list(
+		//North East
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
+		//North West
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
+		//South West
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
+		//South East
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM)
+	)
+	integrity = OVERMAP_ARMOUR_THICKNESS_MEDIUM
+	max_integrity = OVERMAP_ARMOUR_THICKNESS_MEDIUM
+
+/datum/overmap/ship/player/cruiser/heavy
+	name = "NSV Hammerhead"
+	faction = OVERMAP_FACTION_PLAYER
+	icon = 'nsv13/icons/overmap/nanotrasen/heavy_cruiser.dmi'
+	icon_state = "heavy_cruiser"
+	mass = MASS_LARGE
+	armour_quadrants = list(
+		//North East
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY),
+		//North West
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY),
+		//South West
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_LIGHT),
+		//South East
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_LIGHT)
+	)
+	integrity = OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY
+	max_integrity = OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY
+
+//Welcome..home
+/datum/overmap/ship/player/battleship
+	name = "NSV Galactica"
+	faction = OVERMAP_FACTION_PLAYER
+	icon = 'nsv13/icons/overmap/nanotrasen/Battleship.dmi'
+	icon_state = "battleship"
+	mass = MASS_MEDIUM_LARGE
+	armour_quadrants = list(
+		//North East
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY),
+		//North West
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY),
+		//South West
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY),
+		//South East
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY)
+	)
+	integrity = OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY
+	max_integrity = OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY
 
 /datum/overmap/ship/syndicate
 	name = "SSV Dumbass"
@@ -33,13 +92,13 @@
 	mass = MASS_MEDIUM
 	armour_quadrants = list(
 		//North East
-		new /datum/armour_quadrant(500),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
 		//North West
-		new /datum/armour_quadrant(500),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
 		//South West
-		new /datum/armour_quadrant(500),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
 		//South East
-		new /datum/armour_quadrant(500)
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM)
 	)
 	//collision_positions = list(new /matrix/vector(-3,45), new /matrix/vector(-17,29), new /matrix/vector(-22,-12), new /matrix/vector(-11,-45), new /matrix/vector(7,-47), new /matrix/vector(22,-12), new /matrix/vector(9,30))
 
@@ -49,6 +108,16 @@
 	icon = 'nsv13/icons/overmap/new/syndicate/frigate.dmi'
 	icon_state = "mako"
 	mass = MASS_SMALL
+	armour_quadrants = list(
+		//North East
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_LIGHT),
+		//North West
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_LIGHT),
+		//South West
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_LIGHT),
+		//South East
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_LIGHT)
+	)
 
 /datum/overmap/ship/syndicate/cruiser
 	name = "SSV Dunning-Kreuger"
@@ -56,17 +125,17 @@
 	icon = 'nsv13/icons/overmap/syndicate/syn_patrol_cruiser.dmi'
 	icon_state = "patrol_cruiser-100"
 	mass = MASS_LARGE
-	integrity = 1000
-	max_integrity = 1000
+	integrity = OVERMAP_ARMOUR_THICKNESS_HEAVY
+	max_integrity = OVERMAP_ARMOUR_THICKNESS_HEAVY
 	armour_quadrants = list(
 		//North East
-		new /datum/armour_quadrant(1250),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_HEAVY),
 		//North West
-		new /datum/armour_quadrant(1250),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_HEAVY),
 		//South West
-		new /datum/armour_quadrant(1250),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_HEAVY),
 		//South East
-		new /datum/armour_quadrant(1250)
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_HEAVY)
 	)
 
 /datum/overmap/ship/syndicate/destroyer
@@ -75,15 +144,15 @@
 	icon = 'nsv13/icons/overmap/syndicate/gunboat.dmi'
 	icon_state = "gunboat-100"
 	mass = MASS_MEDIUM
-	integrity = 500
-	max_integrity = 500
+	integrity = OVERMAP_ARMOUR_THICKNESS_MEDIUM
+	max_integrity = OVERMAP_ARMOUR_THICKNESS_MEDIUM
 	armour_quadrants = list(
 		//North East
-		new /datum/armour_quadrant(500),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
 		//North West
-		new /datum/armour_quadrant(500),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
 		//South West
-		new /datum/armour_quadrant(500),
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM),
 		//South East
-		new /datum/armour_quadrant(500)
+		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM)
 	)

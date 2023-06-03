@@ -1,60 +1,3 @@
-
-/**
-	The overmap JS subsystem. Not to be confused with overmap!
-	Why? because it's WIP!, experimental, WIPPPP
-*/
-PROCESSING_SUBSYSTEM_DEF(JSOvermap)
-	name = "JS Overmap"
-	wait = 0.2 SECONDS
-	stat_tag = "JS"
-	var/list/physics_world = list()
-
-/**
-	Register "target" with the overmap.
-	Pass in a newly created overmap object, and it will be tracked.
-*/
-/datum/controller/subsystem/processing/JSOvermap/proc/register(datum/overmap/target)
-	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, target)
-	physics_world += target
-	return target
-
-/**
-	Register a list of overmaps as one processing "batch".
-	This means the UI is only marked dirty ONCE, as the ships are pushed in.
-*/
-/datum/controller/subsystem/processing/JSOvermap/proc/register_batch(list/targets)
-	if(!targets)
-		return
-	for(var/datum/overmap/O in targets)
-		physics_world += O
-	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, targets[1])
-
-/datum/controller/subsystem/processing/JSOvermap/proc/unregister(datum/overmap/target)
-	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, target)
-	physics_world -= target
-	STOP_PROCESSING(SSJSOvermap, target)
-	return
-
-/datum/controller/subsystem/processing/JSOvermap/proc/ui_data_for(mob/user, datum/overmap/target)
-	. = list()
-	.["physics_world"] = list()
-	for(var/datum/overmap/O in physics_world)
-		var/list/quads = list()
-		if(O.armour_quadrants)
-			quads = new(4)
-			for(var/I = 1; I <=4; I++)
-				quads[I] = list(O.armour_quadrants[I].integrity, O.armour_quadrants[I].max_integrity)
-		var/list/data = list(
-			icon = O.icon_base64,
-			active = (target == O),
-			thruster_power = O.thruster_power,
-			rotation_power = O.rotation_power,
-			sensor_range = O.get_sensor_range(),
-			armour_quadrants = quads,
-			position = list(O.position.x, O.position.y, O.position.z, O.position.angle, O.position.velocity)
-		)
-		.["physics_world"] += list(data)
-
 /obj/machinery/computer/ship/js_overmap
 	name = "HAHA"
 	var/datum/overmap/ship/active_ship
@@ -63,10 +6,10 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 /obj/machinery/computer/ship/js_overmap/Initialize(mapload)
 	. = ..()
-	active_ship = SSJSOvermap.register(new /datum/overmap/ship/player(600,200, 1, 0, 0))
-	SSJSOvermap.register(new /datum/overmap/ship/syndicate(450,100, 1, 180, 0))
-	SSJSOvermap.register(new /datum/overmap/ship/syndicate/frigate(800,100, 1, 180, 0.05))
-	SSJSOvermap.register(new /datum/overmap/ship/syndicate/cruiser(1500,1000, 1, 90, 0))
+	active_ship = SSJSOvermap.get_overmap(z)//SSJSOvermap.register(new /datum/overmap/ship/player(600,200, 1, 0, 0))
+	//SSJSOvermap.register(new /datum/overmap/ship/syndicate(450,100, 1, 180, 0))
+	//SSJSOvermap.register(new /datum/overmap/ship/syndicate/frigate(800,100, 1, 180, 0.05))
+	//SSJSOvermap.register(new /datum/overmap/ship/syndicate/cruiser(1500,1000, 1, 90, 0))
 
 /obj/machinery/computer/ship/js_overmap/attack_hand(mob/user)
 	. = ..()
@@ -88,6 +31,10 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 /obj/machinery/computer/ship/js_overmap/ui_interact(mob/user, datum/tgui/ui)
 	//TODO: need a UI handler for this to REMOVE their piloting component!
+	if(!active_ship)
+		active_ship = SSJSOvermap.get_overmap(z)
+		if(!active_ship)
+			visible_message("<span class='danger'>[icon2html(src, viewers(src))] Microcontrollers corrupt. Unable to locate compatible ship.</span>")
 
 	//to_chat(world, "Overmap: UI update...")
 	ui = SStgui.try_update_ui(user, src, ui)
@@ -102,12 +49,6 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 /obj/machinery/computer/ship/js_overmap/ui_data(mob/user)
 	. = SSJSOvermap.ui_data_for(user, active_ship)
-	var/datum/component/overmap_piloting/OP = user.GetComponent(/datum/component/overmap_piloting)
-	//Broadcast this particular client's cached overmap Zoom level.
-	var/zoom = 1000
-	if(OP != null)
-		zoom = OP.zoom_distance
-	.["client_zoom"] = zoom
 
 /obj/machinery/computer/ship/js_overmap/ui_act(action, list/params)
 	. = ..()

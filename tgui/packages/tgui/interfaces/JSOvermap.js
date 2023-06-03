@@ -180,7 +180,8 @@ class InfernoCanvasComponent extends Component {
           return <div key="canvas" {...other}>{props.children}</div>
       }
 
-      return <canvas class="bg-space" ref={this.refDOM} key="canvas" {...other}>{props.children}</canvas>
+      //WARNING: The tabindex bit MIGHT lag it out! but is required to focus the canvas.
+      return <canvas tabindex='1' class="bg-space" ref={this.refDOM} key="canvas" {...other}>{props.children}</canvas>
   }
 
   refDOM(element) {
@@ -293,10 +294,12 @@ class overmapEntity{
   }
 };
 
-export const JSOvermap = (props, context) => {
+
+export const JSOvermapGame = (props, context) => {
   const { act, data } = useBackend(context);
   let world = [];
   let active_ship = null;
+  const can_pilot = data.can_pilot;
 
   const rows = 26;
   const cols = 26;
@@ -323,15 +326,23 @@ export const JSOvermap = (props, context) => {
     let zoomLevel = 0;
     switch(e.keyCode){
       case(68):
+        if(!can_pilot)
+          return;
         active_ship.rotate(1);
         break;
       case(65):
+        if(!can_pilot)
+          return;
         active_ship.rotate(-1);
         break;
       case(87):
+        if(!can_pilot)
+          return;
         active_ship.thrust(1);
         break;
       case(18):
+        if(!can_pilot)
+          return;
         active_ship.thrust(-1);
         break;
       //Q to zoom out
@@ -448,6 +459,15 @@ export const JSOvermap = (props, context) => {
       }
 
 
+      //Mirrored from BYOND side. These constants dictate armour thickness values for rendering.
+      const OVERMAP_ARMOUR_THICKNESS_NONE = 0;
+      const OVERMAP_ARMOUR_THICKNESS_LIGHT = 250;
+      const OVERMAP_ARMOUR_THICKNESS_MEDIUM = 500;
+      const OVERMAP_ARMOUR_THICKNESS_HEAVY = 1000;
+      const OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY = 1500;
+      const OVERMAP_ARMOUR_THICKNESS_ABLATIVE = 2000;
+      const OVERMAP_ARMOUR_THICKNESS_GIGA = 2500;
+
       function drawArmourQuadrants(image, x, y, radius, offset, segments, size){
         let w = image.width;
         let h = image.height;
@@ -487,14 +507,23 @@ export const JSOvermap = (props, context) => {
               let quad = segments[segment_count];
               let max_integrity = quad[1];
               ctx.lineWidth = 1;
-              if(max_integrity >= 250){
+              if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_LIGHT){
                 ctx.lineWidth = 2.5;
               }
-              if(max_integrity >= 500){
+              if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_MEDIUM){
                 ctx.lineWidth = 5;
               }
-              if(max_integrity >= 1000){
+              if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_HEAVY){
                 ctx.lineWidth = 10;
+              }
+              if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY){
+                ctx.lineWidth = 15;
+              }
+              if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_ABLATIVE){
+                ctx.lineWidth = 20;
+              }
+              if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_GIGA){
+                ctx.lineWidth = 40;
               }
 
               let integrity = quad[0] / max_integrity * 100;
@@ -592,23 +621,27 @@ export const JSOvermap = (props, context) => {
       //requestAnimationFrame(_render);
     }
   return (
+    <InfernoCanvasComponent
+    onKeyDown={(e) => {
+      HandleKeyDown(e);
+    }}
+    onKeyUp={(e) => {
+      HandleKeyUp(e);
+    }}
+    onMouseDown={(e) => {
+      HandleMouseDown(e);
+    }}
+    draw={_render} realtime width={1280} height={720}></InfernoCanvasComponent>
+  )}
+};
+export const JSOvermap = (props, context) => {
+  return (
     <Window
       width={1280}
-      height={720}>
-        <Window.Content
-          onKeyDown={(e) => {
-            HandleKeyDown(e);
-          }}
-          onKeyUp={(e) => {
-            HandleKeyUp(e);
-          }}
-        >
-          <InfernoCanvasComponent
-          onMouseDown={(e) => {
-            HandleMouseDown(e);
-          }}
-          draw={_render} realtime width={1280} height={720}></InfernoCanvasComponent>
+      height={720}
+      >
+        <Window.Content>
+          <JSOvermapGame props={props} context={context}/>
         </Window.Content>
       </Window>
   )}
-};
