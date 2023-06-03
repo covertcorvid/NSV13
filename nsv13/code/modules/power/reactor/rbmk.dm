@@ -241,7 +241,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	gas_absorption_constant = gas_absorption_effectiveness //And set this up for the rest of the round.
 
 	var/static/list/loc_connections = list(
-		COMSIG_ATOM_ENTERED = .proc/on_entered,
+		COMSIG_ATOM_ENTERED = PROC_REF(on_entered),
 	)
 	AddElement(/datum/element/connect_loc, loc_connections)
 
@@ -577,7 +577,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 
 /obj/machinery/computer/reactor/Initialize(mapload, obj/item/circuitboard/C)
 	. = ..()
-	addtimer(CALLBACK(src, .proc/link_to_reactor), 10 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(link_to_reactor)), 10 SECONDS)
 
 /obj/machinery/computer/reactor/proc/link_to_reactor()
 	for(var/obj/machinery/atmospherics/components/trinary/nuclear_reactor/asdf in GLOB.machines)
@@ -806,6 +806,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	network_destination = "agcnr monitoring system"
 	size = 2
 	tgui_id = "NtosAgcnrStats"
+	program_icon = "radiation"
 	var/active = TRUE //Easy process throttle
 	var/next_stat_interval = 0
 	var/list/psiData = list()
@@ -851,7 +852,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 		if(tempOutputdata.len > 100) //Only lets you track over a certain timeframe.
 			tempOutputdata.Cut(1, 2)
 
-/datum/computer_file/program/nuclear_monitor/run_program(mob/living/user)
+/datum/computer_file/program/nuclear_monitor/on_start(mob/living/user)
 	. = ..(user)
 	//No reactor? Go find one then.
 	if(!reactor)
@@ -866,7 +867,7 @@ The reactor CHEWS through moderator. It does not do this slowly. Be very careful
 	..()
 
 /datum/computer_file/program/nuclear_monitor/ui_data()
-	var/list/data = get_header_data()
+	var/list/data = list()
 	data["powerData"] = powerData
 	data["psiData"] = psiData
 	data["tempInputData"] = tempInputData

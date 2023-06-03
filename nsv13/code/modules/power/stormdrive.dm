@@ -1147,7 +1147,7 @@ Control Rods
 	send_alert("ERROR IN MODULE FISSREAC0 AT ADDRESS 0x12DF. CONTROL RODS HAVE FAILED. IMMEDIATE INTERVENTION REQUIRED.", override=TRUE)
 	warning_state = WARNING_STATE_MELTDOWN
 	var/sound = 'nsv13/sound/effects/ship/reactor/meltdown.ogg'
-	addtimer(CALLBACK(src, .proc/meltdown), 18 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(meltdown)), 18 SECONDS)
 	var/obj/structure/overmap/OM = get_overmap()
 	OM?.relay(sound, null, loop=FALSE, channel = CHANNEL_REACTOR_ALERT)
 	reactor_end_times = TRUE
@@ -1630,7 +1630,7 @@ Control Rods
 	freq_shift = rand(1, 10) / 10
 	code_shift = rand(1, 10) / 10
 	var/static/list/loc_connections = list(
-		COMSIG_ATOM_ENTERED = .proc/on_entered,
+		COMSIG_ATOM_ENTERED = PROC_REF(on_entered),
 	)
 	AddElement(/datum/element/connect_loc, loc_connections)
 
@@ -1783,7 +1783,7 @@ Control Rods
 		A.visible_message("<span class='danger'>The space around [A] begins to shimmer!</span>", \
 		"<span class='userdanger'>Your head swims as space appears to bend around you!</span>",
 		"<span class='italics'>You feel space shift slightly in your vicinity.</span>")
-		addtimer(CALLBACK(src, .proc/equalise, A), 5 SECONDS)
+		addtimer(CALLBACK(src, PROC_REF(equalise), A), 5 SECONDS)
 
 /obj/effect/anomaly/stormdrive/squall/proc/equalise(mob/living/A)
 	var/list/throwlist = orange(6, A)
@@ -1865,6 +1865,7 @@ Control Rods
 	network_destination = "storm drive monitoring system"
 	size = 2
 	tgui_id = "NtosStormdriveMonitor"
+	program_icon = "atom"
 	var/active = TRUE //Easy process throttle
 	var/obj/machinery/atmospherics/components/binary/stormdrive_reactor/reactor //Our reactor.
 
@@ -1894,7 +1895,7 @@ Control Rods
 	if(istype(computer))
 		computer.update_icon()
 
-/datum/computer_file/program/stormdrive_monitor/run_program(mob/living/user)
+/datum/computer_file/program/stormdrive_monitor/on_start(mob/living/user)
 	. = ..(user)
 	//No reactor? Go find one then.
 	if(!reactor)
@@ -1909,7 +1910,7 @@ Control Rods
 	..()
 
 /datum/computer_file/program/stormdrive_monitor/ui_data()
-	var/list/data = get_header_data()
+	var/list/data = list()
 	data["heat"] = reactor.heat
 	data["rod_integrity"] = reactor.control_rod_integrity
 	data["control_rod_percent"] = reactor.control_rod_percent
