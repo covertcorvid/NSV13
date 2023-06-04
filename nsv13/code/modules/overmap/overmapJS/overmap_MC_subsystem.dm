@@ -59,6 +59,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		zoom = OP.zoom_distance
 	.["client_zoom"] = zoom
 	.["can_pilot"] = OP.rights & OVERMAP_CONTROL_RIGHTS_HELM
+	.["control_scheme"] = OP.rights
 	for(var/datum/overmap/O in physics_world)
 		var/list/quads = list()
 		if(O.armour_quadrants)
@@ -81,11 +82,16 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 /datum/overmap_js_panel
 	var/datum/overmap/active_ship = null
+	var/hide_bullets = TRUE
+	var/spawn_type = /datum/overmap
+	var/spawn_z = 1
 
 /datum/overmap_js_panel/ui_data(mob/user)
 	. = SSJSOvermap.ui_data_for(user, active_ship)
 	var/list/ships = list()
 	for(var/datum/overmap/OM in SSJSOvermap.physics_world)
+		if(hide_bullets && IS_OVERMAP_JS_PROJECTILE(OM))
+			continue
 		var/list/ship_data = list()
 		ship_data["active"] = OM == active_ship
 		ship_data["name"] = OM.name
@@ -94,6 +100,9 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		ship_data["datum"] = "\ref[OM]"
 		ships[++ships.len] = ship_data
 	.["ships"] = ships
+	.["spawn_type"] = "[spawn_type]"
+	.["spawn_z"] = spawn_z
+	.["hide_bullets"] = hide_bullets
 
 /datum/overmap_js_panel/ui_state(mob/user)
 	return GLOB.admin_state
@@ -136,6 +145,22 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			C.target = active_ship
 			ui_interact(usr)
 			return
+		if("swap_control_scheme")
+			C.rights = params["target"]
+			ui_interact(usr)
+		if("toggle_hide_bullets")
+			hide_bullets = !hide_bullets
+			ui_interact(usr)
+	//TODO: spawney buttons to add enemies?
+		if("set_spawn_type")
+			spawn_type = params["target"]
+			ui_interact(usr)
+		if("set_spawn_z")
+			spawn_z = params["target"]
+			ui_interact(usr)
+		if("spawn_ship")
+			SSJSOvermap.instance(spawn_type, new /datum/vec5(rand(0, JS_OVERMAP_TACMAP_SIZE), rand(0, JS_OVERMAP_TACMAP_SIZE), spawn_z, 0))
+			ui_interact(usr)
 
 /client/proc/js_overmap_panel() //Admin Verb for the Overmap Gamemode controller
 	set name = "JS Overmap Panel"

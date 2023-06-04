@@ -73,7 +73,7 @@
 		collision_positions = GLOB.projectile_hitbox
 	position = new /datum/vec5(x,y,z,angle,velocity)
 	//If the overmap JS subsystem does not contain our type's icon, add it.
-	var/icon/I = icon(icon,icon_state,SOUTH)
+	var/icon/I = icon(icon,icon_state,SOUTH, frame=1)
 	if(!SSJSOvermap.overmap_icons["[src.type]"])
 		SSJSOvermap.overmap_icons["[src.type]"] = icon2base64(I)
 	icon_base64 = SSJSOvermap.overmap_icons["[src.type]"]
