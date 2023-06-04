@@ -129,7 +129,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			C.zoom(params["key"])
 			return;
 		if("fire")
-			C.process_fire(params["weapon"], params["coords"])
+			C.process_fire(params["weapon"], params["angle"])
 			return;
 		if("keyup")
 			return;
