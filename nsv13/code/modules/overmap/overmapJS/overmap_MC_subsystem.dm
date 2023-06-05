@@ -15,6 +15,16 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	instance(/datum/overmap/ship/syndicate, new /datum/vec5(1000, 400, 1, 0, 0))
 	instance(/datum/overmap/ship/syndicate/cruiser, new /datum/vec5(400, 1000, 1, 90, 0))
 
+/datum/controller/subsystem/processing/JSOvermap/proc/batch_grid()
+	for (var/i=0, i<10, i++)
+		for(var/j=0, j<10, j++)
+			if (i % 2)
+				instance(/datum/overmap/ship/player/cruiser, new /datum/vec5((i+1) * 800, (j+1) * 800, 1, 90, 0))
+			else
+				instance(/datum/overmap/ship/syndicate/cruiser, new /datum/vec5((i+1) * 800, (j+1) * 800, 1, 90, 0))
+
+
+
 /datum/controller/subsystem/processing/JSOvermap/proc/instance(type, datum/vec5/position)
 	var/datum/overmap/OM = register(new type(position.x, position.y, position.z, position.angle, position.velocity.x, position.velocity.y))
 	return OM
@@ -108,7 +118,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	return GLOB.admin_state
 
 /datum/overmap_js_panel/ui_interact(mob/user, datum/tgui/ui)
-	if(!check_rights(0))
+	if(!check_rights(0, 1, TRUE)) //sometimes this is called by the physics engine, which means it won't have a usr
 		return
 	if(!active_ship)
 		active_ship = SSJSOvermap.physics_world[1]

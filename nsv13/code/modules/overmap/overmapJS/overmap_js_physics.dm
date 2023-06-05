@@ -80,6 +80,7 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 				continue
 			if(body.collide(neighbour))
 				SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, body.holder)
+				SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, neighbour.holder)
 				to_chat(world, "BONK")
 
        //multiple collision avoidance. basically collisions and physics run on separate subsystems. it would be very good to change this rather soon
