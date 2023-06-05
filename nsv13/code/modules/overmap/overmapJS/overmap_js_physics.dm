@@ -6,7 +6,7 @@
 */
 
 /// Max amount of objects we can have in a quadtree node before subdividing
-#define MAX_OBJECTS_PER_NODE 15
+#define MAX_OBJECTS_PER_NODE
 
 PROCESSING_SUBSYSTEM_DEF(physics_processing)
 	name = "Physics"
@@ -73,19 +73,36 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 			P.last_chunk -= P
 		AddToChunk(P, chunk)
 
-/datum/controller/subsystem/processing/physics_processing/fire(resumed)
+/*/datum/controller/subsystem/processing/physics_processing/fire(resumed)
 	for(var/datum/component/physics2d/body as() in tracked)
 		for(var/datum/component/physics2d/neighbour as() in body.last_chunk)
 			if(neighbour == body)
 				continue
 			if(body.collide(neighbour))
 				SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, body.holder)
-				//to_chat(world, "BONK")
+				to_chat(world, "BONK")
 			//Okay, we can in theory collide. Perform the more expensive calculations and find out whether we do.
 			//if(IS_OVERMAP_JS_COLLISION_RESPONSE_ELIGIBLE(body.holder) && IS_OVERMAP_JS_COLLISION_RESPONSE_ELIGIBLE(neighbour.holder))
 			//	if(body.collide(neighbour, c_response))
 			//		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, body.holder)
 			//		to_chat(world, "BONK")
+
+			*/
+
+/datum/controller/subsystem/processing/physics_processing/fire(resumed)
+	for(var/datum/component/physics2d/body as() in tracked)
+		for(var/datum/component/physics2d/neighbour as() in tracked)
+			if(neighbour == body)
+				continue
+			if(body.collide(neighbour))
+				SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, body.holder)
+				to_chat(world, "BONK")
+			//Okay, we can in theory collide. Perform the more expensive calculations and find out whether we do.
+			//if(IS_OVERMAP_JS_COLLISION_RESPONSE_ELIGIBLE(body.holder) && IS_OVERMAP_JS_COLLISION_RESPONSE_ELIGIBLE(neighbour.holder))
+			//	if(body.collide(neighbour, c_response))
+			//		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, body.holder)
+			//		to_chat(world, "BONK")
+
 
 
 	//Do processing.
@@ -170,7 +187,8 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 
 /datum/component/physics2d/proc/can_collide(datum/component/physics2d/P)
 	//Is a collision even possible here?
-	return !(P.holder.test_faction(holder)) && collides(P)
+	//return !(P.holder.test_faction(holder)) && collides(P)
+	return collides(P)
 
 
 #undef PHYSICS_PRECISION_IDGAF
@@ -180,8 +198,6 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 		return FALSE
 
 
-	var/src_vel_mag = holder.position.velocity
-	var/other_vel_mag = other.holder.position.velocity
 	//I mean, the angle between the two objects is very likely to be the angle of incidence innit
 	var/col_angle = ATAN2((other.holder.position.x + other.holder.collision_radius / 2) - (src.holder.position.x + src.holder.collision_radius / 2), (other.holder.position.y + other.holder.collision_radius / 2) - (src.holder.position.y + holder.collision_radius / 2))
 	//Bullets behave differently.
@@ -189,37 +205,40 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 		other.holder.bullet_act(holder, col_angle)
 		return TRUE
 	//Debounce
-	if(((cos(holder.position.angle - col_angle) * src_vel_mag) - (cos(other.holder.position.angle - col_angle) * other_vel_mag)) < 0)
-		return
 
 	// Elastic collision equations
-	var/new_src_vel_x = ((																			\
-		(src_vel_mag * cos(holder.position.angle - col_angle) * (src.holder.mass - other.holder.mass)) +			\
-		(2 * other.holder.mass * other_vel_mag * cos(other.holder.position.angle - col_angle))					\
-	) / (src.holder.mass + other.holder.mass)) * cos(col_angle) + (src_vel_mag * sin(holder.position.angle - col_angle) * cos(col_angle + 90))
+	//vector math, go!
 
-	var/new_src_vel_y = ((																			\
-		(src_vel_mag * cos(holder.position.angle - col_angle) * (src.holder.mass - other.holder.mass)) +			\
-		(2 * other.holder.mass * other_vel_mag * cos(other.holder.position.angle - col_angle))					\
-	) / (src.holder.mass + other.holder.mass)) * sin(col_angle) + (src_vel_mag * sin(holder.position.angle - col_angle) * sin(col_angle + 90))
+	var/datum/vector2d/collision_normal = new /datum/vector2d((other.holder.position.x + other.holder.collision_radius / 2) - (src.holder.position.x + src.holder.collision_radius / 2), (other.holder.position.y + other.holder.collision_radius / 2) - (src.holder.position.y + holder.collision_radius / 2))
+	collision_normal = collision_normal.normalize() //it's a collision NORMAL
+	var/datum/vector2d/velocity_1 = new /datum/vector2d(holder.position.velocity.x, holder.position.velocity.y)
+	var/datum/vector2d/velocity_2 = new /datum/vector2d(other.holder.position.velocity.x, other.holder.position.velocity.y)
+	var/datum/vector2d/relative_velocity = velocity_1 - velocity_2
 
-	var/new_other_vel_x = ((																		\
-		(other_vel_mag * cos(other.holder.position.angle - col_angle) * (other.holder.mass - src.holder.mass)) +		\
-		(2 * src.holder.mass * src_vel_mag * cos(holder.position.angle - col_angle))						\
-	) / (other.holder.mass + src.holder.mass)) * cos(col_angle) + (other_vel_mag * sin(other.holder.position.angle - col_angle) * cos(col_angle + 90))
+	//calculate the velocity change imparted by the collision, which depends on restitution and the dot product of the collision normal and the relative velocity of the collision
+	var/datum/vector2d/impulse_velocity = -1 * ( 1 + holder.restitution) * (relative_velocity.dot(collision_normal))
 
-	var/new_other_vel_y = ((																		\
-		(other_vel_mag * cos(other.holder.position.angle - col_angle) * (other.holder.mass - src.holder.mass)) +		\
-		(2 * src.holder.mass * src_vel_mag * cos(holder.position.angle - col_angle))						\
-	) / (other.holder.mass + src.holder.mass)) * sin(col_angle) + (other_vel_mag * sin(other.holder.position.angle - col_angle) * sin(col_angle + 90))
+	//debounce (if impulse is too low, just ignore the rest)
+	//TODO, see if it works first
+
+	//more vectors
+
+	var/datum/vector2d/impulse = impulse_velocity / ( ( 1 / holder.mass) + (1 / other.holder.mass) ) //in case you're wondering why mass is inverted here, it lets us approximate the "immovable object" by setting inverse to 0
+
+	//now it's time!
+
+	holder.position.velocity = holder.position.velocity + (1 / holder.mass ) * impulse * collision_normal
+	other.holder.position.velocity  = other.holder.position.velocity  - (1 / other.holder.mass  ) * impulse * collision_normal
+
+	//in case the above is confusing to you, it's taken from this paper: https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
+	//in case that's still confusing to you, learn vector math or something :^)
+
+
 
 	//TODO: NAIVE! I broke this with overmap JS
 	//src.velocity._set(new_src_vel_x, new_src_vel_y)
 	//other.velocity._set(new_other_vel_x, new_other_vel_y)
-	holder.position.x += new_src_vel_x
-	holder.position.y += new_src_vel_y
-	other.holder.position.x += new_other_vel_x
-	other.holder.position.y += new_other_vel_y
+
 	//var/bonk = src_vel_mag//How much we got bonked
 	//var/bonk2 = other_vel_mag //Vs how much they got bonked
 	//Prevent ultra spam.

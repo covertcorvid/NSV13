@@ -16,7 +16,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	instance(/datum/overmap/ship/syndicate/cruiser, new /datum/vec5(400, 1000, 1, 90, 0))
 
 /datum/controller/subsystem/processing/JSOvermap/proc/instance(type, datum/vec5/position)
-	var/datum/overmap/OM = register(new type(position.x, position.y, position.z, position.angle, position.velocity))
+	var/datum/overmap/OM = register(new type(position.x, position.y, position.z, position.angle, position.velocity.x, position.velocity.y))
 	return OM
 
 /datum/controller/subsystem/processing/JSOvermap/proc/get_overmap(z)
@@ -73,7 +73,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			rotation_power = O.rotation_power,
 			sensor_range = O.get_sensor_range(),
 			armour_quadrants = quads,
-			position = list(O.position.x, O.position.y, O.position.z, O.position.angle, O.position.velocity)
+			position = list(O.position.x, O.position.y, O.position.z, O.position.angle, O.position.velocity.ln(), O.position.velocity.x, O.position.velocity.y)
 		)
 		.["physics_world"] += list(data)
 
