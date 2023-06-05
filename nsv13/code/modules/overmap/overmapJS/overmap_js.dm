@@ -140,9 +140,10 @@
 
 /datum/overmap/proc/fire_projectile(angle = src.position.angle, projectile_type=/datum/overmap/projectile/shell, burst_size=1)
 	//TODO: magic number "10".
+	//Indeed. - Corvid
 	//We scromble the position so it originates from the centre of the ship.
 	for(var/i = 1; i <= burst_size; i++)
-		var/datum/overmap/projectile/O = new projectile_type(position.x + (collision_radius/2),position.y + (collision_radius/2), position.z, angle, position.velocity)
+		var/datum/overmap/projectile/O = new projectile_type(position.x - 10 + (collision_radius/2), position.y - 10 + (collision_radius/2), position.z, angle, position.velocity)
 		O.position.velocity += O.speed
 		O.faction = faction
 		SSJSOvermap.register(O)

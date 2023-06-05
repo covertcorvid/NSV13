@@ -391,8 +391,11 @@ export const JSOvermapGame = (props, context) => {
     }
     let xy = Camera.screenToWorld(e.clientX - canvas_rect.left, e.clientY - canvas_rect.top);
 
-    //This one!!!
-    act('fire', {weapon: -1, angle: get_angle(active_ship.x, active_ship.y, xy.x, xy.y)});
+    // We get the angle from the center of the icon, not the corner
+    act('fire', {
+      weapon: -1,
+      angle: get_angle(active_ship.x + active_ship.icon.width / 2, active_ship.y + active_ship.icon.height / 2, xy.x, xy.y) - 180
+    });
   }
 
     let last_process_time = 0;
