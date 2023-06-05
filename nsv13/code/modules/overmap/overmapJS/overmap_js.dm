@@ -168,7 +168,7 @@
 	//radians = TORADIANS(position.angle)
 	//Okay.. BYOND cos uses degrees, not radians. Good to know!
 	cos_r = cos(position.angle)
-	sin_r = -sin(position.angle)
+	sin_r = sin(position.angle)
 	//TODO: Mark everything dirty when we rotate, as we change heading.
 	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, src)
 

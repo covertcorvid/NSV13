@@ -279,7 +279,7 @@ class overmapEntity{
   }
   rotate(dir){
     //TODO: bodge
-    this.angle -= this.rotation_power * dir;
+    this.angle += this.rotation_power * dir;
     this.r = (this.angle) * (Math.PI / 180);
   }
   thrust(dir){
@@ -604,10 +604,10 @@ export const JSOvermapGame = (props, context) => {
         let x = ship.x;
         let y = ship.y;
         if(x <= Camera.viewport.width+Camera.viewport.left && y <= Camera.viewport.height+Camera.viewport.top){
-          draw(ship.icon, ship.x, ship.y, ship.angle - 90);
+          draw(ship.icon, ship.x, ship.y, ship.angle + 90);
 
           if(ship.armour_quadrants.length > 0){
-            drawArmourQuadrants(ship.icon, ship.x, ship.y, 180, radians(ship.angle-90), ship.armour_quadrants, 0.8)
+            drawArmourQuadrants(ship.icon, ship.x, ship.y, 180, radians(ship.angle + 90), ship.armour_quadrants, 0.8)
           }
           if(ship.sensor_range > 0){
             drawCircle(ship.icon, ship.x, ship.y, ship.sensor_range);
