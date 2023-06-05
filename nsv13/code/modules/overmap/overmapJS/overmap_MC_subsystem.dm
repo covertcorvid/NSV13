@@ -16,8 +16,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	instance(/datum/overmap/ship/syndicate/cruiser, new /datum/vec5(400, 1000, 1, 90, 0))
 
 /datum/controller/subsystem/processing/JSOvermap/proc/batch_grid()
-	for (var/i=0, i<10, i++)
-		for(var/j=0, j<10, j++)
+	for (var/i=0, i<3, i++)
+		for(var/j=0, j<3, j++)
 			if (i % 2)
 				instance(/datum/overmap/ship/player/cruiser, new /datum/vec5((i+1) * 800, (j+1) * 800, 1, 90, 0))
 			else
