@@ -7,14 +7,14 @@
 	var/y = 0
 	var/z = 0
 	var/angle = 0
-	var/velocity = 0
+	var/datum/vector2d/velocity = null
 
-/datum/vec5/New(x,y,z,angle,velocity)
+/datum/vec5/New(x,y,z,angle,velocity_x, velocity_y)
 	src.x = x
 	src.y = y
 	src.z = z
 	src.angle = angle
-	src.velocity = velocity
+	src.velocity = new /datum/vector2d(velocity_x, velocity_y)
 
 /datum/armour_quadrant
 	var/integrity = 100
@@ -64,14 +64,16 @@
 	var/list/armour_quadrants = null
 	var/role = OVERMAP_ROLE_SECONDARY
 
+	var/restitution = 1 //"bounciness", as used for collisions. 1 = boingy boingy, 0 = no boingy
+
 
 /**
 	Constructor for overmap objects. Pre-bakes some maths for you and initialises processing.
 */
-/datum/overmap/New(x,y,z,angle,velocity)
+/datum/overmap/New(x,y,z,angle,velocity_x, velocity_y)
 	if(collision_positions == null)
 		collision_positions = GLOB.projectile_hitbox
-	position = new /datum/vec5(x,y,z,angle,velocity)
+	position = new /datum/vec5(x,y,z,angle,velocity_x, velocity_y)
 	//If the overmap JS subsystem does not contain our type's icon, add it.
 	var/icon/I = icon(icon,icon_state,SOUTH, frame=1)
 	if(!SSJSOvermap.overmap_icons["[src.type]"])
@@ -142,7 +144,7 @@
 	//TODO: magic number "10".
 	//We scromble the position so it originates from the centre of the ship.
 	for(var/i = 1; i <= burst_size; i++)
-		var/datum/overmap/projectile/O = new projectile_type(position.x + (collision_radius/2),position.y + (collision_radius/2), position.z, angle, position.velocity)
+		var/datum/overmap/projectile/O = new projectile_type(position.x + (collision_radius/2),position.y + (collision_radius/2), position.z, angle, position.velocity.ln())
 		O.position.velocity += O.speed
 		O.faction = faction
 		SSJSOvermap.register(O)
@@ -178,13 +180,17 @@
 /datum/overmap/proc/thrust(dir)
 	switch(dir)
 		if(1)
-			position.velocity += thruster_power
+			position.velocity.x += thruster_power * cos_r
+			position.velocity.y += thruster_power * sin_r
 		if(-1)
 			//TODO: unrealistic, OK for now
 			//position.velocity *= 0.99
-			position.velocity -= thruster_power
-			if(position.velocity < 0)
-				position.velocity = 0
+			position.velocity.x -= thruster_power * cos_r
+			position.velocity.y -= thruster_power * sin_r
+
+			if(position.velocity.ln() < 0)
+				position.velocity.x = 0
+				position.velocity.y = 0
 	//TODO: Mark everything dirty when we rotate, as we change heading.
 	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, src)
 
@@ -194,8 +200,8 @@
 
 //TODO: game coords to canvas coords! major desync issues, here.
 /datum/overmap/process()
-	position.x -= cos_r * position.velocity
-	position.y -= sin_r * position.velocity
+	position.x += position.velocity.x //y is down but x points right as usual, so these have to be, er, this way.
+	position.y += position.velocity.y
 	physics2d.update()
 	on_move()
 

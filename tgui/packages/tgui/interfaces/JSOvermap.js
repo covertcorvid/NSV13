@@ -254,12 +254,14 @@ const interpolation_mult = target_fps/backend_fps;
 const tick_rate = backend_tick_rate / interpolation_mult;
 
 class overmapEntity{
-  constructor(x,y,z,angle,velocity, icon, thruster_power, rotation_power, sensor_range, armour_quadrants){
+  constructor(x,y,z,angle, velocity, velocity_x, velocity_y, icon, thruster_power, rotation_power, sensor_range, armour_quadrants){
     this.x = x;
     this.y = y;
     this.z = z;
     this.angle = angle;
-    this.velocity = velocity;
+    this.velocity = velocity
+    this.velocity_x = velocity_x;
+    this.velocity_y = velocity_y;
     this.icon = icon;
     this.thruster_power = thruster_power;
     this.rotation_power = rotation_power;
@@ -272,8 +274,8 @@ class overmapEntity{
   //They attempt to model where the ship "ought" to be, based on input.
   process(){
     //TODO: this calculation is off
-    this.x -= Math.cos(this.r) * (this.velocity/interpolation_mult);
-    this.y -= Math.sin(this.r) * (this.velocity/interpolation_mult);
+    this.x += (this.velocity_x/interpolation_mult);
+    this.y += (this.velocity_y/interpolation_mult);
   }
   rotate(dir){
     //TODO: bodge
@@ -284,10 +286,12 @@ class overmapEntity{
     //TODO: bodge
     //this.velocity += this.thruster_power * dir;
     if(dir == 1){
-      this.velocity += this.thruster_power
+      this.velocity_x += Math.cos(this.r) * this.thruster_power
+      this.velocity_y += Math.sin(this.r) * this.thruster_power
     }
     else{
-      this.velocity -= this.thruster_power
+      this.velocity_x -= Math.cos(this.r) * this.thruster_power
+      this.velocity_y -= Math.sin(this.r) * this.thruster_power
       if(this.velocity < 0)
         this.velocity = 0
     }
@@ -315,7 +319,7 @@ export const JSOvermapGame = (props, context) => {
       let ship = data.physics_world[I];
       const sprite = new Image();
       sprite.src = `data:image/jpeg;base64,${ship.icon}`
-      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants);
+      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants);
       if(ship.active){
         active_ship = world[I];
       }
@@ -600,10 +604,10 @@ export const JSOvermapGame = (props, context) => {
         let x = ship.x;
         let y = ship.y;
         if(x <= Camera.viewport.width+Camera.viewport.left && y <= Camera.viewport.height+Camera.viewport.top){
-          draw(ship.icon, ship.x,ship.y, ship.angle-90);
+          draw(ship.icon, ship.x, ship.y, ship.angle + 90);
 
           if(ship.armour_quadrants.length > 0){
-            drawArmourQuadrants(ship.icon, ship.x, ship.y, 180, radians(ship.angle-90), ship.armour_quadrants, 0.8)
+            drawArmourQuadrants(ship.icon, ship.x, ship.y, 180, radians(ship.angle + 90), ship.armour_quadrants, 0.8)
           }
           if(ship.sensor_range > 0){
             drawCircle(ship.icon, ship.x, ship.y, ship.sensor_range);
