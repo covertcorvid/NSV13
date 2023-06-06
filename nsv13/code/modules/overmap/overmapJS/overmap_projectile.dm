@@ -47,7 +47,7 @@
 
 /datum/overmap/projectile/on_move()
 	..()
-	distance_travelled += position.velocity
+	distance_travelled += position.velocity.ln()
 	if(distance_travelled > range)
 		qdel(src)
 

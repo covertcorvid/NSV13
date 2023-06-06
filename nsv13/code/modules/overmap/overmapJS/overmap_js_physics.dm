@@ -6,7 +6,7 @@
 */
 
 /// Max amount of objects we can have in a quadtree node before subdividing
-#define MAX_OBJECTS_PER_NODE 15
+#define MAX_OBJECTS_PER_NODE
 
 PROCESSING_SUBSYSTEM_DEF(physics_processing)
 	name = "Physics"
@@ -80,7 +80,19 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 				continue
 			if(body.collide(neighbour))
 				SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, body.holder)
-				//to_chat(world, "BONK")
+				SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, neighbour.holder)
+				to_chat(world, "BONK")
+
+       //multiple collision avoidance. basically collisions and physics run on separate subsystems. it would be very good to change this rather soon
+	   //basically anything we hit is left uncollidable until a physics tick passes where we dont hit it again
+		for(var/datum/component/physics2d/close_neighbor as() in body.currently_phasing)
+			if (close_neighbor in body.tried_to_bonk)
+				continue
+
+			else
+				body.currently_phasing -= close_neighbor
+
+		body.tried_to_bonk.Cut()
 			//Okay, we can in theory collide. Perform the more expensive calculations and find out whether we do.
 			//if(IS_OVERMAP_JS_COLLISION_RESPONSE_ELIGIBLE(body.holder) && IS_OVERMAP_JS_COLLISION_RESPONSE_ELIGIBLE(neighbour.holder))
 			//	if(body.collide(neighbour, c_response))
@@ -109,6 +121,9 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 	var/last_y_clamped
 	var/next_chunk_update = 0
 
+	var/list/currently_phasing = null //list of other physics objects this physics object is currently "phasing" with, to prevent multiple collisions
+	var/list/tried_to_bonk = null     //list of other physics objects who we tried to hit this tick and failed to
+
 /datum/component/physics2d/Initialize()
 	. = ..()
 	holder = parent
@@ -117,6 +132,9 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 		return COMPONENT_INCOMPATIBLE //Precondition: This is a subtype of atom/movable.
 	last_registered_z = holder.position.z
 	RegisterSignal(holder, COMSIG_MOVABLE_Z_CHANGED, PROC_REF(update_z))
+
+	currently_phasing = list()
+	tried_to_bonk = list()
 
 /datum/component/physics2d/Destroy(force, silent)
 
@@ -170,7 +188,18 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 
 /datum/component/physics2d/proc/can_collide(datum/component/physics2d/P)
 	//Is a collision even possible here?
+
+	// did we just bonk them?
+	if (P in currently_phasing)
+		tried_to_bonk.Add(P)
+		return FALSE
+
+	//did they just bonk us?
+	if (src in P.currently_phasing)
+		return FALSE
+
 	return !(P.holder.test_faction(holder)) && collides(P)
+
 
 
 #undef PHYSICS_PRECISION_IDGAF
@@ -180,8 +209,6 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 		return FALSE
 
 
-	var/src_vel_mag = holder.position.velocity
-	var/other_vel_mag = other.holder.position.velocity
 	//I mean, the angle between the two objects is very likely to be the angle of incidence innit
 	var/col_angle = ATAN2((other.holder.position.x + other.holder.collision_radius / 2) - (src.holder.position.x + src.holder.collision_radius / 2), (other.holder.position.y + other.holder.collision_radius / 2) - (src.holder.position.y + holder.collision_radius / 2))
 	//Bullets behave differently.
@@ -189,37 +216,82 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 		other.holder.bullet_act(holder, col_angle)
 		return TRUE
 	//Debounce
-	if(((cos(holder.position.angle - col_angle) * src_vel_mag) - (cos(other.holder.position.angle - col_angle) * other_vel_mag)) < 0)
-		return
 
 	// Elastic collision equations
-	var/new_src_vel_x = ((																			\
-		(src_vel_mag * cos(holder.position.angle - col_angle) * (src.holder.mass - other.holder.mass)) +			\
-		(2 * other.holder.mass * other_vel_mag * cos(other.holder.position.angle - col_angle))					\
-	) / (src.holder.mass + other.holder.mass)) * cos(col_angle) + (src_vel_mag * sin(holder.position.angle - col_angle) * cos(col_angle + 90))
 
-	var/new_src_vel_y = ((																			\
-		(src_vel_mag * cos(holder.position.angle - col_angle) * (src.holder.mass - other.holder.mass)) +			\
-		(2 * other.holder.mass * other_vel_mag * cos(other.holder.position.angle - col_angle))					\
-	) / (src.holder.mass + other.holder.mass)) * sin(col_angle) + (src_vel_mag * sin(holder.position.angle - col_angle) * sin(col_angle + 90))
 
-	var/new_other_vel_x = ((																		\
-		(other_vel_mag * cos(other.holder.position.angle - col_angle) * (other.holder.mass - src.holder.mass)) +		\
-		(2 * src.holder.mass * src_vel_mag * cos(holder.position.angle - col_angle))						\
-	) / (other.holder.mass + src.holder.mass)) * cos(col_angle) + (other_vel_mag * sin(other.holder.position.angle - col_angle) * cos(col_angle + 90))
+//
+// ⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀     ⡜⠀⠀⠀
+//⠀⠑⡀⠀⠀⠀⠀⠀math fucking rocks⠀⠀⠀⡔⠁⠀⠀⠀
+//⠀⠀⠀⠈⠢⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠴⠊⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⢀⣀⣀⣀⣀⣀⡀⠤⠄⠒⠈⠀⠀⠀⠀⠀⠀⠀⠀
+//⠀⠀⠀⠀⠀⠀⠘⣀⠄⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+//
+//⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⠛⠛⠋⠉⠈⠉⠉⠉⠉⠛⠻⢿⣿⣿⣿⣿⣿⣿⣿
+//⣿⣿⣿⣿⣿⡿⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⢿⣿⣿⣿⣿
+//⣿⣿⣿⣿⡏⣀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿
+//⣿⣿⣿⢏⣴⣿⣷⠀⠀⠀⠀⠀⢾⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿
+//⣿⣿⣟⣾⣿⡟⠁⠀⠀⠀⠀⠀⢀⣾⣿⣿⣿⣿⣿⣷⢢⠀⠀⠀⠀⠀⠀⠀⢸⣿
+//⣿⣿⣿⣿⣟⠀⡴⠄⠀⠀⠀⠀⠀⠀⠙⠻⣿⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⣿
+//⣿⣿⣿⠟⠻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠶⢴⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⣿
+//⣿⣁⡀⠀⠀⢰⢠⣦⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⣿⣿⣿⣿⣿⡄⠀⣴⣶⣿⡄⣿
+//⣿⡋⠀⠀⠀⠎⢸⣿⡆⠀⠀⠀⠀⠀⠀⣴⣿⣿⣿⣿⣿⣿⣿⠗⢘⣿⣟⠛⠿⣼
+//⣿⣿⠋⢀⡌⢰⣿⡿⢿⡀⠀⠀⠀⠀⠀⠙⠿⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣧⢀⣼
+//⣿⣿⣷⢻⠄⠘⠛⠋⠛⠃⠀⠀⠀⠀⠀⢿⣧⠈⠉⠙⠛⠋⠀⠀⠀⣿⣿⣿⣿⣿
+//⣿⣿⣧⠀⠈⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠟⠀⠀⠀⠀⢀⢃⠀⠀⢸⣿⣿⣿⣿
+//⣿⣿⡿⠀⠴⢗⣠⣤⣴⡶⠶⠖⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡸⠀⣿⣿⣿⣿
+//⣿⣿⣿⡀⢠⣾⣿⠏⠀⠠⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠛⠉⠀⣿⣿⣿⣿
+//⣿⣿⣿⣧⠈⢹⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣿
+//⣿⣿⣿⣿⡄⠈⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣴⣾⣿⣿⣿⣿⣿
+//⣿⣿⣿⣿⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿
+//⣿⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+//⣿⣿⣿⣿⣿⣦⣄⣀⣀⣀⣀⠀⠀⠀⠀⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+//⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+//⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⠀⠙⣿⣿⡟⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿
+//⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⠁⠀⠀⠹⣿⠃⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿
+//⣿⣿⣿⣿⣿⣿⣿⣿⡿⠛⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⢐⣿⣿⣿⣿⣿⣿⣿⣿⣿
+//⣿⣿⣿⣿⠿⠛⠉⠉⠁⠀⢻⣿⡇⠀⠀⠀⠀⠀⠀⢀⠈⣿⣿⡿⠉⠛⠛⠛⠉⠉
+//⣿⡿⠋⠁⠀⠀⢀⣀⣠⡴⣸⣿⣇⡄⠀⠀⠀⠀⢀⡿⠄⠙⠛⠀⣀⣠⣤⣤⠄⠀
 
-	var/new_other_vel_y = ((																		\
-		(other_vel_mag * cos(other.holder.position.angle - col_angle) * (other.holder.mass - src.holder.mass)) +		\
-		(2 * src.holder.mass * src_vel_mag * cos(holder.position.angle - col_angle))						\
-	) / (other.holder.mass + src.holder.mass)) * sin(col_angle) + (other_vel_mag * sin(other.holder.position.angle - col_angle) * sin(col_angle + 90))
+	//vector math, go!
+
+	var/datum/vector2d/collision_normal = new /datum/vector2d((other.holder.position.x + other.holder.collision_radius / 2) - (src.holder.position.x + src.holder.collision_radius / 2), (other.holder.position.y + other.holder.collision_radius / 2) - (src.holder.position.y + holder.collision_radius / 2))
+	collision_normal = collision_normal.normalize() //it's a collision NORMAL
+	var/datum/vector2d/velocity_1 = new /datum/vector2d(holder.position.velocity.x, holder.position.velocity.y)
+	var/datum/vector2d/velocity_2 = new /datum/vector2d(other.holder.position.velocity.x, other.holder.position.velocity.y)
+	var/datum/vector2d/relative_velocity = velocity_1 - velocity_2
+
+	//calculate the velocity change imparted by the collision, which depends on restitution and the dot product of the collision normal and the relative velocity of the collision
+	var/datum/vector2d/impulse_velocity = -1 * ( 1 + holder.restitution) * (relative_velocity.dot(collision_normal))
+
+	//debounce (if impulse is too low, just ignore the rest)
+	//TODO, see if it works first
+
+	//more vectors
+
+	var/datum/vector2d/impulse = impulse_velocity / ( ( 1 / holder.mass) + (1 / other.holder.mass) ) //in case you're wondering why mass is inverted here, it lets us approximate the "immovable object" by setting inverse to 0
+
+	//now it's time!
+	//HOOOOOOOOOLY shit, batman. For anyone who wants to every use the jank BYOND implementation of vector2 ever again, the vector MUST come before the scalar if
+	//doing vector / scalar multiplication or other similar operations, otherwise it just nulls it out..
+	//this literally took me fucking hours to figure out.
+
+	var/holder_velocity_diff = (collision_normal * (1 / holder.mass ) * impulse )
+
+	holder.position.velocity = holder.position.velocity + holder_velocity_diff
+	other.holder.position.velocity  = other.holder.position.velocity  - (collision_normal * (1 / other.holder.mass  ) * impulse )
+
+	//in case the above is confusing to you, it's taken from this paper: https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
+	//in case that's still confusing to you, learn vector math or something :^)
+
+
+	currently_phasing.Add(other) //keep track of the thing we just collided with and stop colliding with it for a bit
+	tried_to_bonk.Add(other)
 
 	//TODO: NAIVE! I broke this with overmap JS
 	//src.velocity._set(new_src_vel_x, new_src_vel_y)
 	//other.velocity._set(new_other_vel_x, new_other_vel_y)
-	holder.position.x += new_src_vel_x
-	holder.position.y += new_src_vel_y
-	other.holder.position.x += new_other_vel_x
-	other.holder.position.y += new_other_vel_y
+
 	//var/bonk = src_vel_mag//How much we got bonked
 	//var/bonk2 = other_vel_mag //Vs how much they got bonked
 	//Prevent ultra spam.
@@ -230,5 +302,6 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 		//other.take_quadrant_hit(bonk2, projectile_quadrant_impact(src)) //This looks horrible, but trust me, it isn't! Probably!. Armour_quadrant.dm for more info
 
 		//log_game("[key_name(pilot)] has impacted an overmap ship into [other] with velocity [bonk]")
+
 
 	return TRUE
