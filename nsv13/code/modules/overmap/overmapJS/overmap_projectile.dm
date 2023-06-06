@@ -60,14 +60,14 @@
 	var/amount = abs(damage - (damage * (resistance / 100)))
 	//Attempt to absorb the hit into a quadrant. If they block us, our life ends here..
 	if(target.take_quadrant_hit(src, amount, angle))
-		goto die
+		if(!unstoppable)
+			qdel(src)
 	//Do we have an interior? If so, let that handle the hit!
 	if(target.interior)
 		return target.interior.take_damage(src, angle)
 
 	. = target.take_damage(amount, damage_type)
 	//Unstoppable projectiles rip straight through everything. IE: railgun slugs. Line 'em up!
-	die:
 	if(!unstoppable)
 		qdel(src)
 

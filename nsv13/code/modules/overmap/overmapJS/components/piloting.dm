@@ -16,18 +16,11 @@
 	src.ui = ui
 	RegisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, PROC_REF(mark_dirty)) //Don't do this for turfs, because we don't care
 
-/datum/component/overmap_piloting/proc/process_fire(weapon_type, coords)
+/datum/component/overmap_piloting/proc/process_fire(weapon_type, angle)
 	if(!(rights & OVERMAP_CONTROL_RIGHTS_GUNNER))
 		return
-	//TODO: Ignore for now!
-	var/_x = coords["x"]
-	var/_y = coords["y"]
-	var/angle = coords["angle"]
-	if(angle == -1)
-		angle = target.position.angle
-	//to_chat(world, _x)
 	//TODO: Check if theyre the gunner. Roles... I don't care for now!
-	target.fire_projectile(angle)
+	target.fire_projectile(angle=angle)
 
 /datum/component/overmap_piloting/Destroy()
 	UnregisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE)

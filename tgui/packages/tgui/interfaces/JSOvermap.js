@@ -363,11 +363,6 @@ export const JSOvermapGame = (props, context) => {
         Camera.zoomTo(zoomLevel)
         act('scroll', {key: -1});
         break;
-      case(32):
-        //TODO: fill out the weapon to be whatever active weapon we have. I don't care right now for the demo :)
-        //Also todo: mouse aiming!
-        act('fire', {weapon: -1, coords: {x: -1, y: -1, angle:-1}});
-        break;
     }
   }
   /**
@@ -394,9 +389,13 @@ export const JSOvermapGame = (props, context) => {
     if(canvas_rect == null){
       return;
     }
-    let xy = Camera.screenToWorld(e.clientX - canvas_rect.left, Camera.screenToWorld(e.clientY - canvas_rect.top));
+    let xy = Camera.screenToWorld(e.clientX - canvas_rect.left, e.clientY - canvas_rect.top);
 
-    act('fire', {weapon: -1, coords: {x: xy.x, y: xy.y, angle:get_angle(xy.x, xy.y, active_ship.x, active_ship.y)}});
+    // We get the angle from the center of the icon, not the corner
+    act('fire', {
+      weapon: -1,
+      angle: get_angle(active_ship.x + active_ship.icon.width / 2, active_ship.y + active_ship.icon.height / 2, xy.x, xy.y) - 180
+    });
   }
 
     let last_process_time = 0;
