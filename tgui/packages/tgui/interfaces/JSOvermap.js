@@ -270,10 +270,8 @@ class overmapEntity{
     this.r = (this.angle) * (Math.PI / 180);
     this.armour_quadrants = armour_quadrants;
   }
-  //The following procs are mirrored from the backend.
-  //They attempt to model where the ship "ought" to be, based on input.
+  //The following procs attempt to model where the ship "ought" to be, based on input.
   process(){
-    //TODO: this calculation is off
     this.x += (this.velocity_x/interpolation_mult);
     this.y += (this.velocity_y/interpolation_mult);
   }
@@ -283,8 +281,8 @@ class overmapEntity{
     this.r = (this.angle) * (Math.PI / 180);
   }
   thrust(dir){
-    //TODO: bodge
-    //this.velocity += this.thruster_power * dir;
+    // Positive dir is forward, negative dir is backward.
+    // Does not permit strafing.
     if(dir == 1){
       this.velocity_x += Math.cos(this.r) * this.thruster_power
       this.velocity_y += Math.sin(this.r) * this.thruster_power
