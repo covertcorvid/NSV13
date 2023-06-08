@@ -396,7 +396,7 @@ export const JSOvermapGame = (props, context) => {
     // We get the angle from the center of the icon, not the corner
     act('fire', {
       weapon: -1,
-      angle: get_angle(active_ship.x + active_ship.icon.width / 2, active_ship.y + active_ship.icon.height / 2, xy.x, xy.y) - 180
+      angle: get_angle(active_ship.x + active_ship.icon.width / 2, active_ship.y + active_ship.icon.height / 2, xy.x, xy.y)
     });
   }
 
