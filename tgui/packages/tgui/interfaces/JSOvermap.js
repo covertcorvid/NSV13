@@ -605,10 +605,10 @@ export const JSOvermapGame = (props, context) => {
                 ctx.strokeStyle = "orange";
               }
               if(integrity >= 50){
-                ctx.strokeStyle = "yellow";
+                ctx.strokeStyle = "gold";
               }
               if(integrity >= 70){
-                ctx.strokeStyle = "green";
+                ctx.strokeStyle = "dodgerblue";
               }
               segment_count++;
               ctx.arc(x, y, radius, arc_start_radians, arc_start_radians + arc_length_radians);
