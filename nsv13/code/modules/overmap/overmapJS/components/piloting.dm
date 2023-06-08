@@ -22,8 +22,11 @@
 /datum/component/overmap_piloting/proc/process_fire(weapon_type, proj_angle)
 	if(!(rights & OVERMAP_CONTROL_RIGHTS_GUNNER))
 		return
-	var/dot_product = cos(target.position.angle + firing_arc_center) * cos(proj_angle) + sin(target.position.angle + firing_arc_center) * sin(proj_angle)
-	var/adjusted_angle = arccos(dot_product)
+	// Calculate the angle between the center of the firing arc and the requested angle, and compare it to the width of the firing arc
+	// CC-BY-SA algorithm from StackOverflow https://stackoverflow.com/questions/12234574/calculating-if-an-angle-is-between-two-angles
+	// Solution by Alnitak (https://stackoverflow.com/users/6782/alnitak) and hdante (https://stackoverflow.com/users/1797000/hdante)
+	var/current_arc_center = target.position.angle + firing_arc_center
+	var/adjusted_angle = arccos(cos(current_arc_center) * cos(proj_angle) + sin(current_arc_center) * sin(proj_angle))
 	if(adjusted_angle > (firing_arc_width/100)*180)
 		to_chat(world, "adjusted angle [adjusted_angle] was out of range")
 		return
