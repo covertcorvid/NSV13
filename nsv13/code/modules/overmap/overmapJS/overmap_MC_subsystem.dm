@@ -70,6 +70,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["client_zoom"] = zoom
 	.["can_pilot"] = OP.rights & OVERMAP_CONTROL_RIGHTS_HELM
 	.["control_scheme"] = OP.rights
+	.["fps_capability"] = OP.fps_capability
 	.["firing_arc_center"] = OP.firing_arc_center
 	.["firing_arc_width"] = OP.firing_arc_width
 	for(var/datum/overmap/O in physics_world)
@@ -147,6 +148,9 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			return;
 		if("keydown")
 			C.process_input(params["key"])
+			return;
+		if("ui_mark_dirty")
+			C.mark_dirty(C.target, C.target, params["fps"])
 			return;
 		if("view_vars")
 			usr.client.debug_variables(locate(params["target"]))
