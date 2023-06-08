@@ -70,6 +70,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["client_zoom"] = zoom
 	.["can_pilot"] = OP.rights & OVERMAP_CONTROL_RIGHTS_HELM
 	.["control_scheme"] = OP.rights
+	.["firing_arc_center"] = OP.firing_arc_center
+	.["firing_arc_width"] = OP.firing_arc_width
 	for(var/datum/overmap/O in physics_world)
 		var/list/quads = list()
 		if(O.armour_quadrants)
@@ -171,6 +173,15 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		if("spawn_ship")
 			SSJSOvermap.instance(spawn_type, new /datum/vec5(rand(0, JS_OVERMAP_TACMAP_SIZE), rand(0, JS_OVERMAP_TACMAP_SIZE), spawn_z, 0))
 			ui_interact(usr)
+		// Initial firing arc test
+		if("firing_arc_center")
+			C.set_firing_arc_center(params["firing_arc_center"])
+			ui_interact(usr)
+			return
+		if("firing_arc_width")
+			C.set_firing_arc_width(params["firing_arc_width"])
+			ui_interact(usr)
+			return
 
 /client/proc/js_overmap_panel() //Admin Verb for the Overmap Gamemode controller
 	set name = "JS Overmap Panel"

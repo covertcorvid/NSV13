@@ -9,6 +9,9 @@
 	var/datum/tgui/ui = null
 	dupe_mode = COMPONENT_DUPE_HIGHLANDER
 	var/rights = OVERMAP_CONTROL_RIGHTS_FULL
+	// Testing - remove later
+	var/firing_arc_center = 0 // Dead center
+	var/firing_arc_width = 100 // In percentage - Omnidirectional
 
 
 /datum/component/overmap_piloting/Initialize(target, ui)
@@ -18,6 +21,11 @@
 
 /datum/component/overmap_piloting/proc/process_fire(weapon_type, proj_angle)
 	if(!(rights & OVERMAP_CONTROL_RIGHTS_GUNNER))
+		return
+	var/dot_product = cos(target.position.angle + firing_arc_center) * cos(proj_angle) + sin(target.position.angle + firing_arc_center) * sin(proj_angle)
+	var/adjusted_angle = arccos(dot_product)
+	if(adjusted_angle > (firing_arc_width/100)*180)
+		to_chat(world, "adjusted angle [adjusted_angle] was out of range")
 		return
 	//TODO: Check if theyre the gunner. Roles... I don't care for now!
 	target.fire_projectile(proj_angle)
@@ -76,6 +84,14 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 	//Gunner controls (TODO)
 	if(rights & OVERMAP_CONTROL_RIGHTS_GUNNER)
 		return
+
+/datum/component/overmap_piloting/proc/set_firing_arc_center(center)
+	to_chat(world, "Setting firing_arc_center to [center]")
+	firing_arc_center = SIMPLIFY_DEGREES(center)
+
+/datum/component/overmap_piloting/proc/set_firing_arc_width(width)
+	to_chat(world, "Setting firing_arc_width to [width]")
+	firing_arc_width = width
 
 /datum/component/overmap_piloting/observer
 	rights = OVERMAP_CONTROL_RIGHTS_NONE

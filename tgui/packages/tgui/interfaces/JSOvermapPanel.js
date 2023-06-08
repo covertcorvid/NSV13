@@ -64,6 +64,32 @@ export const JSOvermapPanel = (props, context) => {
                               />
                             </Box>
                           </LabeledList.Item>
+                          <LabeledList.Item label="Firing arc center">
+                            <NumberInput
+                              animated
+                              value={parseFloat(data.firing_arc_center)}
+                              unit="deg R"
+                              width="125px"
+                              minValue={0}
+                              maxValue={360}
+                              step={1}
+                              onChange={(e, value) => act('firing_arc_center', {
+                                firing_arc_center: value,
+                              })} />
+                          </LabeledList.Item>
+                          <LabeledList.Item label="Firing arc width">
+                            <NumberInput
+                              animated
+                              value={parseFloat(data.firing_arc_width)}
+                              unit="%"
+                              width="125px"
+                              minValue={0}
+                              maxValue={100}
+                              step={1}
+                              onChange={(e, value) => act('firing_arc_width', {
+                                firing_arc_width: value,
+                              })} />
+                          </LabeledList.Item>
                       </LabeledList>
                       <LabeledList>
                           <LabeledList.Item label="Spawning">
