@@ -482,28 +482,29 @@ export const JSOvermapGame = (props, context) => {
          * x / y = center
          * radius = of circle
          * offset = rotation in angle (radians)
-         * How many segments circle should be in
-         * Size of each segment (of one segment) [0.0, 1.0]
+         * How many segments circle should be in, and a value converted to color
+         * Size in percent of each segment (of one segment) [0.0, 1.0]
          *
          * CC-Attr: Ken Fyrstenberg
          * Modified by: Kmc2000
         */
         function dashedCircle(x, y, radius, offset, segments, size) {
 
-          var pi2 = 2 * Math.PI,
-              segs = pi2 / segments.length,
-              len = segs * size,
-              i = 0,
-              ax, ay;
+          var pi2 = 2 * Math.PI; // Total radians in a circle
+          var sector_width_radians = pi2 / segments.length;
+          var arc_length_radians = sector_width_radians * size;
+          var arc_start_radians = (1 - size) * sector_width_radians / 2; // Offset start to half the width of the space between segments
+          var ax, ay;
+
           let segment_count = 0;
           ctx.save();
           ctx.translate(x, y);
           ctx.rotate(offset);
           ctx.translate(-x, -y);
-          for(; i < pi2; i += segs) {
+          for(; arc_start_radians < pi2; arc_start_radians += sector_width_radians) {
               ctx.beginPath();
-              ax = x + radius * Math.cos(i);
-              ay = y + radius * Math.sin(i);
+              ax = x + radius * Math.cos(arc_start_radians);
+              ay = y + radius * Math.sin(arc_start_radians);
               ctx.moveTo(ax, ay);
               let quad = segments[segment_count];
               let max_integrity = quad[1];
@@ -545,7 +546,7 @@ export const JSOvermapGame = (props, context) => {
                 ctx.strokeStyle = "green";
               }
               segment_count++;
-              ctx.arc(x, y, radius, i, i + len);
+              ctx.arc(x, y, radius, arc_start_radians, arc_start_radians + arc_length_radians);
               ctx.stroke();
           }
           ctx.restore();
