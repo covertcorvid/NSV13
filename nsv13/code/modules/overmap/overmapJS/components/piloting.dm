@@ -9,6 +9,7 @@
 	var/datum/tgui/ui = null
 	dupe_mode = COMPONENT_DUPE_HIGHLANDER
 	var/rights = OVERMAP_CONTROL_RIGHTS_FULL
+	var/fps_capability = -1
 
 
 /datum/component/overmap_piloting/Initialize(target, ui)
@@ -37,11 +38,14 @@ Mark our linked TGUI as requiring update.
 The server will send the new positions and state of the physics world.
 Usually called when anything is added to the overmap, removed from it, or a collision occurs.
 */
-/datum/component/overmap_piloting/proc/mark_dirty(datum/source, datum/overmap/target)
+/datum/component/overmap_piloting/proc/mark_dirty(datum/source, datum/overmap/target, fps=-1)
 	SIGNAL_HANDLER
 	//If they're not on our Z, ignore..
 	if(target.position.z != src.target.position.z)
 		return
+	//If the client is reporting its FPS capability to us, set ours to match.
+	if(fps != -1)
+		fps_capability = round(fps)
 	//to_chat(world, "Overmap UI marked dirty.")
 	//src.ui.needs_update = TRUE
 	//HACK: instant UI update. Take your delay and get out.

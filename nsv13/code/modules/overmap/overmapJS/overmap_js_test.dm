@@ -70,4 +70,7 @@
 		if("keydown")
 			C.process_input(params["key"])
 			return;
+		if("ui_mark_dirty")
+			C.mark_dirty(C.target, C.target, params["fps"])
+			return;
 	//active_ship.position.x += 0.1;

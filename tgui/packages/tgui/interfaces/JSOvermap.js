@@ -246,12 +246,13 @@ const backend_tick_rate = 100;
 //Which gives us this many FPS if we don't do any interpolation.
 const backend_fps = 1000/backend_tick_rate;
 //We want to interpolate UP to this framerate. The client MUST be capable of running at least this fast.
-const target_fps = 60;//30;
+const max_ideal_fps = 60;
+let target_fps = max_ideal_fps;//30;
 //Which means we have this many ticks per actual game tick
-const interpolation_mult = target_fps/backend_fps;
+let interpolation_mult = target_fps/backend_fps;
 //Giving us a tick rate as such. This is the delay for framerate we have to use.
 
-const tick_rate = backend_tick_rate / interpolation_mult;
+let tick_rate = backend_tick_rate / interpolation_mult;
 
 class overmapEntity{
   constructor(x,y,z,angle, velocity, velocity_x, velocity_y, icon, thruster_power, rotation_power, sensor_range, armour_quadrants){
@@ -307,9 +308,15 @@ export const JSOvermapGame = (props, context) => {
 
   const rows = 26;
   const cols = 26;
+  const abs=Math.abs;
 
   const gridsize = 2000;
   let previous_frame_time = -1;
+  if(data.fps_capability != -1){
+    target_fps = data.fps_capability;
+    interpolation_mult = target_fps/backend_fps;
+    tick_rate = backend_tick_rate / interpolation_mult;
+  }
 
   //TODO: maybe try an update flag which triggers a repaint or not?
   if(data != null && data.physics_world.length > 0){
@@ -404,10 +411,24 @@ export const JSOvermapGame = (props, context) => {
   }
 
     let last_process_time = 0;
-
+    //How long we've been slipping UNDER our target FPS for.
+    let fps_lag_stacks = 0;
+    //How long we've been throttled for, IE, we can do more than what we're throttled to.
+    let fps_good_stacks = 0;
+    //Did we request a UI update? Terminates all rendering.
+    let mark_dirty_requested = false;
+    //The maximum number of frames we'll accept being slow for. Defaults to 1 second's worth.
+    //(higher -> more lag accepted before we try compensate.)
+    const max_acceptable_frame_drift = max_ideal_fps;
+    //How many consecutive frames we have been held back for. (higher -> longer time to jump back to 60fps.)
+    const min_acceptable_frame_recovery_drift = 5;//max_acceptable_frame_drift / 2;
     //Called every tick that the browser can handle.
     function _render({time, delta, ctx}){
-        let process = (time - last_process_time >= tick_rate);
+        if(mark_dirty_requested){
+          return;
+        }
+        const actual_rate = time - last_process_time;
+        let process = (actual_rate >= tick_rate);
         //Initial draw batch.
         if(last_process_time == 0){
           Camera.constructor(ctx);
@@ -415,9 +436,53 @@ export const JSOvermapGame = (props, context) => {
           Camera.zoomTo(data.client_zoom);
           canvas_rect = ctx.canvas.getBoundingClientRect();
         }
+        //If we're now able to render at the correct framerate after being compensated down...
+        //We report back and request the maximum possible FPS.
+        if(target_fps != max_ideal_fps){
+          //We are being throttled, but are capable of more. Increase the good boy counter.
+          if(!process){
+            fps_good_stacks++;
+          }
+          else{
+            //Nope, can't handle it...
+            fps_good_stacks--;
+            if(fps_good_stacks < 0){
+              fps_good_stacks = 0;
+            }
+          }
+          //You must have been continuing to render at above your real framerate for at least a few seconds worth of "ideal" fps time.
+          if(fps_good_stacks >= min_acceptable_frame_recovery_drift){
+            //Abort all processing and get us an update, pronto.
+            mark_dirty_requested = true;
+            act('ui_mark_dirty', {fps: max_ideal_fps});
+            return;
+          }
+        }
+
         //Slave clientside update to ROUGHLY server speed.
         if(!process){
           return;
+        }
+
+        //We are hitting a major lag spike. We may need to intervene.
+        //Should never exceed the target framerate as we are throttled to that speed.
+        const rate_drift = actual_rate - tick_rate;
+        //If we are more than 10 ms out of sync with the "ideal" rate.
+        if(rate_drift >= 10){
+          //Increase our lag stacks.
+          fps_lag_stacks++;
+          //And, if we are lagging too hard to even be playable...
+          if(fps_lag_stacks >= max_acceptable_frame_drift){
+            //Abort everything, report back what FPS we think we're capable of.
+            const actual_fps = 1000 / actual_rate;
+            mark_dirty_requested = true;
+            //And get a UI update :)
+            act('ui_mark_dirty', {fps: actual_fps});
+            return;
+          }
+        }
+        else{
+          fps_lag_stacks = 0;
         }
         last_process_time = time;
         function draw(image, x, y, degrees) {
