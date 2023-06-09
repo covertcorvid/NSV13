@@ -121,3 +121,12 @@ GLOBAL_DATUM_INIT(conquest_role_handler, /datum/conquest_role_handler, new)
 #define HOLOMAP_EXTRA_STATIONMAP "stationmapformatted"
 #define HOLOMAP_EXTRA_STATIONMAPAREAS "stationareas"
 #define HOLOMAP_EXTRA_STATIONMAPSMALL "stationmapsmall"
+
+///User has NO rights and may only observe the ship.
+#define OVERMAP_CONTROL_RIGHTS_NONE 0
+///User is able to steer the ship.
+#define OVERMAP_CONTROL_RIGHTS_HELM 1 << 0
+///User is able to fire the ship's weaponry.
+#define OVERMAP_CONTROL_RIGHTS_GUNNER 1 << 1
+
+#define OVERMAP_CONTROL_RIGHTS_FULL OVERMAP_CONTROL_RIGHTS_HELM | OVERMAP_CONTROL_RIGHTS_GUNNER
