@@ -7,60 +7,44 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	wait = 0.2 SECONDS
 	stat_tag = "JS"
 	init_order = INIT_ORDER_STARSYSTEM
-	var/list/physics_world = list()
+	flags = SS_BACKGROUND|SS_POST_FIRE_TIMING
+	/// A list of the created overmap levels
+	var/list/datum/overmap_level/overmap_levels = list()
+	/// A map-level that exists fore debugging purposes.
+	var/datum/overmap_level/debug_level
 	var/list/overmap_icons = list()
 
+/datum/controller/subsystem/processing/JSOvermap/Initialize(start_timeofday)
+	. = ..()
+	debug_level = new("Debug Map")
+
 /datum/controller/subsystem/processing/JSOvermap/proc/batch_initial()
-	instance(/datum/overmap/ship/player/cruiser, new /datum/vec5(200, 200, 1, 0, 0))
-	instance(/datum/overmap/ship/syndicate, new /datum/vec5(1000, 400, 1, 0, 0))
-	instance(/datum/overmap/ship/syndicate/cruiser, new /datum/vec5(400, 1000, 1, 90, 0))
+	instance(/datum/overmap/ship/player/cruiser, debug_level, new /datum/vec5(200, 200, 1, 0, 0))
+	instance(/datum/overmap/ship/syndicate, debug_level, new /datum/vec5(1000, 400, 1, 0, 0))
+	instance(/datum/overmap/ship/syndicate/cruiser, debug_level, new /datum/vec5(400, 1000, 1, 90, 0))
 
 /datum/controller/subsystem/processing/JSOvermap/proc/batch_grid()
 	for (var/i=0, i<3, i++)
 		for(var/j=0, j<3, j++)
 			if (i % 2)
-				instance(/datum/overmap/ship/player/cruiser, new /datum/vec5((i+1) * 800, (j+1) * 800, 1, 90, 0))
+				instance(/datum/overmap/ship/player/cruiser, debug_level, new /datum/vec5((i+1) * 800, (j+1) * 800, 1, 90, 0))
 			else
-				instance(/datum/overmap/ship/syndicate/cruiser, new /datum/vec5((i+1) * 800, (j+1) * 800, 1, 90, 0))
+				instance(/datum/overmap/ship/syndicate/cruiser, debug_level, new /datum/vec5((i+1) * 800, (j+1) * 800, 1, 90, 0))
 
 
 
-/datum/controller/subsystem/processing/JSOvermap/proc/instance(type, datum/vec5/position)
-	var/datum/overmap/OM = register(new type(position.x, position.y, position.z, position.angle, position.velocity.x, position.velocity.y))
+/datum/controller/subsystem/processing/JSOvermap/proc/instance(type, datum/overmap_level/map, datum/vec5/position)
+	var/datum/overmap/OM = new type(map, position.x, position.y, position.z, position.angle, position.velocity.x, position.velocity.y)
 	return OM
 
 /datum/controller/subsystem/processing/JSOvermap/proc/get_overmap(z)
 	var/datum/space_level/SL = SSmapping.z_list[z] // Overmaps linked to Zs, like the main ship
 	if(SL?.occupying_overmap)
 		return SL.occupying_overmap
-/**
-	Register "target" with the overmap.
-	Pass in a newly created overmap object, and it will be tracked.
-*/
-/datum/controller/subsystem/processing/JSOvermap/proc/register(datum/overmap/target)
-	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, target)
-	physics_world += target
-	return target
-
-/**
-	Register a list of overmaps as one processing "batch".
-	This means the UI is only marked dirty ONCE, as the ships are pushed in.
-*/
-/datum/controller/subsystem/processing/JSOvermap/proc/register_batch(list/targets)
-	if(!targets)
-		return
-	for(var/datum/overmap/O in targets)
-		physics_world += O
-	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, targets[1])
-
-/datum/controller/subsystem/processing/JSOvermap/proc/unregister(datum/overmap/target)
-	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, target)
-	physics_world -= target
-	STOP_PROCESSING(SSJSOvermap, target)
-	return
 
 /datum/controller/subsystem/processing/JSOvermap/proc/ui_data_for(mob/user, datum/overmap/target)
 	. = list()
+	.["map_id"] = target.map?.identifier || 0
 	.["physics_world"] = list()
 	var/datum/component/overmap_piloting/OP = user.GetComponent(/datum/component/overmap_piloting)
 	//Broadcast this particular client's cached overmap Zoom level.
@@ -71,7 +55,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["can_pilot"] = OP.rights & OVERMAP_CONTROL_RIGHTS_HELM
 	.["control_scheme"] = OP.rights
 	.["fps_capability"] = OP.fps_capability
-	for(var/datum/overmap/O in physics_world)
+	for(var/datum/overmap/O in (target.map?.physics_objects || list(target)))
 		var/list/quads = list()
 		if(O.armour_quadrants)
 			quads = new(4)
@@ -92,6 +76,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 
 /datum/overmap_js_panel
+	var/datum/overmap_level/selected_level
 	var/datum/overmap/active_ship = null
 	var/hide_bullets = TRUE
 	var/spawn_type = /datum/overmap
@@ -100,7 +85,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 /datum/overmap_js_panel/ui_data(mob/user)
 	. = SSJSOvermap.ui_data_for(user, active_ship)
 	var/list/ships = list()
-	for(var/datum/overmap/OM in SSJSOvermap.physics_world)
+	for(var/datum/overmap/OM in (selected_level?.physics_objects || list(active_ship)))
 		if(hide_bullets && IS_OVERMAP_JS_PROJECTILE(OM))
 			continue
 		var/list/ship_data = list()
@@ -115,14 +100,27 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["spawn_z"] = spawn_z
 	.["hide_bullets"] = hide_bullets
 
+/datum/overmap_js_panel/ui_static_data(mob/user)
+	var/list/data = list()
+	data["static_levels"] = list()
+	for (var/datum/overmap_level/level in SSJSOvermap.overmap_levels)
+		data["static_levels"] += list(list(
+			"id" = level.identifier,
+			"name" = level.name,
+			"object_count" = length(level.physics_objects),
+		))
+	return data
+
 /datum/overmap_js_panel/ui_state(mob/user)
 	return GLOB.admin_state
 
 /datum/overmap_js_panel/ui_interact(mob/user, datum/tgui/ui)
 	if(!check_rights(0, 1, TRUE)) //sometimes this is called by the physics engine, which means it won't have a usr
 		return
+	if (!selected_level)
+		selected_level = SSJSOvermap.debug_level
 	if(!active_ship)
-		active_ship = SSJSOvermap.physics_world[1]
+		active_ship = length(selected_level.physics_objects) ? selected_level.physics_objects[1] : null
 	ui = SStgui.try_update_ui(user, src, ui)
 	if(!ui)
 		log_admin_private("[user.ckey] opened the JS overmap panel.")
@@ -153,6 +151,14 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		if("view_vars")
 			usr.client.debug_variables(locate(params["target"]))
 			return
+		// Swap map level - Debugging action
+		if ("set_map_level")
+			var/target_identifier = params["id"]
+			for (var/datum/overmap_level/level in SSJSOvermap.overmap_levels)
+				if (level.identifier == target_identifier)
+					selected_level = level
+					active_ship = length(selected_level.physics_objects) ? selected_level.physics_objects[1] : null
+					return TRUE
 		//Swap ship. TODO: Remote piloting is also doable here!
 		if("track")
 			active_ship = locate(params["target"])
@@ -173,7 +179,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			spawn_z = params["target"]
 			ui_interact(usr)
 		if("spawn_ship")
-			SSJSOvermap.instance(spawn_type, new /datum/vec5(rand(0, JS_OVERMAP_TACMAP_SIZE), rand(0, JS_OVERMAP_TACMAP_SIZE), spawn_z, 0))
+			SSJSOvermap.instance(spawn_type, SSJSOvermap.debug_level, new /datum/vec5(rand(0, JS_OVERMAP_TACMAP_SIZE), rand(0, JS_OVERMAP_TACMAP_SIZE), spawn_z, 0))
 			ui_interact(usr)
 
 /client/proc/js_overmap_panel() //Admin Verb for the Overmap Gamemode controller
