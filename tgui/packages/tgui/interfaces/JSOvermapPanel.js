@@ -32,25 +32,25 @@ export const JSOvermapPanel = (props, context) => {
                       <Button
                         icon="eye"
                         content="OBS"
-                        color={data.control_scheme == 0 ? "green" : "blue"}
+                        color={data.control_scheme === 0 ? "green" : "blue"}
                         onClick={() => act('swap_control_scheme', { target: 0 })}
                       />
                       <Button
                         icon="steering-wheel"
                         content="HLM"
-                        color={data.control_scheme == 1 ? "green" : "orange"}
+                        color={data.control_scheme === 1 ? "green" : "orange"}
                         onClick={() => act('swap_control_scheme', { target: 1 })}
                       />
                       <Button
                         icon="scanner"
                         content="TAC"
-                        color={data.control_scheme == 2 ? "green" : "red"}
+                        color={data.control_scheme === 2 ? "green" : "red"}
                         onClick={() => act('swap_control_scheme', { target: 2 })}
                       />
                       <Button
                         icon="fighter-jet"
                         content="FULL"
-                        color={data.control_scheme == 3 ? "green" : "white"}
+                        color={data.control_scheme === 3 ? "green" : "white"}
                         onClick={() => act('swap_control_scheme', { target: 3 })}
                       />
                     </Box>
