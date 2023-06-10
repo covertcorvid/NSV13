@@ -143,6 +143,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			return;
 		if("fire")
 			C.process_fire(params["weapon"], params["angle"])
+			ui_interact(usr)
 			return;
 		if("keyup")
 			return;
