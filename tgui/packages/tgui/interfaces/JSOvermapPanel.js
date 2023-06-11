@@ -5,6 +5,7 @@ import { useBackend, useLocalState } from '../backend';
 import { Button, Table, Section, NumberInput, Modal, Dropdown, Tabs, Box, Input, Flex, ProgressBar, Collapsible, Icon, Divider, Tooltip, LabeledList } from '../components';
 import { Window } from '../layouts';
 import { JSOvermapGame } from './JSOvermap';
+import { WeaponManagementPanel } from './JSWeaponManagement';
 
 export const JSOvermapPanel = (props, context) => {
   const { act, data } = useBackend(context);
@@ -14,14 +15,13 @@ export const JSOvermapPanel = (props, context) => {
       height={800}
       >
         <Window.Content>
-          <Table>
-            <Table.Row>
-                <Table.Cell>
+          <Flex>
+            <Flex.Item>
                   <Section title="Active view:">
                     <JSOvermapGame props={props} context={context}/>
                   </Section>
-                </Table.Cell>
-                <Table.Cell textAlign="right">
+            </Flex.Item>
+            <Flex.Item>
                   <Section title="Options">
                     <LabeledList>
                           <LabeledList.Item label="Control Scheme">
@@ -141,9 +141,11 @@ export const JSOvermapPanel = (props, context) => {
                       })}
                     </LabeledList>
                   </Section>
-                </Table.Cell>
-            </Table.Row>
-          </Table>
+                  <Section title="Weapon Management">
+                    <WeaponManagementPanel props={props} context={context}/>
+                  </Section>
+            </Flex.Item>
+          </Flex>
 
 
         </Window.Content>

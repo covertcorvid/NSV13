@@ -116,12 +116,13 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["spawn_type"] = "[spawn_type]"
 	.["spawn_z"] = spawn_z
 	.["hide_bullets"] = hide_bullets
+	.["weapon_groups"] = list("foo", "bar", "bat")
 
 /datum/overmap_js_panel/ui_state(mob/user)
 	return GLOB.admin_state
 
 /datum/overmap_js_panel/ui_interact(mob/user, datum/tgui/ui)
-	if(!check_rights(0, 1, TRUE)) //sometimes this is called by the physics engine, which means it won't have a usr
+	if((usr != src) && !check_rights(0, 1, TRUE)) //sometimes this is called by the physics engine, which means it won't have a usr
 		return
 	if(!active_ship)
 		active_ship = SSJSOvermap.physics_world[1]
