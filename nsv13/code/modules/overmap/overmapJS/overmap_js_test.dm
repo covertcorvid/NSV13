@@ -61,17 +61,17 @@
 	switch(action)
 		if("scroll")
 			C.zoom(params["key"])
-			return;
+			return
 		if("fire")
 			C.process_fire(params["weapon"], params["angle"])
 			ui_interact(usr)
-			return;
+			return
 		if("keyup")
-			return;
+			return
 		if("keydown")
 			C.process_input(params["key"])
-			return;
+			return
 		if("ui_mark_dirty")
-			C.mark_dirty(C.target, C.target, params["fps"])
-			return;
+			C.mark_dirty(SSJSOvermap, C.target, params["fps"])
+			return
 	//active_ship.position.x += 0.1;
