@@ -23,7 +23,7 @@ export const WeaponManagementPanel = (props, context) => {
         return (
           <Section
             key={key}
-            label={key}
+            title={group_data.name}
             buttons={
               <>
                 <Button fluid
@@ -41,30 +41,16 @@ export const WeaponManagementPanel = (props, context) => {
                 </Button>
               </>
             }>
-              {}
+              {Object.keys(group_data.weapons).map(key2 => {
+                return(
+                  <>
+                    {key2}<br />
+                  </>
+                )
+              })}
           </Section>
           );
       })}
     </Section>
   )
 }
-
-export const JSOvermap = (props, context) => {
-  return (
-  <Window
-    width={1600}
-    height={720}
-    >
-      <Window.Content>
-        <Flex>
-          <Flex.Item>
-            <JSOvermapGame props={props} context={context}/>
-          </Flex.Item>
-          <Flex.Item>
-            <WeaponManagementPanel props={props} context={context}/>
-          </Flex.Item>
-        </Flex>
-      </Window.Content>
-    </Window>
-  )
-};

@@ -42,7 +42,6 @@
 	//var/shipType = text2path(json["ship_type"])
 	var/mapPath = json["map_path"]
 	var/mapFile = json["map_file"]
-	var/list/traits = json["traits"]
 	if (istext(mapFile))
 		if (!fexists("_maps/[mapPath]/[mapFile]"))
 			log_world("Map file ([mapPath]/[mapFile]) does not exist!")

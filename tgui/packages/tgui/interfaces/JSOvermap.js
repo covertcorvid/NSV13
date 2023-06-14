@@ -711,4 +711,5 @@ export const JSOvermap = (props, context) => {
           <JSOvermapGame props={props} context={context}/>
         </Window.Content>
       </Window>
-  )}
+  )
+};

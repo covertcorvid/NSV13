@@ -3979,6 +3979,7 @@
 #include "nsv13\code\modules\overmap\overmapJS\overmap_projectile.dm"
 #include "nsv13\code\modules\overmap\overmapJS\ship.dm"
 #include "nsv13\code\modules\overmap\overmapJS\subsystems.dm"
+#include "nsv13\code\modules\overmap\overmapJS\weapon_type.dm"
 #include "nsv13\code\modules\overmap\overmapJS\components\piloting.dm"
 #include "nsv13\code\modules\overmap\ship_areas\badmiral.dm"
 #include "nsv13\code\modules\overmap\types\miningships.dm"

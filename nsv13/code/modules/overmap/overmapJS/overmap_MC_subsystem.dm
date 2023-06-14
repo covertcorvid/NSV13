@@ -78,7 +78,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		if(O.armour_quadrants)
 			quads = new(4)
 			for(var/I = 1; I <=4; I++)
-				quads[I] = list(O.armour_quadrants[I].integrity, O.armour_quadrants[I].max_integrity)
+				var/datum/armour_quadrant/quad = O.armour_quadrants[I]
+				quads[I] = list(quad.integrity, quad.max_integrity)
 		var/list/data = list(
 			icon = O.icon_base64,
 			active = (target == O),
@@ -89,6 +90,13 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			position = list(O.position.x, O.position.y, O.position.z, O.position.angle, O.position.velocity.ln(), O.position.velocity.x, O.position.velocity.y)
 		)
 		.["physics_world"] += list(data)
+
+	.["weapon_groups"] = list()
+	message_admins("UI data with groups [english_list(target.weapon_groups)]")
+	for(var/WG as() in target.weapon_groups)
+		var/datum/weapon_group/group = target.weapon_groups[WG]
+		var/list/group_data = group.get_ui_data()
+		.["weapon_groups"] += list(group_data)
 
 //datum/controller/subsystem/processing/JSOvermap/proc/start_piloting(mob/user, datum/overmap/OM)
 
@@ -116,7 +124,6 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["spawn_type"] = "[spawn_type]"
 	.["spawn_z"] = spawn_z
 	.["hide_bullets"] = hide_bullets
-	.["weapon_groups"] = list("foo", "bar", "bat")
 
 /datum/overmap_js_panel/ui_state(mob/user)
 	return GLOB.admin_state

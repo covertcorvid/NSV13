@@ -66,6 +66,8 @@
 
 	var/restitution = 1 //"bounciness", as used for collisions. 1 = boingy boingy, 0 = no boingy
 
+	var/list/weapon_groups = list()
+
 
 /**
 	Constructor for overmap objects. Pre-bakes some maths for you and initialises processing.
@@ -99,6 +101,8 @@
 	//TODO: replace this.
 	START_PROCESSING(SSJSOvermap, src)
 	setup_armour()
+	for(var/i = 0; i < 2; i++)
+		new /datum/weapon_group(src)
 
 /datum/overmap/proc/setup_armour()
 	switch(mass)
