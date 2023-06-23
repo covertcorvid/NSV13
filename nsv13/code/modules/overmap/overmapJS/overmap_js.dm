@@ -37,6 +37,12 @@
 	return integrity > 0
 
 /datum/overmap
+	/// The level that this overmap object is attached to.
+	/// All interactions are contained within this container.
+	/// This can be null in the case that we do not belong to any map. This
+	/// will represent an isolated ship instance with no external interactions.
+	var/datum/overmap_level/map
+	/// Position of the othermap object within the level.
 	var/datum/vec5/position
 	var/icon = null
 	var/icon_state = ""
@@ -70,7 +76,10 @@
 /**
 	Constructor for overmap objects. Pre-bakes some maths for you and initialises processing.
 */
-/datum/overmap/New(x,y,z,angle,velocity_x, velocity_y)
+/datum/overmap/New(datum/overmap_level/map, x,y,z,angle,velocity_x, velocity_y)
+	src.map = map
+	if (map)
+		map.register(src)
 	if(collision_positions == null)
 		collision_positions = GLOB.projectile_hitbox
 	position = new /datum/vec5(x,y,z,angle,velocity_x, velocity_y)
@@ -141,18 +150,21 @@
 
 
 /datum/overmap/proc/fire_projectile(angle = src.position.angle, projectile_type=/datum/overmap/projectile/shell, burst_size=1)
+	if (!map)
+		CRASH("Overmap object with no map cannot fire projectiles.")
 	//TODO: magic number "10".
 	//We scromble the position so it originates from the centre of the ship.
 	for(var/i = 1; i <= burst_size; i++)
-		var/datum/overmap/projectile/O = new projectile_type(position.x + (collision_radius/2),position.y + (collision_radius/2), position.z, angle, position.velocity.ln())
+		var/datum/overmap/projectile/O = new projectile_type(map, position.x + (collision_radius/2),position.y + (collision_radius/2), position.z, angle, position.velocity.ln())
 		O.position.velocity += O.speed
 		O.faction = faction
-		SSJSOvermap.register(O)
 	//to_chat(world, "Fire missile.")
 
 /datum/overmap/Destroy()
 	QDEL_NULL(physics2d)
-	SSJSOvermap.unregister(src)
+	map = null
+	if (map)
+		map.unregister(src)
 	. = ..()
 
 /**

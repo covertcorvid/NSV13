@@ -3975,6 +3975,7 @@
 #include "nsv13\code\modules\overmap\overmapJS\overmap_js.dm"
 #include "nsv13\code\modules\overmap\overmapJS\overmap_js_physics.dm"
 #include "nsv13\code\modules\overmap\overmapJS\overmap_js_test.dm"
+#include "nsv13\code\modules\overmap\overmapJS\overmap_level.dm"
 #include "nsv13\code\modules\overmap\overmapJS\overmap_MC_subsystem.dm"
 #include "nsv13\code\modules\overmap\overmapJS\overmap_projectile.dm"
 #include "nsv13\code\modules\overmap\overmapJS\ship.dm"
