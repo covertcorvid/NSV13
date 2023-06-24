@@ -14,12 +14,12 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	var/datum/overmap_level/debug_level
 	var/list/overmap_icons = list()
 
-/datum/controller/subsystem/processing/JSOvermap/Initialize(start_timeofday)
+/datum/controller/subsystem/processing/JSOvermap/New()
 	. = ..()
-	debug_level = new("Debug Map")
+	debug_level = new /datum/overmap_level/debug_level()
 
 /datum/controller/subsystem/processing/JSOvermap/proc/batch_initial()
-	instance(/datum/overmap/ship/player/cruiser, debug_level, new /datum/vec5(200, 200, 1, 0, 0))
+	//instance(/datum/overmap/ship/player/cruiser, debug_level, new /datum/vec5(200, 200, 1, 0, 0))
 	instance(/datum/overmap/ship/syndicate, debug_level, new /datum/vec5(1000, 400, 1, 0, 0))
 	instance(/datum/overmap/ship/syndicate/cruiser, debug_level, new /datum/vec5(400, 1000, 1, 90, 0))
 

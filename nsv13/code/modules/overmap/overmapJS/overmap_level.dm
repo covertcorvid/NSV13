@@ -8,9 +8,13 @@
 	/// List of physics objects active on this level.
 	var/list/physics_objects = list()
 
+/datum/overmap_level/debug_level
+	name = "Staging"
+
 /datum/overmap_level/New(name)
 	. = ..()
-	src.name = name
+	if(name)
+		src.name = name
 	SSJSOvermap.overmap_levels += src
 
 /datum/overmap_level/Destroy(force, ...)
