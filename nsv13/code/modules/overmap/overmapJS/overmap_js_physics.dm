@@ -159,8 +159,19 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 /// Uses pixel coordinates
 /datum/component/physics2d/proc/update()
 	if(world.time >= next_chunk_update)
+		check_translation()
 		SSphysics_processing.UpdateChunk(src, holder.position.z)
 		next_chunk_update = world.time + 0.5 SECONDS
+
+/datum/component/physics2d/proc/check_translation()
+	if(holder.position.x <= 0 || holder.position.x >= JS_OVERMAP_TACMAP_SIZE || holder.position.y <= 0 || holder.position.y >= JS_OVERMAP_TACMAP_SIZE){
+		to_chat(world, "Out of bounds.")
+		//We have a translation...
+		if(holder.map.parent)
+			if(holder.map.position)
+				holder.position = new /datum/vec5(holder.map.position.x+holder.collision_radius*3, holder.map.position.y+holder.collision_radius*3, holder.map.position.z, holder.position.angle, holder.position.velocity.x, holder.position.velocity.y)
+			holder.map.transfer_to(holder, holder.map.parent)
+	}
 
 /datum/component/physics2d/proc/update_z()
 	if(holder.position.z != last_registered_z) //Z changed? Update this unit's processing chunk.

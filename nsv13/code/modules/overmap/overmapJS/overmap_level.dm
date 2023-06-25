@@ -11,6 +11,8 @@
 	// without worry for conflicts.
 	var/static/created_levels = 0
 	var/datum/star_system/current_system = null
+	var/datum/overmap_level/parent = null
+	var/datum/vec5/position = null
 
 /datum/overmap_level/debug_level
 	name = "Debug Level"

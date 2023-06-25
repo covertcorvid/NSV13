@@ -286,15 +286,41 @@ class overmapEntity {
   thrust(dir) {
     // TODO: bodge
     // this.velocity += this.thruster_power * dir;
-    if (dir == 1) {
-      this.velocity_x += Math.cos(this.r) * this.thruster_power;
-      this.velocity_y += Math.sin(this.r) * this.thruster_power;
-    }
-    else {
-      this.velocity_x -= Math.cos(this.r) * this.thruster_power;
-      this.velocity_y -= Math.sin(this.r) * this.thruster_power;
-      if (this.velocity < 0)
-      { this.velocity = 0; }
+    switch(dir){
+      case(8):
+        this.velocity_y -= this.thruster_power;
+        break;
+      case(2):
+        this.velocity_y += this.thruster_power;
+        break;
+      case(4):
+        this.velocity_x -= this.thruster_power;
+        break;
+      case(6):
+        this.velocity_x += this.thruster_power;
+        break;
+      default:
+        if (dir == 1) {
+          this.velocity_x += Math.cos(this.r) * this.thruster_power;
+          this.velocity_y += Math.sin(this.r) * this.thruster_power;
+        }
+        else {
+          this.velocity_x *= 0.5;
+          this.velocity_y *= 0.5;
+          if(this.velocity_x < 0){
+            this.velocity_x = 0;
+          }
+          if(this.velocity_y < 0){
+            this.velocity_y = 0;
+          }
+          /*
+          this.velocity_x -= Math.cos(this.r) * this.thruster_power;
+          this.velocity_y -= Math.sin(this.r) * this.thruster_power;
+          if (this.velocity < 0)
+          { this.velocity = 0; }
+          */
+        }
+        break;
     }
   }
 }
@@ -318,7 +344,7 @@ export const JSOvermapGame = (props, context) => {
     tick_rate = backend_tick_rate / interpolation_mult;
   }
   // TODO: maybe try an update flag which triggers a repaint or not?
-  if (data != null && data.physics_world != null && data.physics_world.length > 0) {
+  if (data != null && data.physics_world.length > 0) {
     // world = data.physics_world;
     world = [];
     for (let I = 0; I < data.physics_world.length; I++) {
@@ -335,6 +361,28 @@ export const JSOvermapGame = (props, context) => {
       act('keydown', { key: e.keyCode });
       let zoomLevel = 0;
       switch (e.keyCode) {
+        //Arrow keys handle strafing...
+        case (38):
+          if (!can_pilot || active_ship == null)
+          { return; }
+          active_ship.thrust(8);
+          break;
+        case (40):
+          if (!can_pilot || active_ship == null)
+          { return; }
+          active_ship.thrust(2);
+          break;
+        case (39):
+          if (!can_pilot || active_ship == null)
+          { return; }
+          active_ship.thrust(6);
+          break;
+        case (37):
+          if (!can_pilot || active_ship == null)
+          { return; }
+          active_ship.thrust(4);
+          break;
+        //A&D
         case (68):
           if (!can_pilot || active_ship == null)
           { return; }
@@ -345,6 +393,7 @@ export const JSOvermapGame = (props, context) => {
           { return; }
           active_ship.rotate(-1);
           break;
+        //W&S
         case (87):
           if (!can_pilot || active_ship == null)
           { return; }
@@ -669,8 +718,13 @@ export const JSOvermapGame = (props, context) => {
         // TODO: Is visible checks... we can use frustrum culling
         let x = ship.x;
         let y = ship.y;
-        if (x <= Camera.viewport.width+Camera.viewport.left && y <= Camera.viewport.height+Camera.viewport.top) {
-          draw(ship.icon, ship.x, ship.y, ship.angle + 90);
+        if (ship.icon != "" && x <= Camera.viewport.width+Camera.viewport.left && y <= Camera.viewport.height+Camera.viewport.top) {
+          try{
+            draw(ship.icon, ship.x, ship.y, ship.angle + 90);
+          }
+          catch(e){
+            continue;
+          }
 
           if (ship.armour_quadrants.length > 0) {
             drawArmourQuadrants(ship.icon, ship.x, ship.y, 180, radians(ship.angle + 90), ship.armour_quadrants, 0.8);

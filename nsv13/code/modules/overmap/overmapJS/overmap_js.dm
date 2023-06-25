@@ -197,14 +197,23 @@
 */
 /datum/overmap/proc/thrust(dir)
 	switch(dir)
+		if(8)
+			position.velocity.y -= thruster_power;
+		if(2)
+			position.velocity.y += thruster_power;
+		if(4)
+			position.velocity.x -= thruster_power;
+		if(6)
+			position.velocity.x += thruster_power;
 		if(1)
 			position.velocity.x += thruster_power * cos_r
 			position.velocity.y += thruster_power * sin_r
 		if(-1)
 			//TODO: unrealistic, OK for now
-			//position.velocity *= 0.99
-			position.velocity.x -= thruster_power * cos_r
-			position.velocity.y -= thruster_power * sin_r
+			position.velocity.x *= 0.5
+			position.velocity.y *= 0.5
+			//position.velocity.x -= thruster_power * cos_r
+			//position.velocity.y -= thruster_power * sin_r
 
 			if(position.velocity.ln() < 0)
 				position.velocity.x = 0

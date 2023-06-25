@@ -68,6 +68,23 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 	//Helm controls.
 	if(rights & OVERMAP_CONTROL_RIGHTS_HELM)
 		switch(key)
+			//Arrow keys..
+			//Up
+			if(38)
+				target.thrust(8)
+				return
+			//Down
+			if(40)
+				target.thrust(2)
+				return
+			//Right
+			if(39)
+				target.thrust(6)
+				return
+			//Left
+			if(37)
+				target.thrust(4)
+				return
 			//W key (TODO: also arrow keys)
 			if(87)
 				target.thrust(1)

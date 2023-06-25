@@ -87,6 +87,8 @@
 	if(subgrid)
 		//TODO: Check the direction of the object flying in, and position it in the subgrid appropriately.
 		//Right now, this just teleports you straight up where you were the last time...
+		//ALSO TODO: You can't exit a subgrid. Maybe give each subgrid a parent?
+		//When you fly off the subgrid's bounds, you shouldn't just continue off into the void.
 		OM.map.transfer_to(OM, subgrid)
 		return TRUE
 	return FALSE
@@ -97,6 +99,9 @@
 	//preset_grids += list(/datum/overmap/grid_enabled/stellar_body/jump_beacon, STELLARBODY_POSITION_CENTER)
 	to_chat(world, "Instance time: [src.preset_grids.len]")
 	subgrid = current_system.instance_grid(src.name, src.preset_grids)
+	//Todo: Bit basic but works. All subgrids have their parent star system as origin.
+	subgrid.parent = current_system.system_grids[1]
+	subgrid.position = position
 
 /datum/overmap/grid_enabled/stellar_body
 	icon = 'nsv13/goonstation/icons/effects/overmap_anomalies/stellarbodies.dmi'
