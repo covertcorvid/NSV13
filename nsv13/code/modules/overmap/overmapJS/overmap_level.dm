@@ -7,15 +7,24 @@
 	var/name = "Unnamed Map"
 	/// List of physics objects active on this level.
 	var/list/physics_objects = list()
+	// Create a unique identifier so that we can be referenced by the UI calls
+	// without worry for conflicts.
+	var/static/created_levels = 0
+	var/datum/star_system/current_system = null
 
 /datum/overmap_level/debug_level
-	name = "Staging"
+	name = "Debug Level"
 
 /datum/overmap_level/New(name)
 	. = ..()
+	identifier = ++created_levels
 	if(name)
 		src.name = name
 	SSJSOvermap.overmap_levels += src
+
+/datum/overmap_level/New(name, datum/star_system/S)
+	. = ..()
+	current_system = S
 
 /datum/overmap_level/Destroy(force, ...)
 	// This is here to prevent hard-dels in the case that
@@ -28,10 +37,6 @@
 		qdel(contained)
 	physics_objects = null
 	SSJSOvermap.overmap_levels -= src
-	// Create a unique identifier so that we can be referenced by the UI calls
-	// without worry for conflicts.
-	var/static/created_levels = 0
-	identifier = ++created_levels
 	return ..()
 
 /**
@@ -40,7 +45,10 @@
 */
 /datum/overmap_level/proc/register(datum/overmap/target)
 	physics_objects += target
-	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, target)
+	//TODO: added this.
+	target.map = src
+	target.position.z = identifier
+	SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, target)
 
 /**
 	Register a list of overmaps as one processing "batch".
@@ -51,10 +59,18 @@
 		return
 	for(var/datum/overmap/O in targets)
 		physics_objects += O
-	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, targets[1])
+	SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, targets[1])
 
 /datum/overmap_level/proc/unregister(datum/overmap/target)
-	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, target)
+	SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, target)
 	physics_objects -= target
 	STOP_PROCESSING(SSJSOvermap, target)
 	return
+
+/datum/overmap_level/proc/transfer_to(datum/overmap/target, datum/overmap_level/other)
+	if(!other)
+		CRASH("Null level passed into transfer_to")
+	physics_objects -= target
+	SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, target)
+	other.register(target)
+	target.position.z = other.identifier

@@ -6,22 +6,38 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	name = "JS Overmap"
 	wait = 0.2 SECONDS
 	stat_tag = "JS"
-	init_order = INIT_ORDER_STARSYSTEM
+	init_order = INIT_ORDER_JS_OVERMAP
 	flags = SS_BACKGROUND|SS_POST_FIRE_TIMING
 	/// A list of the created overmap levels
 	var/list/datum/overmap_level/overmap_levels = list()
 	/// A map-level that exists fore debugging purposes.
 	var/datum/overmap_level/debug_level
 	var/list/overmap_icons = list()
+	var/list/key_overmaps = list(
+		"player"=null,
+		"miner"=null,
+		"PVP"=null
+	)
 
 /datum/controller/subsystem/processing/JSOvermap/New()
 	. = ..()
 	debug_level = new /datum/overmap_level/debug_level()
 
+/datum/controller/subsystem/processing/JSOvermap/Initialize(start_timeofday)
+	. = ..()
+	addtimer(CALLBACK(src, PROC_REF(setup_player_ship)), 5 SECONDS)
+
+/datum/controller/subsystem/processing/JSOvermap/proc/setup_player_ship()
+	var/datum/overmap/OM = key_overmaps["player"]
+	var/datum/star_system/starter = SSstar_system.system_by_id(OM.starting_system)
+	if(!starter)
+		CRASH("Cannot find starting system: [OM.starting_system]")
+	OM.jump_to_system(starter)
+
 /datum/controller/subsystem/processing/JSOvermap/proc/batch_initial()
 	//instance(/datum/overmap/ship/player/cruiser, debug_level, new /datum/vec5(200, 200, 1, 0, 0))
-	instance(/datum/overmap/ship/syndicate, debug_level, new /datum/vec5(1000, 400, 1, 0, 0))
-	instance(/datum/overmap/ship/syndicate/cruiser, debug_level, new /datum/vec5(400, 1000, 1, 90, 0))
+	instance(/datum/overmap/ship/syndicate, debug_level, new /datum/vec5(1000, 400, debug_level.identifier, 0, 0))
+	instance(/datum/overmap/ship/syndicate/cruiser, debug_level, new /datum/vec5(400, 1000, debug_level.identifier, 90, 0))
 
 /datum/controller/subsystem/processing/JSOvermap/proc/batch_grid()
 	for (var/i=0, i<3, i++)
@@ -34,7 +50,10 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 
 /datum/controller/subsystem/processing/JSOvermap/proc/instance(type, datum/overmap_level/map, datum/vec5/position)
-	var/datum/overmap/OM = new type(map, position.x, position.y, position.z, position.angle, position.velocity.x, position.velocity.y)
+	var/datum/overmap/OM = new type(map, position.x, position.y, map.identifier, position.angle, position.velocity.x, position.velocity.y)
+	if(map.current_system)
+		OM.current_system = map.current_system
+	OM.PostInitialize()
 	return OM
 
 /datum/controller/subsystem/processing/JSOvermap/proc/get_overmap(z)
@@ -44,7 +63,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 /datum/controller/subsystem/processing/JSOvermap/proc/ui_data_for(mob/user, datum/overmap/target)
 	. = list()
-	.["map_id"] = target.map?.identifier || 0
+	.["map_id"] = target?.map?.identifier || 0
 	.["physics_world"] = list()
 	var/datum/component/overmap_piloting/OP = user.GetComponent(/datum/component/overmap_piloting)
 	//Broadcast this particular client's cached overmap Zoom level.
@@ -55,7 +74,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["can_pilot"] = OP.rights & OVERMAP_CONTROL_RIGHTS_HELM
 	.["control_scheme"] = OP.rights
 	.["fps_capability"] = OP.fps_capability
-	for(var/datum/overmap/O in (target.map?.physics_objects || list(target)))
+	for(var/datum/overmap/O in (target?.map?.physics_objects || list(target)))
 		var/list/quads = list()
 		if(O.armour_quadrants)
 			quads = new(4)
@@ -74,7 +93,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 //datum/controller/subsystem/processing/JSOvermap/proc/start_piloting(mob/user, datum/overmap/OM)
 
-
+//TODO MAP STAYS SAME WHEN JUMPING!!
 /datum/overmap_js_panel
 	var/datum/overmap_level/selected_level
 	var/datum/overmap/active_ship = null
@@ -106,6 +125,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	for (var/datum/overmap_level/level in SSJSOvermap.overmap_levels)
 		data["static_levels"] += list(list(
 			"id" = level.identifier,
+			"datum" = "\ref[level]",
 			"name" = level.name,
 			"object_count" = length(level.physics_objects),
 		))

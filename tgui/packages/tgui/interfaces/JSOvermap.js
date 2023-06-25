@@ -317,11 +317,10 @@ export const JSOvermapGame = (props, context) => {
     interpolation_mult = target_fps/backend_fps;
     tick_rate = backend_tick_rate / interpolation_mult;
   }
-
   // TODO: maybe try an update flag which triggers a repaint or not?
-  if (data != null && data.physics_world.length > 0) {
-    world = [];
+  if (data != null && data.physics_world != null && data.physics_world.length > 0) {
     // world = data.physics_world;
+    world = [];
     for (let I = 0; I < data.physics_world.length; I++) {
       let ship = data.physics_world[I];
       const sprite = new Image();
@@ -337,22 +336,22 @@ export const JSOvermapGame = (props, context) => {
       let zoomLevel = 0;
       switch (e.keyCode) {
         case (68):
-          if (!can_pilot)
+          if (!can_pilot || active_ship == null)
           { return; }
           active_ship.rotate(1);
           break;
         case (65):
-          if (!can_pilot)
+          if (!can_pilot || active_ship == null)
           { return; }
           active_ship.rotate(-1);
           break;
         case (87):
-          if (!can_pilot)
+          if (!can_pilot || active_ship == null)
           { return; }
           active_ship.thrust(1);
           break;
         case (18):
-          if (!can_pilot)
+          if (!can_pilot || active_ship == null)
           { return; }
           active_ship.thrust(-1);
           break;
@@ -402,7 +401,7 @@ export const JSOvermapGame = (props, context) => {
     }
     let canvas_rect = null;
     function HandleMouseDown(e) {
-      if (canvas_rect == null) {
+      if (canvas_rect == null  || active_ship == null) {
         return;
       }
       let xy = Camera.screenToWorld(e.clientX - canvas_rect.left, Camera.screenToWorld(e.clientY - canvas_rect.top));
@@ -432,7 +431,9 @@ export const JSOvermapGame = (props, context) => {
       // Initial draw batch.
       if (last_process_time == 0) {
         Camera.constructor(ctx);
-        Camera.moveTo(active_ship.x, active_ship.y);
+        if(active_ship != null){
+          Camera.moveTo(active_ship.x, active_ship.y);
+        }
         Camera.zoomTo(data.client_zoom);
         canvas_rect = ctx.canvas.getBoundingClientRect();
       }
@@ -685,7 +686,9 @@ export const JSOvermapGame = (props, context) => {
         ship.process();
 
       }
-      Camera.moveTo(active_ship.x, active_ship.y);
+      if(active_ship != null){
+        Camera.moveTo(active_ship.x, active_ship.y);
+      }
       Camera.end();
       // requestAnimationFrame(_render);
     }

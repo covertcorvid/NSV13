@@ -24,6 +24,7 @@
 	faction = OVERMAP_FACTION_PLAYER
 	interior_type = /datum/component/overmap_interior
 	role = OVERMAP_ROLE_PRIMARY
+	starting_system = "Sol"
 	//collision_positions = list(new /matrix/vector(-8,46), new /matrix/vector(-17,33), new /matrix/vector(-25,2), new /matrix/vector(-14,-45), new /matrix/vector(9,-46), new /matrix/vector(22,4), new /matrix/vector(14,36))
 
 /datum/overmap/ship/player/cruiser

@@ -200,7 +200,12 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 
 	return !(P.holder.test_faction(holder)) && collides(P)
 
-
+/**
+	Put anything that should come BEFORE a real collision here.
+	Return TRUE if you have intercepted the collision and do NOT want damage applied with the collision!
+*/
+/datum/overmap/proc/intercept_collision(datum/overmap/OM)
+	return FALSE
 
 #undef PHYSICS_PRECISION_IDGAF
 
@@ -211,6 +216,11 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 
 	//I mean, the angle between the two objects is very likely to be the angle of incidence innit
 	var/col_angle = ATAN2((other.holder.position.x + other.holder.collision_radius / 2) - (src.holder.position.x + src.holder.collision_radius / 2), (other.holder.position.y + other.holder.collision_radius / 2) - (src.holder.position.y + holder.collision_radius / 2))
+	//For grid traversal. You don't collide with a planet, you go down to its grid.
+	//If you fire a missile at earth, for example, the missile just goes down to earth's own grid.
+	if(other.holder.intercept_collision(src.holder))
+		return TRUE
+
 	//Bullets behave differently.
 	if(IS_OVERMAP_JS_PROJECTILE(holder))
 		other.holder.bullet_act(holder, col_angle)

@@ -41,7 +41,7 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 /datum/component/overmap_piloting/proc/mark_dirty(datum/source, datum/overmap/target, fps=-1)
 	SIGNAL_HANDLER
 	//If they're not on our Z, ignore..
-	if(target.position.z != src.target.position.z)
+	if(target.map != src.target.map)
 		return
 	//If the client is reporting its FPS capability to us, set ours to match.
 	if(fps != -1)

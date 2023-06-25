@@ -3978,6 +3978,7 @@
 #include "nsv13\code\modules\overmap\overmapJS\overmap_level.dm"
 #include "nsv13\code\modules\overmap\overmapJS\overmap_MC_subsystem.dm"
 #include "nsv13\code\modules\overmap\overmapJS\overmap_projectile.dm"
+#include "nsv13\code\modules\overmap\overmapJS\overmap_starsystem.dm"
 #include "nsv13\code\modules\overmap\overmapJS\ship.dm"
 #include "nsv13\code\modules\overmap\overmapJS\subsystems.dm"
 #include "nsv13\code\modules\overmap\overmapJS\components\piloting.dm"

@@ -15,6 +15,7 @@ export const JSOvermapPanel = (props, context) => {
   return (
     <Window
       width={1600}
+      theme="space_80s"
       height={800}>
       <Window.Content>
         <Table>
@@ -94,25 +95,8 @@ export const JSOvermapPanel = (props, context) => {
                   </LabeledList.Item>
                 </LabeledList>
               </Section>
-              <Section title="Viewable Maps:">
-                <LabeledList scrollable>
-                  {static_levels.map(level => {
-                    return (
-                      <LabeledList.Item label={level.name} key={level.id}>
-                        <Box mb={1}>
-                          <Button
-                            color={level.id === map_id ? "green" : "blue"}
-                            onClick={() => act('set_map_level', { id: level.id })}
-                            content="Switch"
-                          />
-                        </Box>
-                      </LabeledList.Item>
-                    );
-                  })}
-                </LabeledList>
-              </Section>
               <Section title="Active Ships:">
-                <LabeledList scrollable>
+                <LabeledList>
                   {Object.keys(data.ships).map(key => {
                     let value = data.ships[key];
                     return (
@@ -128,6 +112,28 @@ export const JSOvermapPanel = (props, context) => {
                             content="View Vars"
                             color="blue"
                             onClick={() => act('view_vars', { target: value.datum })} />
+                        </Box>
+                      </LabeledList.Item>
+                    );
+                  })}
+                </LabeledList>
+              </Section>
+              <Section title="Viewable Maps:">
+                <LabeledList height={256} scrollable>
+                  {static_levels.map(level => {
+                    return (
+                      <LabeledList.Item label={level.name} key={level.id}>
+                        <Box mb={1}>
+                          <Button
+                            color={level.id === map_id ? "green" : "blue"}
+                            onClick={() => act('set_map_level', { id: level.id })}
+                            content="Switch"
+                          />
+                          <Button
+                            icon="search"
+                            content="View Vars"
+                            color="blue"
+                            onClick={() => act('view_vars', { target: level.datum })} />
                         </Box>
                       </LabeledList.Item>
                     );

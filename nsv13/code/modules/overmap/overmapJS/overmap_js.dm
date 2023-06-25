@@ -69,7 +69,8 @@
 	var/max_integrity = 100
 	var/list/armour_quadrants = null
 	var/role = OVERMAP_ROLE_SECONDARY
-
+	var/starting_system = "Staging"
+	var/datum/star_system/current_system = null
 	var/restitution = 1 //"bounciness", as used for collisions. 1 = boingy boingy, 0 = no boingy
 
 
@@ -77,12 +78,12 @@
 	Constructor for overmap objects. Pre-bakes some maths for you and initialises processing.
 */
 /datum/overmap/New(datum/overmap_level/map, x,y,z,angle,velocity_x, velocity_y)
+	position = new /datum/vec5(x,y,z,angle,velocity_x, velocity_y)
 	src.map = map
 	if (map)
 		map.register(src)
 	if(collision_positions == null)
 		collision_positions = GLOB.projectile_hitbox
-	position = new /datum/vec5(x,y,z,angle,velocity_x, velocity_y)
 	//If the overmap JS subsystem does not contain our type's icon, add it.
 	var/icon/I = icon(icon,icon_state,SOUTH, frame=1)
 	if(!SSJSOvermap.overmap_icons["[src.type]"])
@@ -108,6 +109,11 @@
 	//TODO: replace this.
 	START_PROCESSING(SSJSOvermap, src)
 	setup_armour()
+
+//Stick any operations that require the starsystem to have instanced us here...
+//Used by the grids system.
+/datum/overmap/proc/PostInitialize()
+	return
 
 /datum/overmap/proc/setup_armour()
 	switch(mass)
