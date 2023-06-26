@@ -61,6 +61,13 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	if(SL?.occupying_overmap)
 		return SL.occupying_overmap
 
+/datum/controller/subsystem/processing/JSOvermap/proc/ui_static_data_for(mob/user)
+	var/list/data = list()
+	data["icon_cache"] = list()
+	for(var/key in overmap_icons)
+		data["icon_cache"][key] = "data:image/jpeg;base64,[overmap_icons[key]]"
+	return data
+
 /datum/controller/subsystem/processing/JSOvermap/proc/ui_data_for(mob/user, datum/overmap/target)
 	. = list()
 	.["map_id"] = target?.map?.identifier || 0
@@ -81,7 +88,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			for(var/I = 1; I <=4; I++)
 				quads[I] = list(O.armour_quadrants[I].integrity, O.armour_quadrants[I].max_integrity)
 		var/list/data = list(
-			icon = O.icon_base64,
+			//icon = O.icon_base64,
+			type = O.type,
 			active = (target == O),
 			thruster_power = O.thruster_power,
 			rotation_power = O.rotation_power,
@@ -111,7 +119,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		ship_data["active"] = OM == active_ship
 		ship_data["name"] = OM.name
 		ship_data["faction"] = OM.faction
-		ship_data["icon"] = OM.icon_base64
+		ship_data["type"] = OM.type
+		//ship_data["icon"] = OM.icon_base64
 		ship_data["datum"] = "\ref[OM]"
 		ships[++ships.len] = ship_data
 	.["ships"] = ships
@@ -120,7 +129,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["hide_bullets"] = hide_bullets
 
 /datum/overmap_js_panel/ui_static_data(mob/user)
-	var/list/data = list()
+	var/list/data = SSJSOvermap.ui_static_data_for(user)
 	data["static_levels"] = list()
 	for (var/datum/overmap_level/level in SSJSOvermap.overmap_levels)
 		data["static_levels"] += list(list(
@@ -203,6 +212,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		if("spawn_ship")
 			SSJSOvermap.instance(spawn_type, SSJSOvermap.debug_level, new /datum/vec5(rand(0, JS_OVERMAP_TACMAP_SIZE), rand(0, JS_OVERMAP_TACMAP_SIZE), spawn_z, 0))
 			ui_interact(usr)
+		if("log")
+			to_chat(usr, "<span class='notice'>Overmap debug: [params["text"]]</span>")
 
 /client/proc/js_overmap_panel() //Admin Verb for the Overmap Gamemode controller
 	set name = "JS Overmap Panel"

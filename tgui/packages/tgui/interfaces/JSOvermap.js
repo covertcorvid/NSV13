@@ -335,7 +335,7 @@ export const JSOvermapGame = (props, context) => {
   const rows = 26;
   const cols = 26;
   const abs=Math.abs;
-
+  let icon_cache = data.icon_cache;
   const gridsize = 2000;
   let previous_frame_time = -1;
   if (data.fps_capability != -1) {
@@ -347,10 +347,13 @@ export const JSOvermapGame = (props, context) => {
   if (data != null && data.physics_world.length > 0) {
     // world = data.physics_world;
     world = [];
+
     for (let I = 0; I < data.physics_world.length; I++) {
       let ship = data.physics_world[I];
+      //log(`Sprite: ${icon_cache[ship.type]}`);
       const sprite = new Image();
-      sprite.src = `data:image/jpeg;base64,${ship.icon}`;
+      //sprite.src = `data:image/jpeg;base64,${icon_cache[ship.type]}`;
+      sprite.src = icon_cache[ship.type]
       world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants);
       if (ship.active) {
         active_ship = world[I];
@@ -429,6 +432,11 @@ export const JSOvermapGame = (props, context) => {
           break;
       }
     }
+    function log(str){
+      act('log', { text: str});
+    }
+
+
     /**
    * Get an angle, in degrees, between two points.
    * Degrees are what BYOND likes!

@@ -50,6 +50,9 @@
 /obj/machinery/computer/ship/js_overmap/ui_data(mob/user)
 	. = SSJSOvermap.ui_data_for(user, active_ship)
 
+/obj/machinery/computer/ship/js_overmap/ui_static_data(mob/user)
+	. = SSJSOvermap.ui_static_data_for(user)
+
 /obj/machinery/computer/ship/js_overmap/ui_act(action, list/params)
 	. = ..()
 	if (.)

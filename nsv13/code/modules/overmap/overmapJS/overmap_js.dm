@@ -88,7 +88,9 @@
 	var/icon/I = icon(icon,icon_state,SOUTH, frame=1)
 	if(!SSJSOvermap.overmap_icons["[src.type]"])
 		SSJSOvermap.overmap_icons["[src.type]"] = icon2base64(I)
-	icon_base64 = SSJSOvermap.overmap_icons["[src.type]"]
+		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_STATIC_DATA_UPDATE)
+
+	//icon_base64 = SSJSOvermap.overmap_icons["[src.type]"]
 	collision_radius = I.Width()
 	//TODO this should inversely scale!
 	//thruster_power = (mass / 10)

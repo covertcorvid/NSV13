@@ -16,6 +16,7 @@
 	src.target = target
 	src.ui = ui
 	RegisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, PROC_REF(mark_dirty)) //Don't do this for turfs, because we don't care
+	RegisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_STATIC_DATA_UPDATE, PROC_REF(force_update_static_data)) //Don't do this for turfs, because we don't care
 
 /datum/component/overmap_piloting/proc/process_fire(weapon_type, coords)
 	if(!(rights & OVERMAP_CONTROL_RIGHTS_GUNNER))
@@ -32,6 +33,10 @@
 
 /datum/component/overmap_piloting/Destroy()
 	UnregisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE)
+	UnregisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_STATIC_DATA_UPDATE)
+
+	//Bye bye mr UI, took my chevvy to the levy but the levy was dry..
+	ui?.close()
 	. = ..()
 /**
 Mark our linked TGUI as requiring update.
@@ -50,6 +55,9 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 	//src.ui.needs_update = TRUE
 	//HACK: instant UI update. Take your delay and get out.
 	src.ui.src_object.ui_interact(ui.user, ui)
+
+/datum/component/overmap_piloting/proc/force_update_static_data(datum/source)
+	src.ui.src_object.update_static_data(ui.user)
 
 /**
 	Zoom the client's view by a delta value.

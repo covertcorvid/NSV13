@@ -1,4 +1,5 @@
 #define COMSIG_JS_OVERMAP_UPDATE "js_overmap_mark_dirty"
+#define COMSIG_JS_OVERMAP_STATIC_DATA_UPDATE "js_overmap_static_data_update"
 #define OVERMAP_FACTION_NANOTRASEN 1 << 0
 #define OVERMAP_FACTION_SOLGOV 1 << 1
 #define OVERMAP_FACTION_CIVILIAN 1 << 2

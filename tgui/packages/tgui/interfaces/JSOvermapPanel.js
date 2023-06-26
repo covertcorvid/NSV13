@@ -8,9 +8,11 @@ import { JSOvermapGame } from './JSOvermap';
 
 export const JSOvermapPanel = (props, context) => {
   const { act, data } = useBackend(context);
+
   const {
     map_id = 0,
     static_levels = [],
+    icon_cache = data.icon_cache
   } = data;
   return (
     <Window
@@ -104,7 +106,7 @@ export const JSOvermapPanel = (props, context) => {
                         <Button
                           color={value.active ? "green" : "blue"}
                           onClick={() => act('track', { target: value.datum })}>
-                          <img width={32} height={32} src={`data:image/jpeg;base64,${value.icon}`} />
+                          <img width={32} height={32} src={`${icon_cache[value.type]}`} />
                         </Button>
                         <Button
                           icon="search"
