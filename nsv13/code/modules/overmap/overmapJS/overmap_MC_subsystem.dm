@@ -135,7 +135,9 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	return GLOB.admin_state
 
 /datum/overmap_js_panel/ui_interact(mob/user, datum/tgui/ui)
-	if(!check_rights(0, 1, TRUE)) //sometimes this is called by the physics engine, which means it won't have a usr
+	//sometimes this is called by the physics engine, which means it won't have a usr
+	//other times it's called by a string of procs that results in the usr being the panel itself
+	if((usr != src) && !check_rights(0, 1, TRUE))
 		return
 	if (!selected_level)
 		selected_level = SSJSOvermap.debug_level
