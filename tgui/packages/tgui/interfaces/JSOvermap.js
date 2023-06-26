@@ -606,20 +606,20 @@ export const JSOvermapGame = (props, context) => {
          * CC-Attr: Ken Fyrstenberg
          * Modified by: Kmc2000
         */
-    function dashedCircle(x, y, radius, offset, segments, size) {
+      function dashedCircle(x, y, radius, offset, segments, size) {
 
-      var pi2 = 2 * Math.PI; // Total radians in a circle
-      var sector_width_radians = pi2 / segments.length;
-      var arc_length_radians = sector_width_radians * size;
-      var arc_start_radians = (1 - size) * sector_width_radians / 2; // Offset start to half the width of the space between segments
-      var ax, ay;
+        var pi2 = 2 * Math.PI; // Total radians in a circle
+        var sector_width_radians = pi2 / segments.length;
+        var arc_length_radians = sector_width_radians * size;
+        var arc_start_radians = (1 - size) * sector_width_radians / 2; // Offset start to half the width of the space between segments
+        var ax, ay;
 
-      let segment_count = 0;
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(offset);
-      ctx.translate(-x, -y);
-      for(; arc_start_radians < pi2; arc_start_radians += sector_width_radians) {
+        let segment_count = 0;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(offset);
+        ctx.translate(-x, -y);
+        for (; arc_start_radians < pi2; arc_start_radians += sector_width_radians) {
           ctx.beginPath();
           ax = x + radius * Math.cos(arc_start_radians);
           ay = y + radius * Math.sin(arc_start_radians);
@@ -627,40 +627,40 @@ export const JSOvermapGame = (props, context) => {
           let quad = segments[segment_count];
           let max_integrity = quad[1];
           ctx.lineWidth = 1;
-          if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_LIGHT){
+          if (max_integrity >= OVERMAP_ARMOUR_THICKNESS_LIGHT) {
             ctx.lineWidth = 2.5;
           }
-          if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_MEDIUM){
+          if (max_integrity >= OVERMAP_ARMOUR_THICKNESS_MEDIUM) {
             ctx.lineWidth = 5;
           }
-          if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_HEAVY){
+          if (max_integrity >= OVERMAP_ARMOUR_THICKNESS_HEAVY) {
             ctx.lineWidth = 10;
           }
-          if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY){
+          if (max_integrity >= OVERMAP_ARMOUR_THICKNESS_SUPER_HEAVY) {
             ctx.lineWidth = 15;
           }
-          if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_ABLATIVE){
+          if (max_integrity >= OVERMAP_ARMOUR_THICKNESS_ABLATIVE) {
             ctx.lineWidth = 20;
           }
-          if(max_integrity >= OVERMAP_ARMOUR_THICKNESS_GIGA){
+          if (max_integrity >= OVERMAP_ARMOUR_THICKNESS_GIGA) {
             ctx.lineWidth = 40;
           }
 
           let integrity = quad[0] / max_integrity * 100;
 
-          if(integrity <= 0){
+          if (integrity <= 0) {
             ctx.strokeStyle = "rgba(0,0,0,0)";
           }
-          else if(integrity < 30){
+          else if (integrity < 30) {
             ctx.strokeStyle = "red";
           }
-          if(integrity >= 30){
+          if (integrity >= 30) {
             ctx.strokeStyle = "orange";
           }
-          if(integrity >= 50){
+          if (integrity >= 50) {
             ctx.strokeStyle = "gold";
           }
-          if(integrity >= 70){
+          if (integrity >= 70) {
             ctx.strokeStyle = "dodgerblue";
           }
           segment_count++;
