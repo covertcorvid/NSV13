@@ -127,3 +127,12 @@ GLOBAL_DATUM_INIT(conquest_role_handler, /datum/conquest_role_handler, new)
 #define JS_OVERMAP_TACMAP_TOTAL_SQUARES 26
 #define JS_OVERMAP_TACMAP_TILE_SIZE JS_OVERMAP_TACMAP_SQUARE KM
 #define JS_OVERMAP_TACMAP_SIZE JS_OVERMAP_TACMAP_TILE_SIZE * JS_OVERMAP_TACMAP_TOTAL_SQUARES
+
+///User has NO rights and may only observe the ship.
+#define OVERMAP_CONTROL_RIGHTS_NONE 0
+///User is able to steer the ship.
+#define OVERMAP_CONTROL_RIGHTS_HELM 1 << 0
+///User is able to fire the ship's weaponry.
+#define OVERMAP_CONTROL_RIGHTS_GUNNER 1 << 1
+
+#define OVERMAP_CONTROL_RIGHTS_FULL OVERMAP_CONTROL_RIGHTS_HELM | OVERMAP_CONTROL_RIGHTS_GUNNER

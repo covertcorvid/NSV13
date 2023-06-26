@@ -608,20 +608,21 @@ export const JSOvermapGame = (props, context) => {
         */
       function dashedCircle(x, y, radius, offset, segments, size) {
 
-        let pi2 = 2 * Math.PI,
-          segs = pi2 / segments.length,
-          len = segs * size,
-          i = 0,
-          ax, ay;
+        var pi2 = 2 * Math.PI; // Total radians in a circle
+        var sector_width_radians = pi2 / segments.length;
+        var arc_length_radians = sector_width_radians * size;
+        var arc_start_radians = (1 - size) * sector_width_radians / 2; // Offset start to half the width of the space between segments
+        var ax, ay;
+
         let segment_count = 0;
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(offset);
         ctx.translate(-x, -y);
-        for (; i < pi2; i += segs) {
+        for (; arc_start_radians < pi2; arc_start_radians += sector_width_radians) {
           ctx.beginPath();
-          ax = x + radius * Math.cos(i);
-          ay = y + radius * Math.sin(i);
+          ax = x + radius * Math.cos(arc_start_radians);
+          ay = y + radius * Math.sin(arc_start_radians);
           ctx.moveTo(ax, ay);
           let quad = segments[segment_count];
           let max_integrity = quad[1];
@@ -657,13 +658,13 @@ export const JSOvermapGame = (props, context) => {
             ctx.strokeStyle = "orange";
           }
           if (integrity >= 50) {
-            ctx.strokeStyle = "yellow";
+            ctx.strokeStyle = "gold";
           }
           if (integrity >= 70) {
-            ctx.strokeStyle = "green";
+            ctx.strokeStyle = "dodgerblue";
           }
           segment_count++;
-          ctx.arc(x, y, radius, i, i + len);
+          ctx.arc(x, y, radius, arc_start_radians, arc_start_radians + arc_length_radians);
           ctx.stroke();
         }
         ctx.restore();

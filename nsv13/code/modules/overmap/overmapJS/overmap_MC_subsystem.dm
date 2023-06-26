@@ -135,7 +135,9 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	return GLOB.admin_state
 
 /datum/overmap_js_panel/ui_interact(mob/user, datum/tgui/ui)
-	if(!check_rights(0, 1, TRUE)) //sometimes this is called by the physics engine, which means it won't have a usr
+	//sometimes this is called by the physics engine, which means it won't have a usr
+	//other times it's called by a string of procs that results in the usr being the panel itself
+	if((usr != src) && !check_rights(0, 1, TRUE))
 		return
 	if (!selected_level)
 		selected_level = SSJSOvermap.debug_level
@@ -156,18 +158,18 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	switch(action)
 		if("scroll")
 			C.zoom(params["key"])
-			return;
+			return
 		if("fire")
 			C.process_fire(params["weapon"], params["coords"])
 			return;
 		if("keyup")
-			return;
+			return
 		if("keydown")
 			C.process_input(params["key"])
-			return;
+			return
 		if("ui_mark_dirty")
 			C.mark_dirty(C.target, C.target, params["fps"])
-			return;
+			return
 		if("view_vars")
 			usr.client.debug_variables(locate(params["target"]))
 			return
