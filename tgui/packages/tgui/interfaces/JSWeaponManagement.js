@@ -23,24 +23,19 @@ export const WeaponManagementPanel = (props, context) => {
         return (
           <Section
             key={key}
-            title={group_data.name}
-            buttons={
-              <>
-                <Button fluid
-                  onClick={() => null} // TODO: Add new weapon panel to the group
-                  >
-                  Add
-                </Button>
-                <Button fluid
-                  onClick={() => act("rename_group")}>
-                  Rename
-                </Button>
-                <Button fluid
-                  onClick={() => act("delete_group")}>
-                  Delete
-                </Button>
-              </>
-            }>
+            title={group_data.name}>
+              <Button fluid
+                onClick={() => act("add_group")}>
+                Add
+              </Button>
+              <Button fluid
+                onClick={() => act("rename_group", {id: group_data.id})}>
+                Rename
+              </Button>
+              <Button fluid
+                onClick={() => act("delete_group", {id: group_data.id})}>
+                Delete
+              </Button>
               {Object.keys(group_data.weapons).map(key2 => {
                 return(
                   <>
