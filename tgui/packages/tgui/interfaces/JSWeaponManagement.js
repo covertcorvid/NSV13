@@ -3,7 +3,7 @@ import { Section, Dropdown, Button, Flex } from '../components';
 import { Window } from '../layouts';
 
 export const WeaponManagementPanel = (props, context) => {
-  const { data } = useBackend(context);
+  const { act, data } = useBackend(context);
 
   return (
     <Section title="Armaments:" buttons={
