@@ -178,7 +178,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		if("toggle_hide_bullets")
 			hide_bullets = !hide_bullets
 			ui_interact(usr)
-	//TODO: spawney buttons to add enemies?
+		//TODO: spawney buttons to add enemies?
 		if("set_spawn_type")
 			spawn_type = params["target"]
 			ui_interact(usr)
@@ -197,6 +197,21 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			C.set_firing_arc_width(params["firing_arc_width"])
 			ui_interact(usr)
 			return
+		// Weapon group actions
+		if("add_group")
+			var/new_name = tgui_input_text(usr, "Enter a unique name", "New Group")
+			if(new_name && !(new_name in C.target.weapon_groups))
+				new /datum/weapon_group(C.target, new_name)
+		if("rename_group")
+			var/new_name = tgui_input_text(usr, "Enter the new name", "Rename")
+			if(new_name)
+				var/datum/weapon_group/WG = locate(params["id"])
+				WG.holder.weapon_groups -= WG.name
+				WG.name = new_name
+				WG.holder.weapon_groups[WG.name] = WG
+		if("delete_group")
+			var/datum/weapon_group/WG = locate(params["id"])
+			qdel(WG)
 
 /client/proc/js_overmap_panel() //Admin Verb for the Overmap Gamemode controller
 	set name = "JS Overmap Panel"

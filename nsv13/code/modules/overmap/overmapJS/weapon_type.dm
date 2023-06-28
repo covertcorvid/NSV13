@@ -6,12 +6,13 @@
 	/// The references to the weapons associated with this group
 	var/list/weapon_list = list()
 
-/datum/weapon_group/New(datum/overmap/holder)
+/datum/weapon_group/New(datum/overmap/holder, name)
 	. = ..()
 	src.holder = holder
 	while(!name || (name in holder.weapon_groups))
 		// Look, picking a random number that's already used could happen, okay?
 		name = "Group [rand(0, 999)]"
+	src.name = name
 	holder.weapon_groups[name] = src
 	// TODO actual weapons, this is just for testing
 	for(var/i = 0; i < rand(1,4); i++)
