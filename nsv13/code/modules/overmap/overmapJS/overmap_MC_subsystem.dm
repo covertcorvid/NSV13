@@ -202,16 +202,24 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			var/new_name = tgui_input_text(usr, "Enter a unique name", "New Group")
 			if(new_name && !(new_name in C.target.weapon_groups))
 				new /datum/weapon_group(C.target, new_name)
+				ui_interact()
 		if("rename_group")
+			var/datum/weapon_group/WG = locate(params["id"])
 			var/new_name = tgui_input_text(usr, "Enter the new name", "Rename")
-			if(new_name)
-				var/datum/weapon_group/WG = locate(params["id"])
-				WG.holder.weapon_groups -= WG.name
-				WG.name = new_name
-				WG.holder.weapon_groups[WG.name] = WG
+			if(!new_name)
+				return
+			if(new_name in WG.holder.weapon_groups)
+				to_chat(usr, "<span class='warning'>The new group name nust be unique!</span>")
+				return
+			WG.holder.weapon_groups -= WG.name
+			WG.name = new_name
+			WG.holder.weapon_groups[WG.name] = WG
+			ui_interact()
 		if("delete_group")
 			var/datum/weapon_group/WG = locate(params["id"])
+			WG.holder.weapon_groups -= WG.name
 			qdel(WG)
+			ui_interact()
 
 /client/proc/js_overmap_panel() //Admin Verb for the Overmap Gamemode controller
 	set name = "JS Overmap Panel"
