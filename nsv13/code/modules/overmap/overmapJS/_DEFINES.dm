@@ -8,6 +8,10 @@
 #define OVERMAP_FACTION_PLAYER OVERMAP_FACTION_NANOTRASEN | OVERMAP_FACTION_SOLGOV | OVERMAP_FACTION_CIVILIAN
 #define IS_OVERMAP_JS_COLLISION_RESPONSE_ELIGIBLE(O) !istype(O, /datum/overmap/projectile)
 #define IS_OVERMAP_JS_PROJECTILE(O) istype(O, /datum/overmap/projectile)
+#define IS_OVERMAP_JS_STELLAR_BODY(O) istype(O, /datum/overmap/grid_enabled/stellar_body)
+
+#define OVERMAP_PROJECTILE_FLAGS_NONE 0
+#define OVERMAP_PROJECTILE_FLAGS_CAN_BE_SHOT_DOWN 1 << 0
 
 //Overmap damage types. Any kind of weapon you can think of goes here.
 #define OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL 1

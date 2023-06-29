@@ -24,7 +24,6 @@
 		var/type = L[1]
 		var/anchor = L[2]
 		var/datum/vec5/pos
-		to_chat(world, "[type] | [anchor]")
 		switch(anchor)
 			if(STELLARBODY_POSITION_CENTER)
 				pos = new /datum/vec5((JS_OVERMAP_TACMAP_SIZE / 2), (JS_OVERMAP_TACMAP_SIZE / 2), system.identifier, 0, 0)
@@ -45,7 +44,8 @@
 	if(name == "Sol")
 		preset_grids = list(list(/datum/overmap/grid_enabled/stellar_body, STELLARBODY_POSITION_CENTER),
 		list(/datum/overmap/grid_enabled/stellar_body/planet/earth, STELLARBODY_POSITION_EAST),
-		list(/datum/overmap/grid_enabled/stellar_body/planet/moon/exploded, STELLARBODY_POSITION_SOUTH)
+		list(/datum/overmap/grid_enabled/stellar_body/planet/moon/exploded, STELLARBODY_POSITION_SOUTH),
+		list(/datum/overmap/ship/syndicate/cruiser, STELLARBODY_POSITION_EAST)
 		)
 	//Stupid hack: Ensure there is always SOMETHING in system to jump to.
 	preset_grids += list(/datum/overmap/grid_enabled/stellar_body/jump_beacon, STELLARBODY_POSITION_CENTER)
@@ -131,8 +131,7 @@
 	//The moon's grid.
 	//Contains the moon itself (center) and an evil bad guy! oh no!
 	preset_grids = list(
-		list(/datum/overmap/grid_enabled/stellar_body/planet/moon/exploded/subgrid, STELLARBODY_POSITION_CENTER),
-		list(/datum/overmap/ship/syndicate/cruiser, STELLARBODY_POSITION_EAST),
+		list(/datum/overmap/grid_enabled/stellar_body/planet/moon/exploded/subgrid, STELLARBODY_POSITION_CENTER)
 	)
 
 /**

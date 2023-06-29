@@ -4,6 +4,7 @@ import { flow } from 'common/fp';
 import { useBackend, useLocalState } from '../backend';
 import { Button, Section, Modal, Dropdown, Tabs, Box, Input, Flex, ProgressBar, Collapsible, Icon, Divider, Tooltip } from '../components';
 import { Window, NtosWindow } from '../layouts';
+import { clamp } from '../../common/math';
 
 /**
  * Camera by @robashton returns Camera object.
@@ -255,7 +256,7 @@ let interpolation_mult = target_fps/backend_fps;
 let tick_rate = backend_tick_rate / interpolation_mult;
 
 class overmapEntity {
-  constructor(x, y, z, angle, velocity, velocity_x, velocity_y, icon, thruster_power, rotation_power, sensor_range, armour_quadrants) {
+  constructor(x, y, z, angle, velocity, velocity_x, velocity_y, icon, thruster_power, rotation_power, sensor_range, armour_quadrants, inertial_dampeners) {
     this.x = x;
     this.y = y;
     this.z = z;
@@ -264,12 +265,13 @@ class overmapEntity {
     this.velocity_x = velocity_x;
     this.velocity_y = velocity_y;
     this.icon = icon;
-    this.thruster_power = thruster_power;
-    this.rotation_power = rotation_power;
+    this.thruster_power = thruster_power / interpolation_mult;
+    this.rotation_power = rotation_power / interpolation_mult;
     this.sensor_range = sensor_range;
     // Pre-calculate radians.
     this.r = (this.angle) * (Math.PI / 180);
     this.armour_quadrants = armour_quadrants;
+    this.inertial_dampeners = inertial_dampeners;
   }
   // The following procs are mirrored from the backend.
   // They attempt to model where the ship "ought" to be, based on input.
@@ -277,6 +279,22 @@ class overmapEntity {
     // TODO: this calculation is off
     this.x += (this.velocity_x/interpolation_mult);
     this.y += (this.velocity_y/interpolation_mult);
+    /*
+
+    if(this.inertial_dampeners){
+      let fx = Math.cos(this.r);
+      let fy = Math.sin(this.r); //This appears to be a vector.
+      let sx = fy;
+      let sy = -fx;
+      let side_movement = (sx*this.velocity_x) + (sy*this.velocity_y);
+      let friction_impulse = (this.thruster_power); //Weighty ships generate more space friction
+      let clamped_side_movement = clamp(side_movement, -friction_impulse, friction_impulse);
+      this.velocity_x -= clamped_side_movement * sx;
+      this.velocity_y -= clamped_side_movement * sy;
+    }
+    */
+
+
   }
   rotate(dir) {
     // TODO: bodge
@@ -329,6 +347,7 @@ class overmapEntity {
 export const JSOvermapGame = (props, context) => {
   const { act, data } = useBackend(context);
   let world = [];
+  let keys = data.keys;
   let active_ship = null;
   const can_pilot = data.can_pilot;
 
@@ -354,86 +373,124 @@ export const JSOvermapGame = (props, context) => {
       const sprite = new Image();
       //sprite.src = `data:image/jpeg;base64,${icon_cache[ship.type]}`;
       sprite.src = icon_cache[ship.type]
-      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants);
+      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants, ship.inertial_dampeners);
       if (ship.active) {
         active_ship = world[I];
       }
     }
     let ctx = null;
-    function HandleKeyDown(e) {
-      act('keydown', { key: e.keyCode });
-      let zoomLevel = 0;
-      switch (e.keyCode) {
-        //Arrow keys handle strafing...
-        case (38):
-          if (!can_pilot || active_ship == null)
-          { return; }
-          active_ship.thrust(8);
-          break;
-        case (40):
-          if (!can_pilot || active_ship == null)
-          { return; }
-          active_ship.thrust(2);
-          break;
-        case (39):
-          if (!can_pilot || active_ship == null)
-          { return; }
-          active_ship.thrust(6);
-          break;
-        case (37):
-          if (!can_pilot || active_ship == null)
-          { return; }
-          active_ship.thrust(4);
-          break;
-        //A&D
-        case (68):
-          if (!can_pilot || active_ship == null)
-          { return; }
-          active_ship.rotate(1);
-          break;
-        case (65):
-          if (!can_pilot || active_ship == null)
-          { return; }
-          active_ship.rotate(-1);
-          break;
-        //W&S
-        case (87):
-          if (!can_pilot || active_ship == null)
-          { return; }
-          active_ship.thrust(1);
-          break;
-        case (18):
-          if (!can_pilot || active_ship == null)
-          { return; }
-          active_ship.thrust(-1);
-          break;
-          // Q to zoom out
-        case (81):
-          zoomLevel = Camera.distance + (1 * 100);
-          if (zoomLevel <= 100) {
-            zoomLevel = 100;
-          }
-          Camera.zoomTo(zoomLevel);
-          act('scroll', { key: 1 });
-          break;
-          // E to zoom in
-        case (69):
-          zoomLevel = Camera.distance + (-1 * 100);
-          if (zoomLevel <= 100) {
-            zoomLevel = 100;
-          }
-          Camera.zoomTo(zoomLevel);
-          act('scroll', { key: -1 });
-          break;
-        case (32):
-        // TODO: fill out the weapon to be whatever active weapon we have. I don't care right now for the demo :)
-        // Also todo: mouse aiming!
-          act('fire', { weapon: -1, coords: { x: -1, y: -1, angle: -1 } });
-          break;
+    function HandleKeyUp(e) {
+      if(keys[""+e.keyCode]){
+        act('keyup', { key: e.keyCode });
       }
+      //Report to client to set zoom accordingly.
+      if(e.keyCode == 81 || e.keyCode == 69){
+        act('set_zoom', { key: Camera.distance });
+      }
+      keys[""+e.keyCode] = false;
+      e.preventDefault();
+    }
+    function HandleScroll(e) {
+      act('scroll', { key: e.deltaY });
+    }
+    function HandleKeyDown(e) {
+      if(!keys[""+e.keyCode]){
+        act('keydown', { key: e.keyCode });
+      }
+      keys[""+e.keyCode] = true;
+      e.preventDefault();
     }
     function log(str){
       act('log', { text: str});
+    }
+    let next_zoom_report = 0
+    function process_input(time){
+      let zoomLevel = 0;
+
+      //Arrow keys handle strafing...
+      if(keys["38"]){
+        if (!can_pilot || active_ship == null)
+        { return; }
+        active_ship.thrust(8);
+      }
+
+      if(keys["40"]){
+        if (!can_pilot || active_ship == null)
+        { return; }
+        active_ship.thrust(2);
+      }
+
+      if(keys["39"]){
+        if (!can_pilot || active_ship == null)
+        { return; }
+        active_ship.thrust(6);
+      }
+
+      if(keys["37"]){
+        if (!can_pilot || active_ship == null)
+        { return; }
+        active_ship.thrust(4);
+      }
+
+      //A&D
+      if(keys["68"]){
+        if (!can_pilot || active_ship == null)
+        { return; }
+        active_ship.rotate(1);
+      }
+      if(keys["65"]){
+        if (!can_pilot || active_ship == null)
+        { return; }
+        active_ship.rotate(-1);
+      }
+      //W&S
+      if(keys["87"]){
+        if (!can_pilot || active_ship == null)
+          { return; }
+        active_ship.thrust(1);
+      }
+
+      if(keys["18"]){
+        if (!can_pilot || active_ship == null)
+        { return; }
+        active_ship.thrust(-1);
+      }
+            //Handle zoom first.
+      // Q to zoom out
+      if(keys["81"]){
+        zoomLevel = Camera.distance + (1 * 100);
+        if (zoomLevel <= 100) {
+          zoomLevel = 100;
+        }
+        Camera.zoomTo(zoomLevel);
+        //Report our zoom to the backend.
+        if(time >= next_zoom_report){
+          next_zoom_report = time + 50;
+          act('set_zoom', { key: Camera.distance });
+        }
+        //act('scroll', { key: 1 });
+      }
+        // E to zoom in
+      if(keys["69"]){
+        zoomLevel = Camera.distance + (-1 * 100);
+        if (zoomLevel <= 100) {
+          zoomLevel = 100;
+        }
+        Camera.zoomTo(zoomLevel);
+        //Report our zoom to the backend.
+        if(time >= next_zoom_report){
+          next_zoom_report = time + 50;
+          act('set_zoom', { key: Camera.distance });
+        }
+        //act('scroll', { key: -1 });
+      }
+
+      if(keys["32"]){
+        // TODO: fill out the weapon to be whatever active weapon we have. I don't care right now for the demo :)
+        // Also todo: mouse aiming!
+        act('fire', { weapon: -1, coords: { x: -1, y: -1, angle: -1 } });
+      }
+
     }
 
 
@@ -450,12 +507,6 @@ export const JSOvermapGame = (props, context) => {
       return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
     }
 
-    function HandleKeyUp(e) {
-      act('keyup', { key: e.keyCode });
-    }
-    function HandleScroll(e) {
-      act('scroll', { key: e.deltaY });
-    }
     let canvas_rect = null;
     function HandleMouseDown(e) {
       if (canvas_rect == null  || active_ship == null) {
@@ -478,6 +529,8 @@ export const JSOvermapGame = (props, context) => {
     const max_acceptable_frame_drift = max_ideal_fps;
     // How many consecutive frames we have been held back for. (higher -> longer time to jump back to 60fps.)
     const min_acceptable_frame_recovery_drift = 5;// max_acceptable_frame_drift / 2;
+
+    let last_input_process = 0;
     // Called every tick that the browser can handle.
     function _render({ time, delta, ctx }) {
       if (mark_dirty_requested) {
@@ -521,7 +574,6 @@ export const JSOvermapGame = (props, context) => {
       if (!process) {
         return;
       }
-
       // We are hitting a major lag spike. We may need to intervene.
       // Should never exceed the target framerate as we are throttled to that speed.
       const rate_drift = actual_rate - tick_rate;
@@ -719,6 +771,7 @@ export const JSOvermapGame = (props, context) => {
       }
       ctx.strokeStyle = "green";
       Camera.begin();
+      process_input(time);
       // TODO: maybe needs map, here?
       // Didn't break when just displaying static sprites.
 

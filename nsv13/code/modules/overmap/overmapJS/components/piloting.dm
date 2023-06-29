@@ -67,48 +67,17 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 	if(zoom_level <= 100)
 		zoom_level = 100
 	src.zoom_distance = zoom_level
-	//to_chat(world, zoom_distance)
 
-/datum/component/overmap_piloting/proc/process_input(key)
+/datum/component/overmap_piloting/proc/set_zoom(zoom_level)
+	src.zoom_distance = zoom_level
+
+/datum/component/overmap_piloting/proc/process_input(key, state)
 	if(!target)
 		return
 	//TODO: Mirror me in JS!!
 	//Helm controls.
 	if(rights & OVERMAP_CONTROL_RIGHTS_HELM)
-		switch(key)
-			//Arrow keys..
-			//Up
-			if(38)
-				target.thrust(8)
-				return
-			//Down
-			if(40)
-				target.thrust(2)
-				return
-			//Right
-			if(39)
-				target.thrust(6)
-				return
-			//Left
-			if(37)
-				target.thrust(4)
-				return
-			//W key (TODO: also arrow keys)
-			if(87)
-				target.thrust(1)
-				return
-			//ALT key
-			if(18)
-				target.thrust(-1)
-				return
-			//A
-			if(68)
-				target.rotate(1)
-				return
-			//D
-			if(65)
-				target.rotate(-1)
-				return
+		target.process_input(key, state)
 	//Gunner controls (TODO)
 	if(rights & OVERMAP_CONTROL_RIGHTS_GUNNER)
 		return
@@ -116,3 +85,5 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 /datum/component/overmap_piloting/observer
 	rights = OVERMAP_CONTROL_RIGHTS_NONE
 
+/datum/overmap/proc/process_input(key, state)
+	keys["[key]"] = state

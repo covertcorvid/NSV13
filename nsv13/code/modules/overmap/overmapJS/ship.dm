@@ -101,6 +101,7 @@
 		//South East
 		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM)
 	)
+	ai_type = /datum/component/overmap_ai_agent
 	//collision_positions = list(new /matrix/vector(-3,45), new /matrix/vector(-17,29), new /matrix/vector(-22,-12), new /matrix/vector(-11,-45), new /matrix/vector(7,-47), new /matrix/vector(22,-12), new /matrix/vector(9,30))
 
 /datum/overmap/ship/syndicate/frigate

@@ -67,6 +67,8 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 	var/list/chunk = physics_levels[z_str]
 	var/_x = 1 + round((P.holder.collision_radius + P.holder.position.x) / 2000)
 	var/_y = 1 + round((P.holder.collision_radius + P.holder.position.y) / 2000)
+	_x = CLAMP(_x, 1, JS_OVERMAP_TACMAP_TOTAL_SQUARES)
+	_y = CLAMP(_x, 1, JS_OVERMAP_TACMAP_TOTAL_SQUARES)
 	var/next_chunk = chunk[_x][_y]
 	if(next_chunk != P.last_chunk)
 		if(P.last_chunk)
@@ -81,7 +83,7 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 			if(body.collide(neighbour))
 				SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, body.holder)
 				SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, neighbour.holder)
-				to_chat(world, "BONK")
+				//to_chat(world, "BONK")
 
        //multiple collision avoidance. basically collisions and physics run on separate subsystems. it would be very good to change this rather soon
 	   //basically anything we hit is left uncollidable until a physics tick passes where we dont hit it again
@@ -165,7 +167,7 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 
 /datum/component/physics2d/proc/check_translation()
 	if(holder.position.x <= 0 || holder.position.x >= JS_OVERMAP_TACMAP_SIZE || holder.position.y <= 0 || holder.position.y >= JS_OVERMAP_TACMAP_SIZE){
-		to_chat(world, "Out of bounds.")
+		//to_chat(world, "Out of bounds.")
 		//We have a translation...
 		if(holder.map.parent)
 			if(holder.map.position)
@@ -209,7 +211,7 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 	if (src in P.currently_phasing)
 		return FALSE
 
-	return !(P.holder.test_faction(holder)) && collides(P)
+	return (holder.density && P.holder.density) && !(P.holder.test_faction(holder)) && collides(P)
 
 /**
 	Put anything that should come BEFORE a real collision here.
@@ -235,6 +237,9 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 	//Bullets behave differently.
 	if(IS_OVERMAP_JS_PROJECTILE(holder))
 		other.holder.bullet_act(holder, col_angle)
+		return TRUE
+	if(IS_OVERMAP_JS_PROJECTILE(src))
+		holder.bullet_act(other.holder, col_angle)
 		return TRUE
 	//Debounce
 
@@ -299,8 +304,10 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 
 	var/holder_velocity_diff = (collision_normal * (1 / holder.mass ) * impulse )
 
-	holder.position.velocity = holder.position.velocity + holder_velocity_diff
-	other.holder.position.velocity  = other.holder.position.velocity  - (collision_normal * (1 / other.holder.mass  ) * impulse )
+	if(holder.mass < MASS_IMMOBILE)
+		holder.position.velocity = holder.position.velocity + holder_velocity_diff
+	if(other.holder.mass < MASS_IMMOBILE)
+		other.holder.position.velocity  = other.holder.position.velocity  - (collision_normal * (1 / other.holder.mass  ) * impulse )
 
 	//in case the above is confusing to you, it's taken from this paper: https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
 	//in case that's still confusing to you, learn vector math or something :^)

@@ -81,6 +81,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["can_pilot"] = OP.rights & OVERMAP_CONTROL_RIGHTS_HELM
 	.["control_scheme"] = OP.rights
 	.["fps_capability"] = OP.fps_capability
+	.["keys"] = target.keys
 	for(var/datum/overmap/O in (target?.map?.physics_objects || list(target)))
 		var/list/quads = list()
 		if(O.armour_quadrants)
@@ -95,6 +96,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			rotation_power = O.rotation_power,
 			sensor_range = O.get_sensor_range(),
 			armour_quadrants = quads,
+			inertial_dampeners = O.inertial_dampeners,
 			position = list(O.position.x, O.position.y, O.position.z, O.position.angle, O.position.velocity.ln(), O.position.velocity.x, O.position.velocity.y)
 		)
 		.["physics_world"] += list(data)
@@ -168,13 +170,17 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		if("scroll")
 			C.zoom(params["key"])
 			return
+		if("set_zoom")
+			C.set_zoom(params["key"])
+			return
 		if("fire")
 			C.process_fire(params["weapon"], params["coords"])
 			return;
 		if("keyup")
+			C.process_input(params["key"], FALSE)
 			return
 		if("keydown")
-			C.process_input(params["key"])
+			C.process_input(params["key"], TRUE)
 			return
 		if("ui_mark_dirty")
 			C.mark_dirty(C.target, C.target, params["fps"])
