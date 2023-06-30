@@ -42,10 +42,9 @@
 /datum/star_system/proc/instance_js_overmap_components()
 	//Stupid hack please ignore.
 	if(name == "Sol")
-		preset_grids = list(list(/datum/overmap/grid_enabled/stellar_body, STELLARBODY_POSITION_CENTER),
+		preset_grids = list(list(/datum/overmap/grid_enabled/stellar_body/star, STELLARBODY_POSITION_CENTER),
 		list(/datum/overmap/grid_enabled/stellar_body/planet/earth, STELLARBODY_POSITION_EAST),
-		list(/datum/overmap/grid_enabled/stellar_body/planet/moon/exploded, STELLARBODY_POSITION_SOUTH),
-		list(/datum/overmap/ship/syndicate/cruiser, STELLARBODY_POSITION_EAST)
+		list(/datum/overmap/grid_enabled/stellar_body/planet/moon/exploded, STELLARBODY_POSITION_SOUTH)
 		)
 	//Stupid hack: Ensure there is always SOMETHING in system to jump to.
 	preset_grids += list(/datum/overmap/grid_enabled/stellar_body/jump_beacon, STELLARBODY_POSITION_CENTER)
@@ -106,20 +105,24 @@
 /datum/overmap/grid_enabled/stellar_body
 	icon = 'nsv13/goonstation/icons/effects/overmap_anomalies/stellarbodies.dmi'
 	icon_state = "sun"
-	name = "Sun"
+	name = "Stellar Body"
 	integrity = OVERMAP_ARMOUR_THICKNESS_STELLARBODY
 	max_integrity = OVERMAP_ARMOUR_THICKNESS_STELLARBODY
 	mass = MASS_IMMOBILE
+	thermal_signature = THERMAL_SIGNATURE_LARGE
+
+/datum/overmap/grid_enabled/stellar_body/star
+	name = "Sun"
+	thermal_signature = THERMAL_SIGNATURE_STAR
 
 /datum/overmap/grid_enabled/stellar_body/planet
 	icon = 'nsv13/icons/overmap/stellarbodies/planets.dmi'
 	icon_state = "planet_rocky"
 	name = "Planet"
 
-
 /datum/overmap/grid_enabled/stellar_body/planet/earth
 	icon_state = "planet_earth"
-	name = "Planet"
+	name = "The Earth"
 
 /datum/overmap/grid_enabled/stellar_body/planet/moon
 	icon_state = "planet_rocky"

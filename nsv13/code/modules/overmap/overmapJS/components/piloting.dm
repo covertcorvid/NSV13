@@ -54,7 +54,8 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 	//to_chat(world, "Overmap UI marked dirty.")
 	//src.ui.needs_update = TRUE
 	//HACK: instant UI update. Take your delay and get out.
-	src.ui.src_object.ui_interact(ui.user, ui)
+	//src.ui.src_object.ui_interact(ui.user, ui)
+	src.ui.needs_update = TRUE
 
 /datum/component/overmap_piloting/proc/force_update_static_data(datum/source)
 	src.ui.src_object.update_static_data(ui.user)
