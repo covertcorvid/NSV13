@@ -18,7 +18,7 @@ export const WeaponManagementPanel = (props, context) => {
         </Button>
       </>
     }>
-      {Object.keys(data.weapon_groups).map(key => {
+      {!!data.weapon_groups && Object.keys(data.weapon_groups).map(key => {
         let group_data = data.weapon_groups[key];
         return (
           <Section
@@ -33,7 +33,7 @@ export const WeaponManagementPanel = (props, context) => {
                 Delete
               </Button>
               <br />
-              {Object.keys(group_data.weapons).map(key2 => {
+              {!!group_data.weapons && Object.keys(group_data.weapons).map(key2 => {
                 return(
                   <>
                     {key2}<br />

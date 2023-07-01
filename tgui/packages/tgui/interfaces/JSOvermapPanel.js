@@ -23,7 +23,7 @@ export const JSOvermapPanel = (props, context) => {
             <Section title="Active view:">
               <JSOvermapGame props={props} context={context} />
             </Section>
-          </Flex.Item>.
+          </Flex.Item>
           <Flex.Item>
             <Section title="Options">
               <LabeledList>
@@ -99,9 +99,10 @@ export const JSOvermapPanel = (props, context) => {
                   <Box mb={1}>
                     <Input
                       value={data.spawn_type}
-                      width="250px"
+                      width="200px"
                       onInput={(e, value) => act('set_spawn_type', { target: value,
                       })} />
+                    <br />
                     <NumberInput
                       value={data.spawn_z}
                       minValue={0}
@@ -164,6 +165,9 @@ export const JSOvermapPanel = (props, context) => {
                   );
                 })}
               </LabeledList>
+            </Section>
+            <Section title="Weapon Management">
+              <WeaponManagementPanel props={props} context={context}/>
             </Section>
           </Flex.Item>
         </Flex>
