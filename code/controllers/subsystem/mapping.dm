@@ -294,7 +294,9 @@ SUBSYSTEM_DEF(mapping)
 	//OM.free_treadmills += world.maxz
 	//<NSV13 - Overmap JS>
 
-	SSJSOvermap.instance(config.ship_type, new /datum/vec5(200, 200, 1, 0, 0))
+	//TODO: Make a map level
+	SSJSOvermap.key_overmaps["player"] = SSJSOvermap.instance(config.ship_type, SSJSOvermap.debug_level, new /datum/vec5((JS_OVERMAP_TACMAP_SIZE / 2), (JS_OVERMAP_TACMAP_SIZE / 2), SSJSOvermap.debug_level.identifier, 0, 0))
+
 
 	//</NSV13 - Overmap JS>
 	LoadStationRoomTemplates()

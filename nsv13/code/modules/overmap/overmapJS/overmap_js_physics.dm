@@ -67,6 +67,8 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 	var/list/chunk = physics_levels[z_str]
 	var/_x = 1 + round((P.holder.collision_radius + P.holder.position.x) / 2000)
 	var/_y = 1 + round((P.holder.collision_radius + P.holder.position.y) / 2000)
+	_x = CLAMP(_x, 1, JS_OVERMAP_TACMAP_TOTAL_SQUARES)
+	_y = CLAMP(_x, 1, JS_OVERMAP_TACMAP_TOTAL_SQUARES)
 	var/next_chunk = chunk[_x][_y]
 	if(next_chunk != P.last_chunk)
 		if(P.last_chunk)
@@ -81,7 +83,7 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 			if(body.collide(neighbour))
 				SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, body.holder)
 				SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, neighbour.holder)
-				to_chat(world, "BONK")
+				//to_chat(world, "BONK")
 
        //multiple collision avoidance. basically collisions and physics run on separate subsystems. it would be very good to change this rather soon
 	   //basically anything we hit is left uncollidable until a physics tick passes where we dont hit it again
@@ -159,8 +161,19 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 /// Uses pixel coordinates
 /datum/component/physics2d/proc/update()
 	if(world.time >= next_chunk_update)
+		check_translation()
 		SSphysics_processing.UpdateChunk(src, holder.position.z)
 		next_chunk_update = world.time + 0.5 SECONDS
+
+/datum/component/physics2d/proc/check_translation()
+	if(holder.position.x <= 0 || holder.position.x >= JS_OVERMAP_TACMAP_SIZE || holder.position.y <= 0 || holder.position.y >= JS_OVERMAP_TACMAP_SIZE){
+		//to_chat(world, "Out of bounds.")
+		//We have a translation...
+		if(holder.map.parent)
+			if(holder.map.position)
+				holder.position = new /datum/vec5(holder.map.position.x+holder.collision_radius*3, holder.map.position.y+holder.collision_radius*3, holder.map.position.z, holder.position.angle, holder.position.velocity.x, holder.position.velocity.y)
+			holder.map.transfer_to(holder, holder.map.parent)
+	}
 
 /datum/component/physics2d/proc/update_z()
 	if(holder.position.z != last_registered_z) //Z changed? Update this unit's processing chunk.
@@ -198,9 +211,14 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 	if (src in P.currently_phasing)
 		return FALSE
 
-	return !(P.holder.test_faction(holder)) && collides(P)
+	return (holder.density && P.holder.density) && !(P.holder.test_faction(holder)) && collides(P)
 
-
+/**
+	Put anything that should come BEFORE a real collision here.
+	Return TRUE if you have intercepted the collision and do NOT want damage applied with the collision!
+*/
+/datum/overmap/proc/intercept_collision(datum/overmap/OM)
+	return FALSE
 
 #undef PHYSICS_PRECISION_IDGAF
 
@@ -211,9 +229,17 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 
 	//I mean, the angle between the two objects is very likely to be the angle of incidence innit
 	var/col_angle = ATAN2((other.holder.position.x + other.holder.collision_radius / 2) - (src.holder.position.x + src.holder.collision_radius / 2), (other.holder.position.y + other.holder.collision_radius / 2) - (src.holder.position.y + holder.collision_radius / 2))
+	//For grid traversal. You don't collide with a planet, you go down to its grid.
+	//If you fire a missile at earth, for example, the missile just goes down to earth's own grid.
+	if(other.holder.intercept_collision(src.holder))
+		return TRUE
+
 	//Bullets behave differently.
 	if(IS_OVERMAP_JS_PROJECTILE(holder))
 		other.holder.bullet_act(holder, col_angle)
+		return TRUE
+	if(IS_OVERMAP_JS_PROJECTILE(src))
+		holder.bullet_act(other.holder, col_angle)
 		return TRUE
 	//Debounce
 
@@ -278,8 +304,10 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 
 	var/holder_velocity_diff = (collision_normal * (1 / holder.mass ) * impulse )
 
-	holder.position.velocity = holder.position.velocity + holder_velocity_diff
-	other.holder.position.velocity  = other.holder.position.velocity  - (collision_normal * (1 / other.holder.mass  ) * impulse )
+	if(holder.mass < MASS_IMMOBILE)
+		holder.position.velocity = holder.position.velocity + holder_velocity_diff
+	if(other.holder.mass < MASS_IMMOBILE)
+		other.holder.position.velocity  = other.holder.position.velocity  - (collision_normal * (1 / other.holder.mass  ) * impulse )
 
 	//in case the above is confusing to you, it's taken from this paper: https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
 	//in case that's still confusing to you, learn vector math or something :^)

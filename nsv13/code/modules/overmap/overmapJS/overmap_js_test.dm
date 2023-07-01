@@ -50,6 +50,9 @@
 /obj/machinery/computer/ship/js_overmap/ui_data(mob/user)
 	. = SSJSOvermap.ui_data_for(user, active_ship)
 
+/obj/machinery/computer/ship/js_overmap/ui_static_data(mob/user)
+	. = SSJSOvermap.ui_static_data_for(user)
+
 /obj/machinery/computer/ship/js_overmap/ui_act(action, list/params)
 	. = ..()
 	if (.)
@@ -62,14 +65,18 @@
 		if("scroll")
 			C.zoom(params["key"])
 			return
+		if("set_zoom")
+			C.set_zoom(params["key"])
+			return
 		if("fire")
 			C.process_fire(params["weapon"], params["angle"])
 			ui_interact(usr)
 			return
 		if("keyup")
+			C.process_input(params["key"], FALSE)
 			return
 		if("keydown")
-			C.process_input(params["key"])
+			C.process_input(params["key"], TRUE)
 			return
 		if("ui_mark_dirty")
 			C.mark_dirty(SSJSOvermap, C.target, params["fps"])

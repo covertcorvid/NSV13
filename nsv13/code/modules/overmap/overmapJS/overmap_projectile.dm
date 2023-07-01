@@ -2,7 +2,7 @@
 
 
 /datum/overmap/projectile
-	mass = MASS_TINY
+	mass = MASS_PROJECTILE
 	name = "overmap projectile"
 	icon = 'nsv13/icons/obj/projectiles_nsv.dmi'
 	icon_state = "pdc"
@@ -20,6 +20,7 @@
 	var/distance_travelled = 0
 	var/speed = 10 //m/s
 	var/physical_projectile_type = /obj/item/projectile/bullet
+	var/projectile_flags = OVERMAP_PROJECTILE_FLAGS_NONE
 
 /datum/overmap/projectile/slug
 	name = "railgun slug"
@@ -44,6 +45,8 @@
 	damage_type = OVERMAP_DAMAGE_TYPE_EXPLOSIVE
 	range = 52 KM
 	speed = 50
+	//Hint to gun batteries that we can shoot down warheads.
+	projectile_flags = OVERMAP_PROJECTILE_FLAGS_CAN_BE_SHOT_DOWN
 
 /datum/overmap/projectile/on_move()
 	..()
@@ -73,6 +76,9 @@
 
 /datum/overmap/proc/get_angle_to(datum/overmap/O)
 	return ATAN2((O.position.x - position.x), (O.position.y - position.y))
+
+/datum/overmap/proc/get_angle_to_pos(datum/vec5/O)
+	return ATAN2((O.x - position.x), (O.y - position.y))
 
 /datum/overmap/proc/radians(d)
 	return (d * PI) / 180;
@@ -127,6 +133,7 @@
 */
 /datum/overmap/proc/take_damage(amount, damage_type)
 	integrity -= amount
+	last_combat_entered = world.time
 	if(integrity <= 0)
 		explode()
 

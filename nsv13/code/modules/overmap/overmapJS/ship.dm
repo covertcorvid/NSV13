@@ -24,6 +24,7 @@
 	faction = OVERMAP_FACTION_PLAYER
 	interior_type = /datum/component/overmap_interior
 	role = OVERMAP_ROLE_PRIMARY
+	starting_system = "Sol"
 	//collision_positions = list(new /matrix/vector(-8,46), new /matrix/vector(-17,33), new /matrix/vector(-25,2), new /matrix/vector(-14,-45), new /matrix/vector(9,-46), new /matrix/vector(22,4), new /matrix/vector(14,36))
 
 /datum/overmap/ship/player/cruiser
@@ -100,6 +101,7 @@
 		//South East
 		new /datum/armour_quadrant(OVERMAP_ARMOUR_THICKNESS_MEDIUM)
 	)
+	ai_type = /datum/component/overmap_ai_agent
 	//collision_positions = list(new /matrix/vector(-3,45), new /matrix/vector(-17,29), new /matrix/vector(-22,-12), new /matrix/vector(-11,-45), new /matrix/vector(7,-47), new /matrix/vector(22,-12), new /matrix/vector(9,30))
 
 /datum/overmap/ship/syndicate/frigate
