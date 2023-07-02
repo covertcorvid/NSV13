@@ -311,17 +311,17 @@ class overmapEntity {
   thrust(dir) {
     // TODO: bodge
     // this.velocity += this.thruster_power * dir;
-    switch(dir){
-      case(8):
+    switch (dir) {
+      case (8):
         this.velocity_y -= this.thruster_power;
         break;
-      case(2):
+      case (2):
         this.velocity_y += this.thruster_power;
         break;
-      case(4):
+      case (4):
         this.velocity_x -= this.thruster_power;
         break;
-      case(6):
+      case (6):
         this.velocity_x += this.thruster_power;
         break;
       default:
@@ -332,10 +332,10 @@ class overmapEntity {
         else {
           this.velocity_x *= 0.5;
           this.velocity_y *= 0.5;
-          if(this.velocity_x < 0){
+          if (this.velocity_x < 0) {
             this.velocity_x = 0;
           }
-          if(this.velocity_y < 0){
+          if (this.velocity_y < 0) {
             this.velocity_y = 0;
           }
           /*
@@ -376,10 +376,10 @@ export const JSOvermapGame = (props, context) => {
 
     for (let I = 0; I < data.physics_world.length; I++) {
       let ship = data.physics_world[I];
-      //log(`Sprite: ${icon_cache[ship.type]}`);
+      // log(`Sprite: ${icon_cache[ship.type]}`);
       const sprite = new Image();
-      //sprite.src = `data:image/jpeg;base64,${icon_cache[ship.type]}`;
-      sprite.src = icon_cache[ship.type]
+      // sprite.src = `data:image/jpeg;base64,${icon_cache[ship.type]}`;
+      sprite.src = icon_cache[ship.type];
       world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants, ship.inertial_dampeners, ship.thermal_signature);
       if (ship.active) {
         active_ship = world[I];
@@ -387,11 +387,11 @@ export const JSOvermapGame = (props, context) => {
     }
     let ctx = null;
     function HandleKeyUp(e) {
-      if(keys[""+e.keyCode]){
+      if (keys[""+e.keyCode]) {
         act('keyup', { key: e.keyCode });
       }
-      //Report to client to set zoom accordingly.
-      if(e.keyCode == 81 || e.keyCode == 69){
+      // Report to client to set zoom accordingly.
+      if (e.keyCode == 81 || e.keyCode == 69) {
         act('set_zoom', { key: Camera.distance });
       }
       keys[""+e.keyCode] = false;
@@ -401,98 +401,98 @@ export const JSOvermapGame = (props, context) => {
       act('scroll', { key: e.deltaY });
     }
     function HandleKeyDown(e) {
-      if(!keys[""+e.keyCode]){
+      if (!keys[""+e.keyCode]) {
         act('keydown', { key: e.keyCode });
       }
       keys[""+e.keyCode] = true;
       e.preventDefault();
     }
-    function log(str){
-      act('log', { text: str});
+    function log(str) {
+      act('log', { text: str });
     }
-    let next_zoom_report = 0
-    function process_input(time){
+    let next_zoom_report = 0;
+    function process_input(time) {
       let zoomLevel = 0;
 
-      //Arrow keys handle strafing...
-      if(keys["38"]){
+      // Arrow keys handle strafing...
+      if (keys["38"]) {
         if (!can_pilot || active_ship == null)
         { return; }
         active_ship.thrust(8);
       }
 
-      if(keys["40"]){
+      if (keys["40"]) {
         if (!can_pilot || active_ship == null)
         { return; }
         active_ship.thrust(2);
       }
 
-      if(keys["39"]){
+      if (keys["39"]) {
         if (!can_pilot || active_ship == null)
         { return; }
         active_ship.thrust(6);
       }
 
-      if(keys["37"]){
+      if (keys["37"]) {
         if (!can_pilot || active_ship == null)
         { return; }
         active_ship.thrust(4);
       }
 
-      //A&D
-      if(keys["68"]){
+      // A&D
+      if (keys["68"]) {
         if (!can_pilot || active_ship == null)
         { return; }
         active_ship.rotate(1);
       }
-      if(keys["65"]){
+      if (keys["65"]) {
         if (!can_pilot || active_ship == null)
         { return; }
         active_ship.rotate(-1);
       }
-      //W&S
-      if(keys["87"]){
+      // W&S
+      if (keys["87"]) {
         if (!can_pilot || active_ship == null)
-          { return; }
+        { return; }
         active_ship.thrust(1);
       }
 
-      if(keys["18"]){
+      if (keys["18"]) {
         if (!can_pilot || active_ship == null)
         { return; }
         active_ship.thrust(-1);
       }
-            //Handle zoom first.
+      // Handle zoom first.
       // Q to zoom out
-      if(keys["81"]){
+      if (keys["81"]) {
         zoomLevel = Camera.distance + (1 * 100);
         if (zoomLevel <= 100) {
           zoomLevel = 100;
         }
         Camera.zoomTo(zoomLevel);
-        //Report our zoom to the backend.
-        if(time >= next_zoom_report){
+        // Report our zoom to the backend.
+        if (time >= next_zoom_report) {
           next_zoom_report = time + 50;
           act('set_zoom', { key: Camera.distance });
         }
-        //act('scroll', { key: 1 });
+        // act('scroll', { key: 1 });
       }
-        // E to zoom in
-      if(keys["69"]){
+      // E to zoom in
+      if (keys["69"]) {
         zoomLevel = Camera.distance + (-1 * 100);
         if (zoomLevel <= 100) {
           zoomLevel = 100;
         }
         Camera.zoomTo(zoomLevel);
-        //Report our zoom to the backend.
-        if(time >= next_zoom_report){
+        // Report our zoom to the backend.
+        if (time >= next_zoom_report) {
           next_zoom_report = time + 50;
           act('set_zoom', { key: Camera.distance });
         }
-        //act('scroll', { key: -1 });
+        // act('scroll', { key: -1 });
       }
 
-      if(keys["32"]){
+      if (keys["32"]) {
         // TODO: fill out the weapon to be whatever active weapon we have. I don't care right now for the demo :)
         // Also todo: mouse aiming!
         act('fire', { weapon: -1, coords: { x: -1, y: -1, angle: -1 } });
@@ -511,12 +511,12 @@ export const JSOvermapGame = (props, context) => {
    * @returns
    */
     function get_angle(x1, y1, x2, y2) {
-      return Math.atan2((x2 - x1), (y2 - y1)) * 180 / Math.PI;
+      return Math.atan2((y2 - y1), (x2 - x1)) * 180 / Math.PI + 90; // Quadrant 0-90 should be northeast.
     }
 
     let canvas_rect = null;
     function HandleMouseDown(e) {
-      if (canvas_rect == null  || active_ship == null) {
+      if (canvas_rect == null || active_ship == null) {
         return;
       }
       let xy = Camera.screenToWorld(e.clientX - canvas_rect.left, Camera.screenToWorld(e.clientY - canvas_rect.top));
@@ -537,7 +537,7 @@ export const JSOvermapGame = (props, context) => {
     // How many consecutive frames we have been held back for. (higher -> longer time to jump back to 60fps.)
     const min_acceptable_frame_recovery_drift = 5;// max_acceptable_frame_drift / 2;
 
-    const sensor_mode = data.sensor_mode
+    const sensor_mode = data.sensor_mode;
 
     let last_input_process = 0;
     // Called every tick that the browser can handle.
@@ -550,7 +550,7 @@ export const JSOvermapGame = (props, context) => {
       // Initial draw batch.
       if (last_process_time == 0) {
         Camera.constructor(ctx);
-        if(active_ship != null){
+        if (active_ship != null) {
           Camera.moveTo(active_ship.x, active_ship.y);
         }
         Camera.zoomTo(data.client_zoom);
@@ -677,11 +677,11 @@ export const JSOvermapGame = (props, context) => {
         */
       function dashedCircle(x, y, radius, offset, segments, size) {
 
-        var pi2 = 2 * Math.PI; // Total radians in a circle
-        var sector_width_radians = pi2 / segments.length;
-        var arc_length_radians = sector_width_radians * size;
-        var arc_start_radians = (1 - size) * sector_width_radians / 2; // Offset start to half the width of the space between segments
-        var ax, ay;
+        let pi2 = 2 * Math.PI; // Total radians in a circle
+        let sector_width_radians = pi2 / segments.length;
+        let arc_length_radians = sector_width_radians * size;
+        let arc_start_radians = (1 - size) * sector_width_radians / 2; // Offset start to half the width of the space between segments
+        let ax, ay;
 
         let segment_count = 0;
         ctx.save();
@@ -754,6 +754,7 @@ export const JSOvermapGame = (props, context) => {
 
       /**
        * Author(s): DeltaFire, Kmc2000
+       * Interference Tracking System core code, aka the wobbly circle.
        * Draws the sensor circle around the ship, based on a scan mode.
        * For now, mostly visual and a slightly overpowered radar.
        * Wobbly circle spikes in the direction of a signature based on its size.
@@ -769,10 +770,10 @@ export const JSOvermapGame = (props, context) => {
        * @param {*} y
        * @param {*} radius
        */
-      function drawSensorCircle(image, x, y){
-        switch(sensor_mode){
-          //IR sensors...
-          case(0):
+      function drawSensorCircle(image, x, y) {
+        switch (sensor_mode) {
+          // IR sensors...
+          case (0):
             ctx.strokeStyle = "orange";
             break;
         }
@@ -782,54 +783,85 @@ export const JSOvermapGame = (props, context) => {
         let circle_core_x = (x) + w/2;
         let circle_core_y = (y)+h/2;
 
-        let inter_impact = 30; //This is the total amount of vectorshifting our interference does. Multiplied by signature. This gets split up depending on x / y ownership of the actual signature.
-        let inter_resolution = 31; //How high does the random number potentially go
-        let inter_cut = 0.01 //The random number gets divided by this
-        //inter_resolution * inter_cut = what inter_impact is multiplied with, reads, its intensity.
 
-        //Anything after this point is not random vars you can play with - you have been warned.
-        const point_count = 360; //If you change this, this stops working, but it would be a var in the real thing.
-        var datapoints = new Array(point_count);
-        for(var i=0;i<point_count;i++)
+        // Note / TODO: Many of these variables could / should be influenced or set by a) scan mode, b) sensor tech and c) condition of the ship's sensors.
+
+        // "Wobbly" interference-related vars.
+        let inter_impact = 30; // This is the total amount of vectorshifting our interference does. Amplified by some random factors.
+        let inter_resolution = 31; // How high does the random number potentially go
+        let inter_cut = 0.01; // The random number gets divided by this
+        // inter_resolution * inter_cut = what inter_impact is multiplied with, reads, its intensity.
+
+        // Signature angle-propagation vars.
+        let signature_cutoff = 10; // Anything that ends up below this after a angle propagation is omitted. If base signal, still used.
+        let max_angular_spread = 15; // 10? // Signatures can only spread at most this angle into each direction
+        let signature_propagation_multiplier = 0.8; // 0.5? // Signatures have their value multiplied by this when propagating angles. Diminishing returns.
+
+        // Anything after this point is not random vars you can play with - you have been warned.
+        const point_count = 360; // If you change this, this stops working.. honestly 360 is a very nice var for less-math's sake, and it seems high-enough res.
+        let datapoints = new Array(point_count); // interference datapoints - could probably just be local var, but keeping it for the moment - TODO - revisit.
+        for (let i=0; i<point_count; i++)
         {
-          //Interference signature...
-          datapoints[i] = 0 + (Math.floor((Math.random() * inter_resolution)) * inter_cut); //0.0 - 3.0 as scaling for impact
+          // Interference signature...
+          datapoints[i] = 0 + (Math.floor((Math.random() * inter_resolution)) * inter_cut); // 0.0 - 3.0 as scaling for impact
         }
-        //Now, scan for nearby ships large enough to produce a heat signature.
+        let signature_list = new Array(point_count); for (let i=0; i<point_count; i++) signature_list[i] = 0; // Collection of each total signature value by datapoint
+        let strongest_signature = new Array(point_count); for (let i=0; i<point_count; i++) strongest_signature[i] = 0; // The strongest signature per datapoint
+        // Now, scan for nearby ships large enough to produce a heat signature.
         for (let j = 0; j < world.length; j++) {
           let ship = world[j];
-          if(ship == active_ship){
+          if (ship == active_ship) {
             continue;
           }
-          let sig = 0;
-          sig = ship.thermal_signature;
-          if(sig <= 0){
+          let ship_sig = ship.thermal_signature;
+          if (ship_sig <= 0) {
             continue;
           }
-          //TODO: this bit brokey
-          let angle = Math.floor(get_angle(circle_core_x, circle_core_y, ship.x, ship.y));
-          //How much of a spike we draw around this?
-          let chonk_distortion_factor = Math.floor(sig / 20);
-          //Draw a big line.
-          for(let k = angle-chonk_distortion_factor; k < angle+chonk_distortion_factor; k++){
-            if(k < 0 || k > datapoints.length-1){
-              continue;
-            }
-            datapoints[k] += 0 + (((Math.random() * inter_resolution) + sig) * inter_cut); //0.0 - 3.0 as scaling for impact
-          }
-          datapoints[angle] = 0 + (((Math.random() * inter_resolution) + sig) * inter_cut); //0.0 - 3.0 as scaling for impact
-        }
+          let angle = Math.floor((360 + get_angle(circle_core_x, circle_core_y, ship.x, ship.y))) % 360; // There will be no negative angles in this household.
 
-        let start_vector = radius + inter_impact * datapoints[0];
+          signature_list[angle] += ship_sig; // TODO: add potential for decrease by distance to target - none, linear, inverse_square, etc.
+          if (strongest_signature[angle] < ship_sig) {
+            strongest_signature[angle] = ship_sig;
+          }
+          for (let angle_iter = 1; angle_iter <= max_angular_spread; angle_iter++) { // We ball
+            ship_sig *= signature_propagation_multiplier; // signature loss per angle point - TODO: check other potential curve styles for looks.
+            if (ship_sig < signature_cutoff) {
+              break;
+            }
+            let handled_angle_ccw = (360 + angle - angle_iter) % 360;
+            let handled_angle_cw = (360 + angle + angle_iter) % 360;
+
+            // Same TODO as above list add - need to consider distance reduction, or at least codewise support for it.
+            signature_list[handled_angle_ccw] += ship_sig;
+            if (strongest_signature[handled_angle_ccw] < ship_sig) {
+              strongest_signature[handled_angle_ccw] = ship_sig;
+            }
+            signature_list[handled_angle_cw] += ship_sig;
+            if (strongest_signature[handled_angle_cw] < ship_sig) {
+              strongest_signature[handled_angle_cw] = ship_sig;
+            }
+          }
+        }
+        let start_signature_impact = 0;
+        if (strongest_signature[0] > 0) {
+          let start_secondary_signatures = (signature_list[0] - strongest_signature[0]) * Math.min((signature_list[0] - strongest_signature[0]) / strongest_signature[0], 1);
+          start_signature_impact = strongest_signature[0] + Math.min(start_secondary_signatures, strongest_signature[0] * 0.2);
+        }
+        let start_vector = radius + (inter_impact * datapoints[0]) + start_signature_impact;
         ctx.beginPath();
         ctx.moveTo(circle_core_x, circle_core_y - start_vector);
-        for(let i=1;i<point_count;i++)
+        for (let i=1; i<point_count; i++)
         {
-          let angulis = (i + 180) % 360; //I am too tired for angular math so deal with it.
+          let angulis = (i) % 360; // I am too tired for angular math so deal with it.
           let total_offset = inter_impact * datapoints[i];
+          let signature_impact = 0;
+          if (strongest_signature[i] > 0) { // This sure is some of the math of all time.
+            let secondary_signatures = (signature_list[i] - strongest_signature[i]) * Math.min((signature_list[i] - strongest_signature[i]) / strongest_signature[i], 1);
+            signature_impact = strongest_signature[i] + Math.min(secondary_signatures, strongest_signature[i] * 0.2);
+          }
 
-          var x_offset = (radius + total_offset) * Math.sin(angulis * Math.PI / 180);
-          var y_offset = (radius + total_offset) * Math.cos(angulis * Math.PI / 180);
+          let x_offset = (radius + total_offset + signature_impact) * Math.sin(angulis * Math.PI / 180);
+          let y_offset = -(radius + total_offset + signature_impact) * Math.cos(angulis * Math.PI / 180);
 
           ctx.lineTo(circle_core_x + x_offset, circle_core_y + y_offset);
         }
@@ -875,10 +907,10 @@ export const JSOvermapGame = (props, context) => {
         let x = ship.x;
         let y = ship.y;
         if (ship.icon != "" && x <= Camera.viewport.width+Camera.viewport.left && y <= Camera.viewport.height+Camera.viewport.top) {
-          try{
+          try {
             draw(ship.icon, ship.x, ship.y, ship.angle + 90);
           }
-          catch(e){
+          catch (e) {
             continue;
           }
 
@@ -896,7 +928,7 @@ export const JSOvermapGame = (props, context) => {
         ship.process();
 
       }
-      if(active_ship != null){
+      if (active_ship != null) {
         Camera.moveTo(active_ship.x, active_ship.y);
       }
       drawSensorCircle(active_ship.icon, active_ship.x, active_ship.y);
