@@ -20,7 +20,6 @@
 
 /datum/weapon_group/proc/get_ui_data()
 	. = list()
-	message_admins("[name]: [english_list(weapon_list)]")
 	.["name"] = name
 	.["weapons"] = weapon_list
 	.["id"] = "\ref[src]"

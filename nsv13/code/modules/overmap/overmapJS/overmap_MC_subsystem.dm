@@ -105,7 +105,6 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		.["physics_world"] += list(data)
 
 	.["weapon_groups"] = list()
-	message_admins("UI data with groups [english_list(target.weapon_groups)]")
 	for(var/WG as() in target.weapon_groups)
 		var/datum/weapon_group/group = target.weapon_groups[WG]
 		var/list/group_data = group.get_ui_data()
