@@ -256,7 +256,7 @@ let interpolation_mult = target_fps/backend_fps;
 let tick_rate = backend_tick_rate / interpolation_mult;
 
 class overmapEntity {
-  constructor(x, y, z, angle, velocity, velocity_x, velocity_y, icon, thruster_power, rotation_power, sensor_range, armour_quadrants, inertial_dampeners) {
+  constructor(x, y, z, angle, velocity, velocity_x, velocity_y, icon, thruster_power, rotation_power, sensor_range, armour_quadrants, inertial_dampeners, thermal_signature) {
     this.x = x;
     this.y = y;
     this.z = z;
@@ -272,6 +272,7 @@ class overmapEntity {
     this.r = (this.angle) * (Math.PI / 180);
     this.armour_quadrants = armour_quadrants;
     this.inertial_dampeners = inertial_dampeners;
+    this.thermal_signature = thermal_signature;
   }
   // The following procs are mirrored from the backend.
   // They attempt to model where the ship "ought" to be, based on input.
@@ -373,7 +374,7 @@ export const JSOvermapGame = (props, context) => {
       const sprite = new Image();
       //sprite.src = `data:image/jpeg;base64,${icon_cache[ship.type]}`;
       sprite.src = icon_cache[ship.type]
-      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants, ship.inertial_dampeners);
+      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants, ship.inertial_dampeners, ship.thermal_signature);
       if (ship.active) {
         active_ship = world[I];
       }
@@ -504,7 +505,7 @@ export const JSOvermapGame = (props, context) => {
    * @returns
    */
     function get_angle(x1, y1, x2, y2) {
-      return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+      return Math.atan2((x2 - x1), (y2 - y1)) * 180 / Math.PI;
     }
 
     let canvas_rect = null;
@@ -529,6 +530,8 @@ export const JSOvermapGame = (props, context) => {
     const max_acceptable_frame_drift = max_ideal_fps;
     // How many consecutive frames we have been held back for. (higher -> longer time to jump back to 60fps.)
     const min_acceptable_frame_recovery_drift = 5;// max_acceptable_frame_drift / 2;
+
+    const sensor_mode = data.sensor_mode
 
     let last_input_process = 0;
     // Called every tick that the browser can handle.
@@ -742,6 +745,92 @@ export const JSOvermapGame = (props, context) => {
 
         ctx.stroke();
       }
+
+      /**
+       * Author(s): DeltaFire, Kmc2000
+       * Draws the sensor circle around the ship, based on a scan mode.
+       * For now, mostly visual and a slightly overpowered radar.
+       * Wobbly circle spikes in the direction of a signature based on its size.
+       *
+       * IR mode:
+       * - Signature is based on heat signature.
+       * - If the object is a star.. expect huge signature.
+       * - TODO: if they fire weapons, should spike the sensors!
+       *
+       * This will eventually be down to the science officer (radar operator) to select scan mode!
+       * @param {*} image
+       * @param {*} x
+       * @param {*} y
+       * @param {*} radius
+       */
+      function drawSensorCircle(image, x, y){
+        switch(sensor_mode){
+          //IR sensors...
+          case(0):
+            ctx.strokeStyle = "orange";
+            break;
+        }
+        let w = image.width;
+        let h = image.height;
+        let radius = w*2;
+        let circle_core_x = (x) + w/2;
+        let circle_core_y = (y)+h/2;
+
+        let inter_impact = 30; //This is the total amount of vectorshifting our interference does. Multiplied by signature. This gets split up depending on x / y ownership of the actual signature.
+        let inter_resolution = 31; //How high does the random number potentially go
+        let inter_cut = 0.01 //The random number gets divided by this
+        //inter_resolution * inter_cut = what inter_impact is multiplied with, reads, its intensity.
+
+        //Anything after this point is not random vars you can play with - you have been warned.
+        const point_count = 360; //If you change this, this stops working, but it would be a var in the real thing.
+        var datapoints = new Array(point_count);
+        for(var i=0;i<point_count;i++)
+        {
+          //Interference signature...
+          datapoints[i] = 0 + (Math.floor((Math.random() * inter_resolution)) * inter_cut); //0.0 - 3.0 as scaling for impact
+        }
+        //Now, scan for nearby ships large enough to produce a heat signature.
+        for (let j = 0; j < world.length; j++) {
+          let ship = world[j];
+          if(ship == active_ship){
+            continue;
+          }
+          let sig = 0;
+          sig = ship.thermal_signature;
+          if(sig <= 0){
+            continue;
+          }
+          //TODO: this bit brokey
+          let angle = Math.floor(get_angle(circle_core_x, circle_core_y, ship.x, ship.y));
+          //How much of a spike we draw around this?
+          let chonk_distortion_factor = Math.floor(sig / 20);
+          //Draw a big line.
+          for(let k = angle-chonk_distortion_factor; k < angle+chonk_distortion_factor; k++){
+            if(k < 0 || k > datapoints.length-1){
+              continue;
+            }
+            datapoints[k] += 0 + (((Math.random() * inter_resolution) + sig) * inter_cut); //0.0 - 3.0 as scaling for impact
+          }
+          datapoints[angle] = 0 + (((Math.random() * inter_resolution) + sig) * inter_cut); //0.0 - 3.0 as scaling for impact
+        }
+
+        let start_vector = radius + inter_impact * datapoints[0];
+        ctx.beginPath();
+        ctx.moveTo(circle_core_x, circle_core_y - start_vector);
+        for(let i=1;i<point_count;i++)
+        {
+          let angulis = (i + 180) % 360; //I am too tired for angular math so deal with it.
+          let total_offset = inter_impact * datapoints[i];
+
+          var x_offset = (radius + total_offset) * Math.sin(angulis * Math.PI / 180);
+          var y_offset = (radius + total_offset) * Math.cos(angulis * Math.PI / 180);
+
+          ctx.lineTo(circle_core_x + x_offset, circle_core_y + y_offset);
+        }
+        ctx.lineTo(circle_core_x, circle_core_y - start_vector);
+        ctx.stroke();
+      }
+
       ctx.clearRect(0, 0, 1280, 720);
       // ctx.fillStyle = "transparent";
       // ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -774,7 +863,6 @@ export const JSOvermapGame = (props, context) => {
       process_input(time);
       // TODO: maybe needs map, here?
       // Didn't break when just displaying static sprites.
-
       for (let I = 0; I < world.length; I++) {
         let ship = world[I];
         // TODO: Is visible checks... we can use frustrum culling
@@ -805,6 +893,7 @@ export const JSOvermapGame = (props, context) => {
       if(active_ship != null){
         Camera.moveTo(active_ship.x, active_ship.y);
       }
+      drawSensorCircle(active_ship.icon, active_ship.x, active_ship.y);
       Camera.end();
       // requestAnimationFrame(_render);
     }

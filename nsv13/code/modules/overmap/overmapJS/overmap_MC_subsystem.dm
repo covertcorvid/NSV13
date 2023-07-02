@@ -82,6 +82,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["control_scheme"] = OP.rights
 	.["fps_capability"] = OP.fps_capability
 	.["keys"] = target.keys
+	.["sensor_mode"] = target.sensor_mode
 	.["firing_arc_center"] = OP.firing_arc_center
 	.["firing_arc_width"] = OP.firing_arc_width
 	for(var/datum/overmap/O in (target?.map?.physics_objects || list(target)))
@@ -100,6 +101,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			sensor_range = O.get_sensor_range(),
 			armour_quadrants = quads,
 			inertial_dampeners = O.inertial_dampeners,
+			thermal_signature = O.thermal_signature,
 			position = list(O.position.x, O.position.y, O.position.z, O.position.angle, O.position.velocity.ln(), O.position.velocity.x, O.position.velocity.y)
 		)
 		.["physics_world"] += list(data)

@@ -80,6 +80,8 @@
 	var/list/keys = list()
 	var/last_combat_entered = 0
 	var/inertial_dampeners = TRUE
+	var/sensor_mode = SENSOR_MODE_IR
+	var/thermal_signature = THERMAL_SIGNATURE_NONE
 
 	var/list/weapon_groups = list()
 
@@ -145,30 +147,37 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 5, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
 			)
+			thermal_signature = THERMAL_SIGNATURE_SMALL
+
 		if(MASS_MEDIUM)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 90, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 20, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 10, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
+			thermal_signature = THERMAL_SIGNATURE_MEDIUM
+
 		if(MASS_MEDIUM_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 95, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 25, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 15, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
+			thermal_signature = THERMAL_SIGNATURE_LARGE
 		if(MASS_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 98, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 25, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 15, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 35, \
 			)
+			thermal_signature = THERMAL_SIGNATURE_LARGE
 		if(MASS_TITAN)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 100, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 40, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 30, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 40, \
 			)
+			thermal_signature = THERMAL_SIGNATURE_LARGE
 
 
 /datum/overmap/proc/fire_projectile(proj_angle = src.position.angle, datum/overmap/projectile/projectile_type=/datum/overmap/projectile/shell, burst_size=1)
@@ -268,35 +277,27 @@
 	//Up
 	if(keys["[38]"])
 		thrust(8)
-		return
 	//Down
 	if(keys["[40]"])
 		thrust(2)
-		return
 	//Right
 	if(keys["[39]"])
 		thrust(6)
-		return
 	//Left
 	if(keys["[37]"])
 		thrust(4)
-		return
 	//W key (TODO: also arrow keys)
 	if(keys["[87]"])
 		thrust(1)
-		return
 	//ALT key
 	if(keys["[18]"])
 		thrust(-1)
-		return
 	//A
 	if(keys["[68]"])
 		rotate(1)
-		return
 	//D
 	if(keys["[65]"])
 		rotate(-1)
-		return
 
 
 /**
