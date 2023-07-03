@@ -24,7 +24,7 @@
 #define OVERMAP_INTERIOR_TYPE_CAPITAL 1
 #define OVERMAP_INTERIOR_TYPE_TINY 2
 
-#define OVERMAP_INTERIOR_METRIC_MOBS "mobs"
+//#define OVERMAP_INTERIOR_METRIC_MOBS "mobs"
 #define OVERMAP_INTERIOR_METRIC_Z_LEVELS "Zs"
 #define OVERMAP_INTERIOR_METRIC_AREAS "areas"
 
@@ -54,3 +54,18 @@
 #define THERMAL_SIGNATURE_MEDIUM 150
 #define THERMAL_SIGNATURE_LARGE 200
 #define THERMAL_SIGNATURE_STAR 400
+
+#define COMSIG_JS_OVERMAP_SYSTEM_RELAY_SOUND "js_system_relay_sound"
+
+#define COMSIG_JS_OVERMAP_SEND_SOUND "js_overmap_sound"
+#define COMSIG_JS_OVERMAP_FTL "js_overmap_ftl"
+#define COMSIG_JS_OVERMAP_STOP_SEND_SOUND "js_overmap_stop_sound"
+
+/**
+	Automatically subscribe mobs to these signals, as it affects them.
+	Keep this up to date, please!
+*/
+#define COMSIG_JS_SIGNALS_TO_SUBSCRIBE_TO list(list(COMSIG_JS_OVERMAP_SEND_SOUND, (.proc/on_overmap_sound)), \
+	list(COMSIG_JS_OVERMAP_FTL, (.proc/on_overmap_ftl)),\
+	list(COMSIG_JS_OVERMAP_STOP_SEND_SOUND, (.proc/on_sound_cancelled))\
+	)
