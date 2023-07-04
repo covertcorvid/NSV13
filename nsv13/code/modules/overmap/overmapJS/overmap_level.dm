@@ -41,6 +41,8 @@
 	SSJSOvermap.overmap_levels -= src
 	return ..()
 
+/datum/overmap_level/proc/send_sound(datum/overmap/OM, sound, loop=FALSE, message=null, channel=null, ignore_self=TRUE)
+	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_SYSTEM_RELAY_SOUND, OM, sound, message, loop, channel, ignore_self)
 /**
 	Register "target" with the overmap.
 	Pass in a newly created overmap object, and it will be tracked.
@@ -50,6 +52,8 @@
 	//TODO: added this.
 	target.map = src
 	target.position.z = identifier
+	target.RegisterSignal(src, COMSIG_JS_OVERMAP_SYSTEM_RELAY_SOUND, (/datum/overmap/proc/on_sound_relayed))
+
 	SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, target)
 
 /**
@@ -72,6 +76,8 @@
 /datum/overmap_level/proc/transfer_to(datum/overmap/target, datum/overmap_level/other)
 	if(!other)
 		CRASH("Null level passed into transfer_to")
+	target.UnregisterSignal(src, COMSIG_JS_OVERMAP_SYSTEM_RELAY_SOUND)
+
 	physics_objects -= target
 	SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, target)
 	other.register(target)

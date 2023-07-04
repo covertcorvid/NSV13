@@ -52,10 +52,20 @@
 	instance_grid(src.name, preset_grids)
 
 /datum/overmap/proc/jump_to_system(datum/star_system/S)
-	current_system = S
+	update_system(S)
 	if(map)
 		map.transfer_to(src, S.system_grids[1])
 
+/datum/overmap/proc/update_system(datum/star_system/S)
+	current_system = S
+	if(!SSstar_system.ships[src])
+		SSstar_system.ships[src] = list()
+		SSstar_system.ships[src]["target_system"] = null
+		SSstar_system.ships[src]["current_system"] = S
+		SSstar_system.ships[src]["last_system"] = S
+		SSstar_system.ships[src]["from_time"] = 0
+		SSstar_system.ships[src]["to_time"] = 0
+	SSstar_system.ships[src]["current_system"] = S
 //Anomalies, effects, planets, etc..
 
 /**
