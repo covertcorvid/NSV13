@@ -799,12 +799,6 @@ export const JSOvermapGame = (props, context) => {
 
         // Anything after this point is not random vars you can play with - you have been warned.
         const point_count = 360; // If you change this, this stops working.. honestly 360 is a very nice var for less-math's sake, and it seems high-enough res.
-        let datapoints = new Array(point_count); // interference datapoints - could probably just be local var, but keeping it for the moment - TODO - revisit.
-        for (let i=0; i<point_count; i++)
-        {
-          // Interference signature...
-          datapoints[i] = 0 + (Math.floor((Math.random() * inter_resolution)) * inter_cut); // 0.0 - 3.0 as scaling for impact
-        }
         let signature_list = new Array(point_count); for (let i=0; i<point_count; i++) signature_list[i] = 0; // Collection of each total signature value by datapoint
         let strongest_signature = new Array(point_count); for (let i=0; i<point_count; i++) strongest_signature[i] = 0; // The strongest signature per datapoint
         // Now, scan for nearby ships large enough to produce a heat signature.
@@ -817,8 +811,9 @@ export const JSOvermapGame = (props, context) => {
           if (ship_sig <= 0) {
             continue;
           }
-          let angle = Math.floor((360 + get_angle(circle_core_x, circle_core_y, ship.x, ship.y))) % 360; // There will be no negative angles in this household.
-
+          let real_x = ship.x + Math.floor(ship.icon.width / 2); // why does the coord have to be the top-left...
+          let real_y = ship.y + Math.floor(ship.icon.height / 2);
+          let angle = Math.floor((360 + get_angle(circle_core_x, circle_core_y, real_x, real_y))) % 360; // There will be no negative angles in this household.
           signature_list[angle] += ship_sig; // TODO: add potential for decrease by distance to target - none, linear, inverse_square, etc.
           if (strongest_signature[angle] < ship_sig) {
             strongest_signature[angle] = ship_sig;
@@ -843,25 +838,25 @@ export const JSOvermapGame = (props, context) => {
           }
         }
         let start_signature_impact = 0;
+        let start_interference = inter_impact * (Math.floor((Math.random() * inter_resolution)) * inter_cut); // 0.0 - 3.0 as scaling for impact
         if (strongest_signature[0] > 0) {
           let start_secondary_signatures = (signature_list[0] - strongest_signature[0]) * Math.min((signature_list[0] - strongest_signature[0]) / strongest_signature[0], 1);
           start_signature_impact = strongest_signature[0] + Math.min(start_secondary_signatures, strongest_signature[0] * 0.2);
         }
-        let start_vector = radius + (inter_impact * datapoints[0]) + start_signature_impact;
+        let start_vector = radius + start_interference + start_signature_impact;
         ctx.beginPath();
         ctx.moveTo(circle_core_x, circle_core_y - start_vector);
         for (let i=1; i<point_count; i++)
         {
           let angulis = (i) % 360; // I am too tired for angular math so deal with it.
-          let total_offset = inter_impact * datapoints[i];
           let signature_impact = 0;
           if (strongest_signature[i] > 0) { // This sure is some of the math of all time.
             let secondary_signatures = (signature_list[i] - strongest_signature[i]) * Math.min((signature_list[i] - strongest_signature[i]) / strongest_signature[i], 1);
             signature_impact = strongest_signature[i] + Math.min(secondary_signatures, strongest_signature[i] * 0.2);
           }
-
-          let x_offset = (radius + total_offset + signature_impact) * Math.sin(angulis * Math.PI / 180);
-          let y_offset = -(radius + total_offset + signature_impact) * Math.cos(angulis * Math.PI / 180);
+          let interference = inter_impact * (Math.floor((Math.random() * inter_resolution)) * inter_cut); // 0.0 - 3.0 as scaling for impactinterference = inter_impact * (Math.floor((Math.random() * inter_resolution)) * inter_cut); // 0.0 - 3.0 as scaling for impact
+          let x_offset = (radius + interference + signature_impact) * Math.sin(angulis * Math.PI / 180);
+          let y_offset = -(radius + interference + signature_impact) * Math.cos(angulis * Math.PI / 180);
 
           ctx.lineTo(circle_core_x + x_offset, circle_core_y + y_offset);
         }
