@@ -16,10 +16,55 @@
 	holder.weapon_groups[name] = src
 	// TODO actual weapons, this is just for testing
 	for(var/i = 0; i < rand(1,4); i++)
-		weapon_list += "weapon [i]"
+		weapon_list += new /datum/weapon/pdc()
 
 /datum/weapon_group/proc/get_ui_data()
 	. = list()
 	.["name"] = name
 	.["weapons"] = weapon_list
 	.["id"] = "\ref[src]"
+
+/datum/weapon
+	var/name
+	// Testing - remove later
+	var/firing_arc_center
+	var/firing_arc_width
+
+/datum/weapon/proc/fire()
+
+/datum/weapon/pdc
+	name = "PDC"
+	// Testing - remove later
+	firing_arc_center = 0 // Dead center
+	firing_arc_width = 100 // In percentage - Omnidirectional
+
+/datum/weapon/pdc/fire(datum/overmap/src_overmap, angle)
+	var/proj_angle = angle
+	if(!src_overmap)
+		CRASH("Tried to fire [src] without a source overmap")
+	if(!proj_angle)
+		proj_angle = src_overmap.position.angle
+
+	// Calculate the angle between the center of the firing arc and the requested angle, and compare it to the width of the firing arc
+	// CC-BY-SA algorithm from StackOverflow https://stackoverflow.com/questions/12234574/calculating-if-an-angle-is-between-two-angles
+	// Solution by Alnitak (https://stackoverflow.com/users/6782/alnitak) and hdante (https://stackoverflow.com/users/1797000/hdante)
+	var/current_arc_center = src_overmap.position.angle + firing_arc_center
+	var/adjusted_angle = arccos(cos(current_arc_center) * cos(proj_angle) + sin(current_arc_center) * sin(proj_angle))
+	if(adjusted_angle > (firing_arc_width/100)*180)
+		to_chat(world, "adjusted angle [adjusted_angle] was out of range")
+		return
+
+	src_overmap.fire_projectile(proj_angle)
+	//TODO: Check if theyre the gunner. Roles... I don't care for now!
+
+/datum/overmap/proc/fire_projectile(proj_angle = src.position.angle, datum/overmap/projectile/projectile_type=/datum/overmap/projectile/shell, burst_size=1)
+	if (!map)
+		CRASH("Overmap object with no map cannot fire projectiles.")
+	//TODO: magic number "10".
+	//We scromble the position so it originates from the centre of the ship.
+	for(var/i = 1; i <= burst_size; i++)
+		var/new_velocity_x = position.velocity.x + initial(projectile_type.speed) * cos(proj_angle)
+		var/new_velocity_y = position.velocity.y + initial(projectile_type.speed) * sin(proj_angle)
+		var/datum/overmap/projectile/O = new projectile_type(src.map, position.x + (collision_radius/2), position.y + (collision_radius/2), position.z, proj_angle, new_velocity_x, new_velocity_y)
+		O.faction = faction
+	//to_chat(world, "Fire missile.")

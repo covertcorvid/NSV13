@@ -21,19 +21,15 @@
 	RegisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, PROC_REF(mark_dirty)) //Don't do this for turfs, because we don't care
 	RegisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_STATIC_DATA_UPDATE, PROC_REF(force_update_static_data)) //Don't do this for turfs, because we don't care
 
-/datum/component/overmap_piloting/proc/process_fire(weapon_type, proj_angle)
+/datum/component/overmap_piloting/proc/process_fire(datum/weapon_group/WG, proj_angle)
 	if(!(rights & OVERMAP_CONTROL_RIGHTS_GUNNER))
 		return
-	// Calculate the angle between the center of the firing arc and the requested angle, and compare it to the width of the firing arc
-	// CC-BY-SA algorithm from StackOverflow https://stackoverflow.com/questions/12234574/calculating-if-an-angle-is-between-two-angles
-	// Solution by Alnitak (https://stackoverflow.com/users/6782/alnitak) and hdante (https://stackoverflow.com/users/1797000/hdante)
-	var/current_arc_center = target.position.angle + firing_arc_center
-	var/adjusted_angle = arccos(cos(current_arc_center) * cos(proj_angle) + sin(current_arc_center) * sin(proj_angle))
-	if(adjusted_angle > (firing_arc_width/100)*180)
-		to_chat(world, "adjusted angle [adjusted_angle] was out of range")
-		return
-	//TODO: Check if theyre the gunner. Roles... I don't care for now!
-	target.fire_projectile(proj_angle)
+	//TODO hack to test the rest of this
+	if(!istype(WG))
+		var/key = target.weapon_groups[1]
+		WG = target.weapon_groups[key]
+	for(var/datum/weapon/W in WG.weapon_list)
+		W.fire(target, proj_angle)
 
 /datum/component/overmap_piloting/Destroy()
 	UnregisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE)

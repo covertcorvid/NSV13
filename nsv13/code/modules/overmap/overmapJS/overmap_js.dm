@@ -180,18 +180,6 @@
 			thermal_signature = THERMAL_SIGNATURE_LARGE
 
 
-/datum/overmap/proc/fire_projectile(proj_angle = src.position.angle, datum/overmap/projectile/projectile_type=/datum/overmap/projectile/shell, burst_size=1)
-	if (!map)
-		CRASH("Overmap object with no map cannot fire projectiles.")
-	//TODO: magic number "10".
-	//We scromble the position so it originates from the centre of the ship.
-	for(var/i = 1; i <= burst_size; i++)
-		var/new_velocity_x = position.velocity.x + initial(projectile_type.speed) * cos(proj_angle)
-		var/new_velocity_y = position.velocity.y + initial(projectile_type.speed) * sin(proj_angle)
-		var/datum/overmap/projectile/O = new projectile_type(src.map, position.x + (collision_radius/2), position.y + (collision_radius/2), position.z, proj_angle, new_velocity_x, new_velocity_y)
-		O.faction = faction
-	//to_chat(world, "Fire missile.")
-
 /datum/overmap/Destroy()
 	QDEL_NULL(physics2d)
 	map = null
