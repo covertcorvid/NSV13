@@ -28,8 +28,9 @@
 	if(!istype(WG))
 		var/key = target.weapon_groups[1]
 		WG = target.weapon_groups[key]
-	for(var/datum/weapon/W in WG.weapon_list)
-		W.fire(target, proj_angle)
+	for(var/W in WG.weapon_list)
+		var/datum/overmap_weapon/weap = W
+		weap.fire(target, proj_angle)
 
 /datum/component/overmap_piloting/Destroy()
 	UnregisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE)

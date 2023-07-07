@@ -16,7 +16,7 @@
 	holder.weapon_groups[name] = src
 	// TODO actual weapons, this is just for testing
 	for(var/i = 0; i < rand(1,4); i++)
-		weapon_list += new /datum/weapon/pdc()
+		weapon_list += new /datum/ai_weapon/pdc()
 
 /datum/weapon_group/proc/get_ui_data()
 	. = list()
@@ -24,21 +24,21 @@
 	.["weapons"] = weapon_list
 	.["id"] = "\ref[src]"
 
-/datum/weapon
+/datum/overmap_weapon
 	var/name
 	// Testing - remove later
 	var/firing_arc_center
 	var/firing_arc_width
 
-/datum/weapon/proc/fire()
+/datum/overmap_weapon/proc/fire()
 
-/datum/weapon/pdc
-	name = "PDC"
+/datum/ai_weapon
+	var/name
 	// Testing - remove later
-	firing_arc_center = 0 // Dead center
-	firing_arc_width = 100 // In percentage - Omnidirectional
+	var/firing_arc_center
+	var/firing_arc_width
 
-/datum/weapon/pdc/fire(datum/overmap/src_overmap, angle)
+/datum/ai_weapon/proc/fire(datum/overmap/src_overmap, angle)
 	var/proj_angle = angle
 	if(!src_overmap)
 		CRASH("Tried to fire [src] without a source overmap")
@@ -56,6 +56,11 @@
 
 	src_overmap.fire_projectile(proj_angle)
 	//TODO: Check if theyre the gunner. Roles... I don't care for now!
+/datum/ai_weapon/pdc
+	name = "PDC"
+	// Testing - remove later
+	firing_arc_center = 0 // Dead center
+	firing_arc_width = 100 // In percentage - Omnidirectional
 
 /datum/overmap/proc/fire_projectile(proj_angle = src.position.angle, datum/overmap/projectile/projectile_type=/datum/overmap/projectile/shell, burst_size=1)
 	if (!map)

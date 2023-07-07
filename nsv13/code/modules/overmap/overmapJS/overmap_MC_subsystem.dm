@@ -81,8 +81,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["can_pilot"] = OP.rights & OVERMAP_CONTROL_RIGHTS_HELM
 	.["control_scheme"] = OP.rights
 	.["fps_capability"] = OP.fps_capability
-	.["keys"] = target.keys
-	.["sensor_mode"] = target.sensor_mode
+	.["keys"] = target?.keys
+	.["sensor_mode"] = target?.sensor_mode
 	.["firing_arc_center"] = OP.firing_arc_center
 	.["firing_arc_width"] = OP.firing_arc_width
 	for(var/datum/overmap/O in (target?.map?.physics_objects || list(target)))
