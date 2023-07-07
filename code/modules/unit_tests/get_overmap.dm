@@ -6,7 +6,7 @@
 	var/turf/center = SSmapping.get_station_center()
 	ASSERT(center)
 	dummy = new(center)
-	dummy.update_overmap()
+	dummy.get_or_update_overmap()
 	TEST_ASSERT_EQUAL(dummy.get_overmap(), SSstar_system.find_main_overmap(), "The mob's overmap was not the main ship")
 
 /datum/unit_test/basic_mob_overmap/Destroy()

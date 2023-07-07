@@ -1,3 +1,12 @@
+/*
+* @file
+* @copyright 2023 Kmc2000, PowerfulBacon, Vivlas, Covertcorvid
+* @license MIT
+*/
+
+import { Component, forwardRef } from 'inferno';
+import { filter, map, sortBy } from 'common/collections';
+import { flow } from 'common/fp';
 import { useBackend, useLocalState } from '../backend';
 import { Button, Section, NumberInput, Box, Input, Flex, LabeledList } from '../components';
 import { Window } from '../layouts';

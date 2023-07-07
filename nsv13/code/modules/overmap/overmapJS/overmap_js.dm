@@ -82,6 +82,15 @@
 	var/inertial_dampeners = TRUE
 	var/sensor_mode = SENSOR_MODE_IR
 	var/thermal_signature = THERMAL_SIGNATURE_NONE
+	var/datum/component/overmap_ftl_drive/ftl_drive = null
+
+	//Nightmare legacy support.
+	//Beacons
+	var/list/beacons_in_ship = list()
+	//Armour stuff.
+	var/armour_plates = 0 //You lose max integrity when you lose armour plates.
+	var/max_armour_plates = 0
+	var/linked_apnw = null //Our linked APNW
 
 	var/list/weapon_groups = list()
 
@@ -121,6 +130,7 @@
 		ai_skynet3 = AddComponent(ai_type)
 	if(interior_type)
 		interior = AddComponent(interior_type)
+	ftl_drive = AddComponent(/datum/component/overmap_ftl_drive)
 	physics2d.setup(collision_positions, angle, faction)
 	//TODO: replace this.
 	START_PROCESSING(SSJSOvermap, src)
@@ -203,6 +213,12 @@
 	sin_r = sin(position.angle)
 	//TODO: Mark everything dirty when we rotate, as we change heading.
 	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_UPDATE, src)
+
+/datum/overmap/proc/relay(sound, loop=FALSE, message=null, channel=null, ignore_self=TRUE)
+	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_SEND_SOUND, sound, loop, message, channel)
+
+/datum/overmap/proc/stop_relay(channel)
+	SEND_SIGNAL(src, COMSIG_JS_OVERMAP_STOP_SEND_SOUND, channel)
 
 /**
 	Apply thrust to an overmap. TODO mostly.

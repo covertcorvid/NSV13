@@ -52,7 +52,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 /datum/controller/subsystem/processing/JSOvermap/proc/instance(type, datum/overmap_level/map, datum/vec5/position)
 	var/datum/overmap/OM = new type(map, position.x, position.y, map.identifier, position.angle, position.velocity.x, position.velocity.y)
 	if(map.current_system)
-		OM.current_system = map.current_system
+		OM.update_system(map.current_system)
 	OM.PostInitialize()
 	return OM
 
