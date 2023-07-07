@@ -854,7 +854,7 @@ export const JSOvermapGame = (props, context) => {
             let secondary_signatures = (signature_list[i] - strongest_signature[i]) * Math.min((signature_list[i] - strongest_signature[i]) / strongest_signature[i], 1);
             signature_impact = strongest_signature[i] + Math.min(secondary_signatures, strongest_signature[i] * 0.2);
           }
-          let interference = inter_impact * (Math.floor((Math.random() * inter_resolution)) * inter_cut); // 0.0 - 3.0 as scaling for impactinterference = inter_impact * (Math.floor((Math.random() * inter_resolution)) * inter_cut); // 0.0 - 3.0 as scaling for impact
+          let interference = inter_impact * (Math.floor((Math.random() * inter_resolution)) * inter_cut); // 0.0 - 3.0 as scaling for impact
           let x_offset = (radius + interference + signature_impact) * Math.sin(angulis * Math.PI / 180);
           let y_offset = -(radius + interference + signature_impact) * Math.cos(angulis * Math.PI / 180);
 
