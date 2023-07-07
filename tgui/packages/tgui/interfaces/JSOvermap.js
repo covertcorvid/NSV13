@@ -505,7 +505,7 @@ export const JSOvermapGame = (props, context) => {
    * @returns
    */
     function get_angle(x1, y1, x2, y2) {
-      return Math.atan2((x2 - x1), (y2 - y1)) * 180 / Math.PI;
+      return Math.atan2((y2 - y1), (x2 - x1)) * 180 / Math.PI;
     }
 
     let canvas_rect = null;
