@@ -80,8 +80,15 @@
 	var/list/keys = list()
 	var/last_combat_entered = 0
 	var/inertial_dampeners = TRUE
-	var/sensor_mode = SENSOR_MODE_IR
-	var/thermal_signature = THERMAL_SIGNATURE_NONE
+
+	//ITS-TODO: This stuff should later be on the on the sensor console, NOT the ship itself.
+	///Currently active ITS mode.
+	var/datum/its_sensor_datum/sensor_mode = null
+	///List of sensor modes that (eventually) the ITS console has access to. Typepaths in here, which during init get associated with objects from the global.
+	var/list/sensor_modes = list(/datum/its_sensor_datum/off, /datum/its_sensor_datum/ir, /datum/its_sensor_datum/grav, /datum/its_sensor_datum/comms, /datum/its_sensor_datum/theta)
+
+	///List of signatures of this object. e.g. SIG_IR = 100, SIG_GRAV = 50, etc.
+	var/list/signatures = list()
 	var/datum/component/overmap_ftl_drive/ftl_drive = null
 
 	//Nightmare legacy support.
@@ -132,6 +139,46 @@
 	//TODO: replace this.
 	START_PROCESSING(SSJSOvermap, src)
 	setup_armour()
+	//ITS-TODO: This will be on the sensor console once the scan modes are moved.
+	setup_sensor_modes()
+
+/datum/overmap/proc/setup_sensor_modes()
+	if(!length(GLOB.its_sensor_datums)) //setup the global if not done yet
+		for(var/typepath in subtypesof(/datum/its_sensor_datum))
+			var/datum/its_sensor_datum/sensor_datum = new typepath()
+			GLOB.its_sensor_datums["[typepath]"] = sensor_datum
+
+	var/list/actual_sensor_modes = list()
+	for(var/typepath in sensor_modes)
+		actual_sensor_modes["[typepath]"] = GLOB.its_sensor_datums["[typepath]"]
+	sensor_modes = actual_sensor_modes //replace list and discard the no-longer used one.
+	sensor_mode = GLOB.its_sensor_datums["[/datum/its_sensor_datum/off]"]
+
+/datum/overmap/proc/add_sensor_mode(key)
+	if(!GLOB.its_sensor_datums["[key]"])
+		return
+	sensor_modes["[key]"] = GLOB.its_sensor_datums["[key]"]
+
+/datum/overmap/proc/remove_sensor_mode(key)
+	sensor_modes.Remove(key)
+
+/datum/overmap/proc/cycle_sensor_mode()
+	var/current_sensor
+	if(sensor_mode)
+		current_sensor = sensor_modes.Find("[sensor_mode.type]")
+	else
+		current_sensor = 0
+	sensor_mode = sensor_modes["[sensor_modes[((current_sensor%length(sensor_modes))+1)]]"] //mildly cursed but it works.
+
+/datum/overmap/proc/add_signature(key, strength)
+	if(!signatures["[key]"])
+		signatures["[key]"] = 0
+	signatures["[key]"] = max(0, signatures["[key]"] + strength) //Negative signatures are an interesting concept though.. or, at least negative values that get interpreted as 0..
+
+/datum/overmap/proc/remove_signature(key, strength)
+	if(!signatures["[key]"])
+		return
+	signatures["[key]"] = max(0, signatures["[key]"] - strength)
 
 //Stick any operations that require the starsystem to have instanced us here...
 //Used by the grids system.
@@ -152,7 +199,7 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 5, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
 			)
-			thermal_signature = THERMAL_SIGNATURE_SMALL
+			add_signature(SIG_IR, THERMAL_SIGNATURE_SMALL)
 
 		if(MASS_MEDIUM)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 90, \
@@ -160,7 +207,7 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 10, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
-			thermal_signature = THERMAL_SIGNATURE_MEDIUM
+			add_signature(SIG_IR, THERMAL_SIGNATURE_MEDIUM)
 
 		if(MASS_MEDIUM_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 95, \
@@ -168,21 +215,21 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 15, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
-			thermal_signature = THERMAL_SIGNATURE_LARGE
+			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE)
 		if(MASS_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 98, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 25, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 15, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 35, \
 			)
-			thermal_signature = THERMAL_SIGNATURE_LARGE
+			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE)
 		if(MASS_TITAN)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 100, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 40, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 30, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 40, \
 			)
-			thermal_signature = THERMAL_SIGNATURE_LARGE
+			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE)
 
 
 /datum/overmap/proc/fire_projectile(angle = src.position.angle, projectile_type=/datum/overmap/projectile/shell, burst_size=1)
@@ -201,6 +248,8 @@
 	map = null
 	if (map)
 		map.unregister(src)
+	sensor_mode = null
+	sensor_modes = null
 	. = ..()
 
 /**

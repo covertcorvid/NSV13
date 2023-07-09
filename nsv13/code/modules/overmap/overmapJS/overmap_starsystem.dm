@@ -119,11 +119,11 @@
 	integrity = OVERMAP_ARMOUR_THICKNESS_STELLARBODY
 	max_integrity = OVERMAP_ARMOUR_THICKNESS_STELLARBODY
 	mass = MASS_IMMOBILE
-	thermal_signature = THERMAL_SIGNATURE_LARGE
+	signatures = list(SIG_IR = THERMAL_SIGNATURE_LARGE)
 
 /datum/overmap/grid_enabled/stellar_body/star
 	name = "Sun"
-	thermal_signature = THERMAL_SIGNATURE_STAR
+	signatures = list(SIG_IR = THERMAL_SIGNATURE_STAR)
 
 /datum/overmap/grid_enabled/stellar_body/planet
 	icon = 'nsv13/icons/overmap/stellarbodies/planets.dmi'

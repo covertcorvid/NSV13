@@ -46,8 +46,11 @@
 #define OVERMAP_ARMOUR_THICKNESS_GIGA 2500
 #define OVERMAP_ARMOUR_THICKNESS_STELLARBODY 9999999
 
-#define SENSOR_MODE_IR 0
-#define SENSOR_MODE_GRAVIMETRIC 1
+//Signature defines
+#define SIG_IR "SIG_IR"
+#define SIG_GRAV "SIG_GRAV"
+#define SIG_COMMS "SIG_COMMS" //Well, more like general signals.
+#define SIG_THETA "SIG_THETA"
 
 /*
 Very basic (and likely temporary) signature defines to serve as a guideline.

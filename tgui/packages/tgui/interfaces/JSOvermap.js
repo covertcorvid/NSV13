@@ -262,7 +262,7 @@ let interpolation_mult = target_fps/backend_fps;
 let tick_rate = backend_tick_rate / interpolation_mult;
 
 class overmapEntity {
-  constructor(x, y, z, angle, velocity, velocity_x, velocity_y, icon, thruster_power, rotation_power, sensor_range, armour_quadrants, inertial_dampeners, thermal_signature) {
+  constructor(x, y, z, angle, velocity, velocity_x, velocity_y, icon, thruster_power, rotation_power, sensor_range, armour_quadrants, inertial_dampeners, signatures) {
     this.x = x;
     this.y = y;
     this.z = z;
@@ -278,7 +278,7 @@ class overmapEntity {
     this.r = (this.angle) * (Math.PI / 180);
     this.armour_quadrants = armour_quadrants;
     this.inertial_dampeners = inertial_dampeners;
-    this.thermal_signature = thermal_signature;
+    this.signatures = signatures;
   }
   // The following procs are mirrored from the backend.
   // They attempt to model where the ship "ought" to be, based on input.
@@ -380,7 +380,7 @@ export const JSOvermapGame = (props, context) => {
       const sprite = new Image();
       // sprite.src = `data:image/jpeg;base64,${icon_cache[ship.type]}`;
       sprite.src = icon_cache[ship.type];
-      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants, ship.inertial_dampeners, ship.thermal_signature);
+      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants, ship.inertial_dampeners, ship.signatures);
       if (ship.active) {
         active_ship = world[I];
       }
@@ -536,8 +536,6 @@ export const JSOvermapGame = (props, context) => {
     const max_acceptable_frame_drift = max_ideal_fps;
     // How many consecutive frames we have been held back for. (higher -> longer time to jump back to 60fps.)
     const min_acceptable_frame_recovery_drift = 5;// max_acceptable_frame_drift / 2;
-
-    const sensor_mode = data.sensor_mode;
 
     let last_input_process = 0;
     // Called every tick that the browser can handle.
@@ -771,12 +769,6 @@ export const JSOvermapGame = (props, context) => {
        * @param {*} radius
        */
       function drawSensorCircle(image, x, y) {
-        switch (sensor_mode) {
-          // IR sensors...
-          case (0):
-            ctx.strokeStyle = "orange";
-            break;
-        }
         let w = image.width;
         let h = image.height;
         let radius = w*2;
@@ -796,18 +788,41 @@ export const JSOvermapGame = (props, context) => {
         let signature_cutoff = 10; // Anything that ends up below this after a angle propagation is omitted. If base signal, still used.
         let max_angular_spread = 15; // 10? // Signatures can only spread at most this angle into each direction
         let signature_propagation_multiplier = 0.8; // 0.5? // Signatures have their value multiplied by this when propagating angles. Diminishing returns.
+        let spec_key = "normal";
+        let signature_key = "SIG_IR";
+        ctx.strokeStyle = "orange";
 
+        if (data.sensor_mode_data !== null) { // Load info from selected sensor mode if existing.
+          let mode_data = data.sensor_mode_data;
+          inter_impact = mode_data.interference_impact;
+          inter_resolution = mode_data.interference_resolution;
+          inter_cut = mode_data.interference_cut;
+          signature_cutoff = mode_data.signature_cutoff;
+          max_angular_spread = mode_data.max_angular_spread;
+          signature_propagation_multiplier = mode_data.signature_propagation_multiplier;
+          // name not used yet
+          spec_key = mode_data.spec_key;
+          signature_key = mode_data.signature_key;
+          ctx.strokeStyle = mode_data.sig_color;
+        }
+        if (spec_key === "error" || spec_key === "none") {
+          return;
+        }
         // Anything after this point is not random vars you can play with - you have been warned.
         const point_count = 360; // If you change this, this stops working.. honestly 360 is a very nice var for less-math's sake, and it seems high-enough res.
         let signature_list = new Array(point_count); for (let i=0; i<point_count; i++) signature_list[i] = 0; // Collection of each total signature value by datapoint
         let strongest_signature = new Array(point_count); for (let i=0; i<point_count; i++) strongest_signature[i] = 0; // The strongest signature per datapoint
-        // Now, scan for nearby ships large enough to produce a heat signature.
+        // Now, scan for nearby ships large enough to produce a signature.
+
         for (let j = 0; j < world.length; j++) {
           let ship = world[j];
           if (ship == active_ship) {
             continue;
           }
-          let ship_sig = ship.thermal_signature;
+          let ship_sig = 0;
+          if (ship.signatures[signature_key]) {
+            ship_sig = ship.signatures[signature_key];
+          }
           if (ship_sig <= 0) {
             continue;
           }
