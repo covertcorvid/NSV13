@@ -86,6 +86,9 @@ GLOBAL_LIST_EMPTY(its_sensor_datums)
 	spec_key = "normal"
 	signature_key = SIG_GRAV
 	sig_color = "#1c55d1"
+	signature_propagation_multiplier = 0.9
+	max_angular_spread = 45
+	signature_cutoff = MASS_SIGNATURE_SMALL
 
 //Comms / signals. Yelling things.
 /datum/its_sensor_datum/comms
