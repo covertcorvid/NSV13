@@ -119,11 +119,11 @@
 	integrity = OVERMAP_ARMOUR_THICKNESS_STELLARBODY
 	max_integrity = OVERMAP_ARMOUR_THICKNESS_STELLARBODY
 	mass = MASS_IMMOBILE
-	signatures = list(SIG_IR = THERMAL_SIGNATURE_LARGE)
+	signatures = list(SIG_IR = THERMAL_SIGNATURE_LARGE, SIG_GRAV = MASS_SIGNATURE_PLANET)
 
 /datum/overmap/grid_enabled/stellar_body/star
 	name = "Sun"
-	signatures = list(SIG_IR = THERMAL_SIGNATURE_STAR)
+	signatures = list(SIG_IR = THERMAL_SIGNATURE_STAR, SIG_GRAV = MASS_SIGNATURE_STAR)
 
 /datum/overmap/grid_enabled/stellar_body/planet
 	icon = 'nsv13/icons/overmap/stellarbodies/planets.dmi'
@@ -133,10 +133,12 @@
 /datum/overmap/grid_enabled/stellar_body/planet/earth
 	icon_state = "planet_earth"
 	name = "The Earth"
+	signatures = list(SIG_IR = THERMAL_SIGNATURE_LARGE, SIG_GRAV = MASS_SIGNATURE_PLANET, SIG_COMMS = COMMS_SIGNATURE_CASUAL)
 
 /datum/overmap/grid_enabled/stellar_body/planet/moon
 	icon_state = "planet_rocky"
 	name = "Moon"
+	signatures = list(SIG_IR = THERMAL_SIGNATURE_MINISCULE, SIG_GRAV = MASS_SIGNATURE_PLANETOID, SIG_COMMS = COMMS_SIGNATURE_CASUAL)
 
 /datum/overmap/grid_enabled/stellar_body/planet/moon/exploded
 	icon_state = "planet_exploded"
@@ -146,9 +148,10 @@
 	preset_grids = list(
 		list(/datum/overmap/grid_enabled/stellar_body/planet/moon/exploded/subgrid, STELLARBODY_POSITION_CENTER)
 	)
+	signatures = list(SIG_GRAV = MASS_SIGNATURE_HUGE, SIG_COMMS = COMMS_SIGNATURE_SPOTTY)
 
 /**
-	A decorative version of the moon that does NOT have, for example, a planetary interior. Sits in the middle of the moon's own subgrid.
+	A decorative version of the moon that does NOT have, for example, a planetary interior. Sits in the middle of the moon's own subgrid. ~This one would need snowflaking to not stack signatures with the system map moon once we make them relay between subgrids.. probably generally useful var. - Delta
 */
 /datum/overmap/grid_enabled/stellar_body/planet/moon/exploded/subgrid
 	preset_grids = null

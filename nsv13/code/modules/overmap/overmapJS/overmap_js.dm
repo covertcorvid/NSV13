@@ -193,6 +193,8 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 0, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
 			)
+			add_signature(SIG_IR, THERMAL_SIGNATURE_MINISCULE)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_MINISCULE)
 		if(MASS_SMALL)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 20, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 10, \
@@ -200,6 +202,7 @@
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
 			)
 			add_signature(SIG_IR, THERMAL_SIGNATURE_SMALL)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_SMALL)
 
 		if(MASS_MEDIUM)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 90, \
@@ -208,6 +211,7 @@
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
 			add_signature(SIG_IR, THERMAL_SIGNATURE_MEDIUM)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_MEDIUM)
 
 		if(MASS_MEDIUM_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 95, \
@@ -216,6 +220,7 @@
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
 			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_LARGE)
 		if(MASS_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 98, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 25, \
@@ -223,6 +228,7 @@
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 35, \
 			)
 			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_LARGE)
 		if(MASS_TITAN)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 100, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 40, \
@@ -230,6 +236,7 @@
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 40, \
 			)
 			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_HUGE)
 
 
 /datum/overmap/proc/fire_projectile(angle = src.position.angle, projectile_type=/datum/overmap/projectile/shell, burst_size=1)
