@@ -89,6 +89,10 @@
 
 	///List of signatures of this object. e.g. SIG_IR = 100, SIG_GRAV = 50, etc.
 	var/list/signatures = list()
+	///Temporary signatures, these do not need to be manually decreased but instead decay over time
+	var/list/temp_signatures = list()
+	///Signature decay of this vessel. Decreases all temp signatures by this value each SECOND.
+	var/signature_decay = 10;
 	var/datum/component/overmap_ftl_drive/ftl_drive = null
 
 	//Nightmare legacy support.
@@ -170,15 +174,44 @@
 		current_sensor = 0
 	sensor_mode = sensor_modes["[sensor_modes[((current_sensor%length(sensor_modes))+1)]]"] //mildly cursed but it works.
 
-/datum/overmap/proc/add_signature(key, strength)
+/datum/overmap/proc/add_signature(key, strength, update = TRUE)
 	if(!signatures["[key]"])
 		signatures["[key]"] = 0
 	signatures["[key]"] = max(0, signatures["[key]"] + strength) //Negative signatures are an interesting concept though.. or, at least negative values that get interpreted as 0..
+	if(update)
+		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, src)
 
-/datum/overmap/proc/remove_signature(key, strength)
+/datum/overmap/proc/remove_signature(key, strength, update = TRUE)
 	if(!signatures["[key]"])
 		return
 	signatures["[key]"] = max(0, signatures["[key]"] - strength)
+	if(update)
+		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, src)
+
+
+///Decays temporary signatures. Why.
+/datum/overmap/proc/decay_signatures(delta_t)
+	for(var/key as anything in temp_signatures)
+		var/val = temp_signatures["[key]"]
+		if(val > 0)
+			val = max(0, val - (signature_decay * delta_t))
+		else if(val < 0)
+			val = min(0, val + (signature_decay * delta_t))
+		if(val == 0)
+			temp_signatures.Remove(key)
+			return
+		temp_signatures["[key]"] = val
+
+///Adds a temporary signature which will decay over time.
+/datum/overmap/proc/add_temp_signature(key, strength, gupdate = TRUE)
+	if(!temp_signatures["[key]"])
+		temp_signatures["[key]"] = 0
+	temp_signatures["[key]"] += strength
+	if(gupdate)
+		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, src)
+
+
+
 
 //Stick any operations that require the starsystem to have instanced us here...
 //Used by the grids system.
@@ -193,7 +226,7 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 0, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
 			)
-			add_signature(SIG_IR, THERMAL_SIGNATURE_MINISCULE)
+			add_signature(SIG_IR, THERMAL_SIGNATURE_MINISCULE, update = FALSE)
 			add_signature(SIG_GRAV, MASS_SIGNATURE_MINISCULE)
 		if(MASS_SMALL)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 20, \
@@ -201,7 +234,7 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 5, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
 			)
-			add_signature(SIG_IR, THERMAL_SIGNATURE_SMALL)
+			add_signature(SIG_IR, THERMAL_SIGNATURE_SMALL, update = FALSE)
 			add_signature(SIG_GRAV, MASS_SIGNATURE_SMALL)
 
 		if(MASS_MEDIUM)
@@ -210,7 +243,7 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 10, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
-			add_signature(SIG_IR, THERMAL_SIGNATURE_MEDIUM)
+			add_signature(SIG_IR, THERMAL_SIGNATURE_MEDIUM, update = FALSE)
 			add_signature(SIG_GRAV, MASS_SIGNATURE_MEDIUM)
 
 		if(MASS_MEDIUM_LARGE)
@@ -219,7 +252,7 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 15, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
-			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE)
+			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE, update = FALSE)
 			add_signature(SIG_GRAV, MASS_SIGNATURE_LARGE)
 		if(MASS_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 98, \
@@ -227,7 +260,7 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 15, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 35, \
 			)
-			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE)
+			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE, update = FALSE)
 			add_signature(SIG_GRAV, MASS_SIGNATURE_LARGE)
 		if(MASS_TITAN)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 100, \
@@ -235,7 +268,7 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 30, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 40, \
 			)
-			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE)
+			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE, update = FALSE)
 			add_signature(SIG_GRAV, MASS_SIGNATURE_HUGE)
 
 
@@ -318,12 +351,13 @@
 	return
 
 //TODO: game coords to canvas coords! major desync issues, here.
-/datum/overmap/process()
+/datum/overmap/process(delta_time)
 	handle_input()
 	position.x += position.velocity.x //y is down but x points right as usual, so these have to be, er, this way.
 	position.y += position.velocity.y
 	physics2d.update()
 	on_move()
+	decay_signatures(delta_time) //Hate.
 	/*
 	//TODO: broken!
 	if(inertial_dampeners) //An optional toggle to make capital ships more "fly by wire" and help you steer in only the direction you want to go.

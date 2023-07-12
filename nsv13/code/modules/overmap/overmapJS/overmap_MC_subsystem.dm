@@ -5,6 +5,7 @@
 PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	name = "JS Overmap"
 	wait = 0.2 SECONDS
+	priority = FIRE_PRIORITY_JSOVERMAP
 	stat_tag = "JS"
 	init_order = INIT_ORDER_JS_OVERMAP
 	flags = SS_BACKGROUND|SS_POST_FIRE_TIMING
@@ -115,6 +116,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			armour_quadrants = quads,
 			inertial_dampeners = O.inertial_dampeners,
 			signatures = O.signatures,
+			temp_signatures = O.temp_signatures,
+			signature_decay = O.signature_decay,
 			position = list(O.position.x, O.position.y, O.position.z, O.position.angle, O.position.velocity.ln(), O.position.velocity.x, O.position.velocity.y)
 		)
 		.["physics_world"] += list(data)

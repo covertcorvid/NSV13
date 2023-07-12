@@ -262,7 +262,7 @@ let interpolation_mult = target_fps/backend_fps;
 let tick_rate = backend_tick_rate / interpolation_mult;
 
 class overmapEntity {
-  constructor(x, y, z, angle, velocity, velocity_x, velocity_y, icon, thruster_power, rotation_power, sensor_range, armour_quadrants, inertial_dampeners, signatures) {
+  constructor(x, y, z, angle, velocity, velocity_x, velocity_y, icon, thruster_power, rotation_power, sensor_range, armour_quadrants, inertial_dampeners, signatures, temp_signatures, signature_decay) {
     this.x = x;
     this.y = y;
     this.z = z;
@@ -279,6 +279,8 @@ class overmapEntity {
     this.armour_quadrants = armour_quadrants;
     this.inertial_dampeners = inertial_dampeners;
     this.signatures = signatures;
+    this.temp_signatures = temp_signatures;
+    this.signature_decay = signature_decay;
   }
   // The following procs are mirrored from the backend.
   // They attempt to model where the ship "ought" to be, based on input.
@@ -356,6 +358,7 @@ export const JSOvermapGame = (props, context) => {
   let world = [];
   let keys = data.keys;
   let active_ship = null;
+  let update_tick = performance.now(); // Should reset to 0 on payload?
   const can_pilot = data.can_pilot;
 
   const rows = 26;
@@ -380,7 +383,7 @@ export const JSOvermapGame = (props, context) => {
       const sprite = new Image();
       // sprite.src = `data:image/jpeg;base64,${icon_cache[ship.type]}`;
       sprite.src = icon_cache[ship.type];
-      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants, ship.inertial_dampeners, ship.signatures);
+      world[I] = new overmapEntity(ship.position[0], ship.position[1], ship.position[2], ship.position[3], ship.position[4], ship.position[5], ship.position[6], sprite, ship.thruster_power, ship.rotation_power, ship.sensor_range, ship.armour_quadrants, ship.inertial_dampeners, ship.signatures, ship.temp_signatures, ship.signature_decay);
       if (ship.active) {
         active_ship = world[I];
       }
@@ -805,6 +808,8 @@ export const JSOvermapGame = (props, context) => {
           signature_key = mode_data.signature_key;
           ctx.strokeStyle = mode_data.sig_color;
         }
+        let tick_drift = ((performance.now() - update_tick) / 1000);
+        // log("U-T: " + update_tick + " Delta T: " + tick_drift);
         if (spec_key === "error" || spec_key === "none") {
           return;
         }
@@ -821,9 +826,18 @@ export const JSOvermapGame = (props, context) => {
           }
           let ship_sig = 0;
           if (ship.signatures[signature_key]) {
-            ship_sig = ship.signatures[signature_key];
+            ship_sig += ship.signatures[signature_key];
           }
-          if (ship_sig <= 0) {
+          if (ship.temp_signatures[signature_key] && ship.temp_signatures[signature_key] !== 0) {
+            if (ship.temp_signatures[signature_key] > 0) {
+              ship_sig += Math.floor(Math.max(0, ship.temp_signatures[signature_key] - (ship.signature_decay * tick_drift))); // All hail our lord and savior delta-t. I still hate this.
+            }
+            else {
+              ship_sig += Math.ceil(Math.min(0, ship.temp_signatures[signature_key] - (ship.signature_decay * tick_drift)));
+            }
+          }
+          ship_sig = Math.max(0, ship_sig); // No fun allowed.. yet.
+          if (ship_sig === 0) {
             continue;
           }
           let real_x = ship.x + Math.floor(ship.icon.width / 2); // why does the coord have to be the top-left...
