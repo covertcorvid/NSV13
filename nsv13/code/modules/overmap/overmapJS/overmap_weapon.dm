@@ -15,8 +15,8 @@
 	src.name = name
 	holder.weapon_groups[name] = src
 	// TODO actual weapons, this is just for testing
-	for(var/i = 0; i < rand(1,4); i++)
-		weapon_list += new /datum/ai_weapon/pdc()
+	for(var/type in subtypesof(/datum/ai_weapon))
+		weapon_list += new type()
 
 /datum/weapon_group/proc/get_ui_data()
 	. = list()
@@ -35,6 +35,7 @@
 /datum/ai_weapon
 	var/name
 	// Testing - remove later
+	var/shell_type
 	var/firing_arc_center
 	var/firing_arc_width
 
@@ -54,13 +55,22 @@
 		to_chat(world, "adjusted angle [adjusted_angle] was out of range")
 		return
 
-	src_overmap.fire_projectile(proj_angle)
+	src_overmap.fire_projectile(proj_angle, shell_type)
 	//TODO: Check if theyre the gunner. Roles... I don't care for now!
+
+
 /datum/ai_weapon/pdc
-	name = "PDC"
+	name = "Axial Cannon"
 	// Testing - remove later
+	shell_type = /datum/overmap/projectile/shell
 	firing_arc_center = 0 // Dead center
-	firing_arc_width = 100 // In percentage - Omnidirectional
+	firing_arc_width = 50 // In percentage - Front side only
+
+/datum/ai_weapon/torpedo
+	name = "Torpedo"
+	shell_type = /datum/overmap/projectile/slug
+	firing_arc_center = 180 // Back
+	firing_arc_width = 50
 
 /datum/overmap/proc/fire_projectile(proj_angle = src.position.angle, datum/overmap/projectile/projectile_type=/datum/overmap/projectile/shell, burst_size=1)
 	if (!map)

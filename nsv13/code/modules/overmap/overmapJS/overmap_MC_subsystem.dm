@@ -83,8 +83,6 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["fps_capability"] = OP.fps_capability
 	.["keys"] = target?.keys
 	.["sensor_mode"] = target?.sensor_mode
-	.["firing_arc_center"] = OP.firing_arc_center
-	.["firing_arc_width"] = OP.firing_arc_width
 	for(var/datum/overmap/O in (target?.map?.physics_objects || list(target)))
 		var/list/quads = list()
 		if(O.armour_quadrants)
@@ -167,7 +165,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		active_ship = length(selected_level.physics_objects) ? selected_level.physics_objects[1] : null
 	ui = SStgui.try_update_ui(user, src, ui)
 	if(!ui)
-		log_admin_private("[user.ckey] opened the JS overmap panel.")
+		log_admin_private("[user?.ckey] opened the JS overmap panel.")
 		ui = new(user, src, "JSOvermapPanel", "JS Overmap Panel")
 		user.AddComponent(/datum/component/overmap_piloting/observer, active_ship, ui)
 		ui.open()
@@ -177,6 +175,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	if (.)
 		return
 	var/datum/component/overmap_piloting/C = usr.GetComponent(/datum/component/overmap_piloting)
+	message_admins(action)
 	switch(action)
 		if("scroll")
 			C.zoom(params["key"])
@@ -232,34 +231,25 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			ui_interact(usr)
 		if("log")
 			to_chat(usr, "<span class='notice'>Overmap debug: [params["text"]]</span>")
-		// Initial firing arc test
-		if("firing_arc_center")
-			C.set_firing_arc_center(params["firing_arc_center"])
-			ui_interact(usr)
-			return
-		if("firing_arc_width")
-			C.set_firing_arc_width(params["firing_arc_width"])
-			ui_interact(usr)
-			return
 		// Weapon group actions
-		if("add_group")
+		if("add_weapon_group")
 			var/new_name = tgui_input_text(usr, "Enter a unique name", "New Group")
 			if(new_name && !(new_name in C.target.weapon_groups))
 				new /datum/weapon_group(C.target, new_name)
 				ui_interact()
-		if("rename_group")
+		if("rename_weapon_group")
 			var/datum/weapon_group/WG = locate(params["id"])
 			var/new_name = tgui_input_text(usr, "Enter the new name", "Rename")
 			if(!new_name)
 				return
 			if(new_name in WG.holder.weapon_groups)
-				to_chat(usr, "<span class='warning'>The new group name nust be unique!</span>")
+				to_chat(usr, "<span class='warning'>The new group name must be unique!</span>")
 				return
 			WG.holder.weapon_groups -= WG.name
 			WG.name = new_name
 			WG.holder.weapon_groups[WG.name] = WG
 			ui_interact()
-		if("delete_group")
+		if("delete_weapon_group")
 			var/datum/weapon_group/WG = locate(params["id"])
 			WG.holder.weapon_groups -= WG.name
 			qdel(WG)

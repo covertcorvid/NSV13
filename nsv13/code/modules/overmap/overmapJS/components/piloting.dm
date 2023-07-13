@@ -10,9 +10,6 @@
 	dupe_mode = COMPONENT_DUPE_HIGHLANDER
 	var/rights = OVERMAP_CONTROL_RIGHTS_FULL
 	var/fps_capability = -1
-	// Testing - remove later
-	var/firing_arc_center = 0 // Dead center
-	var/firing_arc_width = 100 // In percentage - Omnidirectional
 
 
 /datum/component/overmap_piloting/Initialize(target, ui)
@@ -83,14 +80,6 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 	//Gunner controls (TODO)
 	if(rights & OVERMAP_CONTROL_RIGHTS_GUNNER)
 		return
-
-/datum/component/overmap_piloting/proc/set_firing_arc_center(center)
-	to_chat(world, "Setting firing_arc_center to [center]")
-	firing_arc_center = SIMPLIFY_DEGREES(center)
-
-/datum/component/overmap_piloting/proc/set_firing_arc_width(width)
-	to_chat(world, "Setting firing_arc_width to [width]")
-	firing_arc_width = width
 
 /datum/component/overmap_piloting/observer
 	rights = OVERMAP_CONTROL_RIGHTS_NONE

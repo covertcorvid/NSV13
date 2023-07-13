@@ -9,7 +9,7 @@ export const WeaponManagementPanel = (props, context) => {
     <Section title="Armaments:" buttons={
       <>
         <Button fluid
-          onClick={() => {act("add_group")}}>
+          onClick={() => {act("add_weapon_group")}}>
           Add Group
         </Button>
         <Button fluid
@@ -25,18 +25,28 @@ export const WeaponManagementPanel = (props, context) => {
             key={key}
             title={group_data.name}>
               <Button
-                onClick={() => act("rename_group", {id: group_data.id})}>
-                Rename
-              </Button>
+                icon="pencil"
+                tooltip="Rename"
+                onClick={() => act("rename_weapon_group", {id: group_data.id})}/>
               <Button
-                onClick={() => act("delete_group", {id: group_data.id})}>
-                Delete
-              </Button>
+                icon="minus"
+                tooltip="Delete"
+                onClick={() => act("delete_weapon_group", {id: group_data.id})}/>
+              <Button
+                icon="eye"
+                tooltip="View Variables"
+                onClick={() => act("view_vars", {target: group_data.id})}/>
               <br />
               {!!group_data.weapons && Object.keys(group_data.weapons).map(key2 => {
+                let weapon_data = group_data.weapons[key2];
                 return(
                   <>
-                    {key2}<br />
+                    {weapon_data.name}
+                    <Button
+                      icon="eye"
+                      tooltip="View Variables"
+                      onClick={() => act("view_vars", {target: weapon_data.id})}/>
+                    <br />
                   </>
                 )
               })}

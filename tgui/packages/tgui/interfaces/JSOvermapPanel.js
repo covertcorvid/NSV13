@@ -8,7 +8,7 @@ import { Component, forwardRef } from 'inferno';
 import { filter, map, sortBy } from 'common/collections';
 import { flow } from 'common/fp';
 import { useBackend, useLocalState } from '../backend';
-import { Button, Section, NumberInput, Box, Input, Flex, LabeledList } from '../components';
+import { Button, Section, NumberInput, Box, Input, Flex, LabeledList, Collapsible } from '../components';
 import { Window } from '../layouts';
 import { JSOvermapGame } from './JSOvermap';
 import { WeaponManagementPanel } from './JSWeaponManagement';
@@ -76,32 +76,6 @@ export const JSOvermapPanel = (props, context) => {
                     />
                   </Box>
                 </LabeledList.Item>
-                <LabeledList.Item label="Firing arc center">
-                  <NumberInput
-                    animated
-                    value={parseFloat(data.firing_arc_center)}
-                    unit="deg R"
-                    width="125px"
-                    minValue={0}
-                    maxValue={360}
-                    step={1}
-                    onChange={(e, value) => act('firing_arc_center', {
-                      firing_arc_center: value,
-                    })} />
-                </LabeledList.Item>
-                <LabeledList.Item label="Firing arc width">
-                  <NumberInput
-                    animated
-                    value={parseFloat(data.firing_arc_width)}
-                    unit="%"
-                    width="125px"
-                    minValue={0}
-                    maxValue={100}
-                    step={1}
-                    onChange={(e, value) => act('firing_arc_width', {
-                      firing_arc_width: value,
-                    })} />
-                </LabeledList.Item>
               </LabeledList>
               <LabeledList>
                 <LabeledList.Item label="Spawning">
@@ -154,26 +128,28 @@ export const JSOvermapPanel = (props, context) => {
               </LabeledList>
             </Section>
             <Section title="Viewable Maps:">
-              <LabeledList height={256} scrollable>
-                {static_levels.map(level => {
-                  return (
-                    <LabeledList.Item label={level.name} key={level.id}>
-                      <Box mb={1}>
-                        <Button
-                          color={level.id === map_id ? "green" : "blue"}
-                          onClick={() => act('set_map_level', { id: level.id })}
-                          content="Switch"
-                        />
-                        <Button
-                          icon="search"
-                          content="View Vars"
-                          color="blue"
-                          onClick={() => act('view_vars', { target: level.datum })} />
-                      </Box>
-                    </LabeledList.Item>
-                  );
-                })}
-              </LabeledList>
+              <Collapsible>
+                <LabeledList height={256} scrollable>
+                  {static_levels.map(level => {
+                    return (
+                      <LabeledList.Item label={level.name} key={level.id}>
+                        <Box mb={1}>
+                          <Button
+                            color={level.id === map_id ? "green" : "blue"}
+                            onClick={() => act('set_map_level', { id: level.id })}
+                            content="Switch"
+                          />
+                          <Button
+                            icon="search"
+                            content="View Vars"
+                            color="blue"
+                            onClick={() => act('view_vars', { target: level.datum })} />
+                        </Box>
+                      </LabeledList.Item>
+                    );
+                  })}
+                </LabeledList>
+              </Collapsible>
             </Section>
             <Section title="Weapon Management">
               <WeaponManagementPanel props={props} context={context}/>
