@@ -69,7 +69,7 @@
 			C.set_zoom(params["key"])
 			return
 		if("fire")
-			C.process_fire(params["weapon"], params["angle"])
+			C.process_fire(params["weapon"], params["angle"] - 90)
 			ui_interact(usr)
 			return
 		if("keyup")

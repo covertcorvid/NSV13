@@ -11,6 +11,7 @@ import { useBackend, useLocalState } from '../backend';
 import { Button, Section, Modal, Dropdown, Tabs, Box, Input, Flex, ProgressBar, Collapsible, Icon, Divider, Tooltip } from '../components';
 import { Window, NtosWindow } from '../layouts';
 import { clamp } from '../../common/math';
+import { WeaponManagementPanel } from './JSWeaponManagement';
 
 /**
  * Camera by @robashton returns Camera object.
@@ -955,7 +956,15 @@ export const JSOvermap = (props, context) => {
       width={1280}
       height={720}>
       <Window.Content>
-        <JSOvermapGame props={props} context={context} />
+        <Flex>
+          <Flex.Item>
+            <JSOvermapGame props={props} context={context} />
+          </Flex.Item>
+          <Flex.Item>
+            <WeaponManagementPanel props={props} context={context} />
+          </Flex.Item>
+        </Flex>
       </Window.Content>
     </Window>
-  ); };
+  );
+};

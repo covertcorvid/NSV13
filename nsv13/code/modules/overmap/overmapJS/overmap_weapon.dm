@@ -21,8 +21,10 @@
 /datum/weapon_group/proc/get_ui_data()
 	. = list()
 	.["name"] = name
-	.["weapons"] = weapon_list
 	.["id"] = "\ref[src]"
+	.["weapons"] = list()
+	for(var/datum/overmap_weapon/W as() in weapon_list)
+		.["weapons"] += list(list(name = W.name, id = "\ref[W]"))
 
 /datum/overmap_weapon
 	var/name
