@@ -182,7 +182,7 @@
 		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, src)
 
 /datum/overmap/proc/remove_signature(key, strength, update = TRUE)
-	if(!signatures["[key]"])
+	if(isnull(signatures["[key]"]))
 		return
 	signatures["[key]"] = max(0, signatures["[key]"] - strength)
 	if(update)
@@ -202,13 +202,102 @@
 			return
 		temp_signatures["[key]"] = val
 
-///Adds a temporary signature which will decay over time.
+///Adds a temporary signature which will decay over time. Supports lists for keys.
 /datum/overmap/proc/add_temp_signature(key, strength, gupdate = TRUE)
-	if(!temp_signatures["[key]"])
-		temp_signatures["[key]"] = 0
-	temp_signatures["[key]"] += strength
+	if(islist(key))
+		for(var/single_key as anything in key)
+			if(isnull(temp_signatures["[single_key]"]))
+				temp_signatures["[single_key]"] = 0
+			temp_signatures["[single_key]"] += strength
+	else
+		if(isnull(temp_signatures["[key]"]))
+			temp_signatures["[key]"] = 0
+		temp_signatures["[key]"] += strength
 	if(gupdate)
 		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, src)
+
+/**
+Adds a temporary signature and supports lists, but more complicated.
+This one is capped, at a specific value, which is applied to all keys handed.
+If you wish to use different caps for different signatures, call this proc seperately per signature (for now?)
+cap modes:
+"hard" - anything above the cap is discarded.
+"soft" - anything above the cap is reduced by a significant percentage.
+"log" - anything above the cap is reduced using a logarithmical function, on percentage of cap.
+**/
+/datum/overmap/proc/add_temp_signature_capped(key, strength, cap = INFINITY, cap_mode = "log", update = TRUE)
+	var/updated = FALSE
+	if(islist(key))
+		for(var/single_key as anything in key)
+			if(isnull(temp_signatures["[single_key]"]))
+				temp_signatures["[single_key]"] = 0
+			var/current_sig = temp_signatures["[single_key]"]
+			var/new_sig = cap_sig_value(current_sig + strength, cap, cap_mode) //ITS-TODO: Is all this math correct??
+			if(current_sig > 0 && strength < 0 && current_sig + strength > new_sig)
+				temp_signatures["[single_key]"] = current_sig + strength //Avoid negative sigs draining positive sig too hard.
+				updated = TRUE
+			else if(current_sig < 0 && strength > 0 && current_sig + strength < new_sig)
+				temp_signatures["[single_key]"] = current_sig + strength //Avoid positive sig boosting negative sig too hard.
+				updated = TRUE
+			else if(current_sig > 0 && new_sig < current_sig)
+				continue //Avoid small caps reducing already existing positive signals
+			else if(current_sig < 0 && new_sig > current_sig)
+				continue //Same but for negatives
+			else
+				temp_signatures["[single_key]"] = new_sig
+				updated = TRUE
+	else
+		updated = TRUE
+		if(isnull(temp_signatures["[key]"]))
+			temp_signatures["[key]"] = 0
+		var/current_sig = temp_signatures["[key]"]
+		var/new_sig = cap_sig_value(current_sig + strength, cap, cap_mode)
+		if(current_sig > 0 && strength < 0 && current_sig + strength > new_sig)
+			temp_signatures["[key]"] = current_sig + strength //Avoid negative sigs draining positive sig too hard.
+			updated = TRUE
+		else if(current_sig < 0 && strength > 0 && current_sig + strength < new_sig)
+			temp_signatures["[key]"] = current_sig + strength //Avoid positive sig boosting negative sig too hard.
+			updated = TRUE
+		else if(current_sig > 0 && new_sig < current_sig)
+			return //Avoid small caps reducing already existing positive signals
+		else if(current_sig < 0 && new_sig > current_sig)
+			return //Same but for negatives
+		else
+			temp_signatures["[key]"] = new_sig
+	if(update && updated)
+		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, src)
+
+///This proc does the capping and returns the capped value. Supports negative signatures. Exists to avoid copypasta. Could probably be a define? meh.
+/datum/overmap/proc/cap_sig_value(value, cap, cap_mode)
+	if(abs(value) <= cap)
+		return value
+	var/negate = FALSE
+	if(value < 0)
+		value = -value
+		negate = TRUE
+	var/overflow = value - cap
+	switch(cap_mode)
+		if("hard")
+			if(negate)
+				return -cap
+			else
+				return cap
+		if("soft")
+			var/total = FLOOR(cap + (overflow / 10), 1)
+			if(negate)
+				return -total
+			else
+				return total
+		if("log") //Cursed.
+			var/ratio = (overflow/cap*100)
+			var/adjusted_ratio = 25 * (log(ratio + 1)) / 100 //~50% of overflow is used if the overflow is 100% of cap.
+			var/adjusted_total = FLOOR(cap + (overflow * adjusted_ratio), 1)
+			if(negate)
+				return -adjusted_total
+			else
+				return adjusted_total
+		else
+			CRASH("Invalid cap_mode. Valid modes are 'soft', 'hard' and 'log'. cap_mode was [cap_mode]")
 
 
 
