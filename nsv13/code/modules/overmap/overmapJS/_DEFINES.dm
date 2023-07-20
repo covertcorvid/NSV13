@@ -48,6 +48,8 @@
 
 //Signature defines //BEGIN
 
+#define BASE_SIGNATURE_DECAY 4 //How much temporary signature of each type ships tend to usually lose per second.
+
 #define SIG_IR "SIG_IR"
 #define SIG_GRAV "SIG_GRAV"
 #define SIG_COMMS "SIG_COMMS" //Well, more like general signals.

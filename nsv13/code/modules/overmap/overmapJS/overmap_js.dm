@@ -92,7 +92,7 @@
 	///Temporary signatures, these do not need to be manually decreased but instead decay over time
 	var/list/temp_signatures = list()
 	///Signature decay of this vessel. Decreases all temp signatures by this value each SECOND.
-	var/signature_decay = 10;
+	var/signature_decay = BASE_SIGNATURE_DECAY;
 	var/datum/component/overmap_ftl_drive/ftl_drive = null
 
 	//Nightmare legacy support.
@@ -223,7 +223,7 @@ If you wish to use different caps for different signatures, call this proc seper
 cap modes:
 "hard" - anything above the cap is discarded.
 "soft" - anything above the cap is reduced by a significant percentage.
-"log" - anything above the cap is reduced using a logarithmical function, on percentage of cap.
+"log" - anything above the cap is reduced using a logarithmical function, to a percentage of cap.
 **/
 /datum/overmap/proc/add_temp_signature_capped(key, strength, cap = INFINITY, cap_mode = "log", update = TRUE)
 	var/updated = FALSE
@@ -289,9 +289,13 @@ cap modes:
 			else
 				return total
 		if("log") //Cursed.
-			var/ratio = (overflow/cap*100)
-			var/adjusted_ratio = 25 * (log(ratio + 1)) / 100 //~50% of overflow is used if the overflow is 100% of cap.
-			var/adjusted_total = FLOOR(cap + (overflow * adjusted_ratio), 1)
+			var/ratio = (overflow/cap)
+			var/adjusted_ratio
+			if(ratio > 0.2)
+				adjusted_ratio = (26.2844 * log(0.0753197 * (ratio * 100)) - 7.32019) / 100 //Yes I used a plotter. Sue me.
+			else
+				adjusted_ratio = ratio
+			var/adjusted_total = FLOOR(cap + (cap * adjusted_ratio), 1) //Open for experimentation. overflow * adjusted_value would make it percentage of overflow instead.
 			if(negate)
 				return -adjusted_total
 			else
