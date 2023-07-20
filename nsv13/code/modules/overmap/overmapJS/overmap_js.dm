@@ -164,7 +164,7 @@
 	sensor_modes["[key]"] = GLOB.its_sensor_datums["[key]"]
 
 /datum/overmap/proc/remove_sensor_mode(key)
-	sensor_modes.Remove(key)
+	sensor_modes.Remove("[key]")
 
 /datum/overmap/proc/cycle_sensor_mode()
 	var/current_sensor
@@ -198,7 +198,7 @@
 		else if(val < 0)
 			val = min(0, val + (signature_decay * delta_t))
 		if(val == 0)
-			temp_signatures.Remove(key)
+			temp_signatures.Remove("[key]")
 			return
 		temp_signatures["[key]"] = val
 

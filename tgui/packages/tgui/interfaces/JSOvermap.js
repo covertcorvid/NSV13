@@ -833,7 +833,7 @@ export const JSOvermapGame = (props, context) => {
               ship_sig += Math.floor(Math.max(0, ship.temp_signatures[signature_key] - (ship.signature_decay * tick_drift))); // All hail our lord and savior delta-t. I still hate this.
             }
             else {
-              ship_sig += Math.ceil(Math.min(0, ship.temp_signatures[signature_key] - (ship.signature_decay * tick_drift)));
+              ship_sig += Math.ceil(Math.min(0, ship.temp_signatures[signature_key] + (ship.signature_decay * tick_drift)));
             }
           }
           ship_sig = Math.max(0, ship_sig); // No fun allowed.. yet.
