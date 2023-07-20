@@ -763,7 +763,7 @@ export const JSOvermapGame = (props, context) => {
        * IR mode:
        * - Signature is based on heat signature.
        * - If the object is a star.. expect huge signature.
-       * - TODO: if they fire weapons, should spike the sensors!
+       * - ITS-TODO: if they fire weapons, should spike the sensors!
        *
        * This will eventually be down to the science officer (radar operator) to select scan mode!
        * @param {*} image
@@ -779,7 +779,7 @@ export const JSOvermapGame = (props, context) => {
         let circle_core_y = (y)+h/2;
 
 
-        // Note / TODO: Many of these variables could / should be influenced or set by a) scan mode, b) sensor tech and c) condition of the ship's sensors.
+        // Note / ITS-TODO: Many of these variables could / should be influenced or set by a) scan mode, b) sensor tech and c) condition of the ship's sensors.
 
         // "Wobbly" interference-related vars.
         let inter_impact = 30; // This is the total amount of vectorshifting our interference does. Amplified by some random factors.
@@ -843,19 +843,19 @@ export const JSOvermapGame = (props, context) => {
           let real_x = ship.x + Math.floor(ship.icon.width / 2); // why does the coord have to be the top-left...
           let real_y = ship.y + Math.floor(ship.icon.height / 2);
           let angle = Math.floor((360 + get_angle(circle_core_x, circle_core_y, real_x, real_y))) % 360; // There will be no negative angles in this household.
-          signature_list[angle] += ship_sig; // TODO: add potential for decrease by distance to target - none, linear, inverse_square, etc.
+          signature_list[angle] += ship_sig; // ITS-TODO: add potential for decrease by distance to target - none, linear, inverse_square, etc.
           if (strongest_signature[angle] < ship_sig) {
             strongest_signature[angle] = ship_sig;
           }
           for (let angle_iter = 1; angle_iter <= max_angular_spread; angle_iter++) { // We ball
-            ship_sig *= signature_propagation_multiplier; // signature loss per angle point - TODO: check other potential curve styles for looks.
+            ship_sig *= signature_propagation_multiplier; // signature loss per angle point - ITS-TODO: check other potential curve styles for looks.
             if (ship_sig < signature_cutoff) {
               break;
             }
             let handled_angle_ccw = (360 + angle - angle_iter) % 360;
             let handled_angle_cw = (360 + angle + angle_iter) % 360;
 
-            // Same TODO as above list add - need to consider distance reduction, or at least codewise support for it.
+            // Same ITS-TODO as above list add - need to consider distance reduction, or at least codewise support for it.
             signature_list[handled_angle_ccw] += ship_sig;
             if (strongest_signature[handled_angle_ccw] < ship_sig) {
               strongest_signature[handled_angle_ccw] = ship_sig;
