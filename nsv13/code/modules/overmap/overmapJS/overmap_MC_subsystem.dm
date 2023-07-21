@@ -103,6 +103,38 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		)
 		.["physics_world"] += list(data)
 
+/**
+	Handle all signals sent by anything using the JS overmap system's frontend.
+	Returns TRUE if the action was handled.
+*/
+/datum/controller/subsystem/processing/JSOvermap/proc/ui_act_for(mob/user, action, list/params)
+	var/datum/component/overmap_piloting/C = user.GetComponent(/datum/component/overmap_piloting)
+	if(!C)
+		return FALSE
+	switch(action)
+		if("test")
+			return
+		if("scroll")
+			C.zoom(params["key"])
+			return TRUE
+		if("set_zoom")
+			C.set_zoom(params["key"])
+			return TRUE
+		if("fire")
+			C.process_fire(params["weapon"], params["coords"])
+			return TRUE
+		if("keyup")
+			C.process_input(params["key"], FALSE)
+			return TRUE
+		if("keydown")
+			C.process_input(params["key"], TRUE)
+			return TRUE
+		if("ui_mark_dirty")
+			C.mark_dirty(SSJSOvermap, C.target, params["fps"])
+			return TRUE
+		if("sync_keys")
+			C.sync_keys(params["zoom"], params["keys"])
+			return TRUE
 //datum/controller/subsystem/processing/JSOvermap/proc/start_piloting(mob/user, datum/overmap/OM)
 
 //TODO MAP STAYS SAME WHEN JUMPING!!
@@ -163,30 +195,17 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		user.AddComponent(/datum/component/overmap_piloting/observer, active_ship, ui)
 		ui.open()
 
+/datum/overmap_js_panel/ui_close(mob/user)
+	var/datum/component/overmap_piloting/C = user.GetComponent(/datum/component/overmap_piloting)
+	C?.RemoveComponent()
+	return ..()
+
 /datum/overmap_js_panel/ui_act(action, list/params)
 	. = ..()
 	if (.)
 		return
 	var/datum/component/overmap_piloting/C = usr.GetComponent(/datum/component/overmap_piloting)
 	switch(action)
-		if("scroll")
-			C.zoom(params["key"])
-			return
-		if("set_zoom")
-			C.set_zoom(params["key"])
-			return
-		if("fire")
-			C.process_fire(params["weapon"], params["coords"])
-			return;
-		if("keyup")
-			C.process_input(params["key"], FALSE)
-			return
-		if("keydown")
-			C.process_input(params["key"], TRUE)
-			return
-		if("ui_mark_dirty")
-			C.mark_dirty(C.target, C.target, params["fps"])
-			return
 		if("view_vars")
 			usr.client.debug_variables(locate(params["target"]))
 			return
@@ -207,21 +226,28 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		if("swap_control_scheme")
 			C.rights = params["target"]
 			ui_interact(usr)
+			return
 		if("toggle_hide_bullets")
 			hide_bullets = !hide_bullets
 			ui_interact(usr)
+			return
 	//TODO: spawney buttons to add enemies?
 		if("set_spawn_type")
 			spawn_type = params["target"]
 			ui_interact(usr)
+			return
 		if("set_spawn_z")
 			spawn_z = params["target"]
 			ui_interact(usr)
+			return
 		if("spawn_ship")
 			SSJSOvermap.instance(spawn_type, SSJSOvermap.debug_level, new /datum/vec5(rand(0, JS_OVERMAP_TACMAP_SIZE), rand(0, JS_OVERMAP_TACMAP_SIZE), spawn_z, 0))
 			ui_interact(usr)
+			return
 		if("log")
 			to_chat(usr, "<span class='notice'>Overmap debug: [params["text"]]</span>")
+			return
+	return SSJSOvermap.ui_act_for(usr, action, params)
 
 /client/proc/js_overmap_panel() //Admin Verb for the Overmap Gamemode controller
 	set name = "JS Overmap Panel"

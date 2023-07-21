@@ -13,6 +13,10 @@ GLOBAL_LIST_INIT(computer_beeps, list('nsv13/sound/effects/computer/beep.ogg','n
 	var/can_sound = TRUE //Warning sound placeholder
 	var/sound_cooldown = 10 SECONDS //For big warnings like enemies firing on you, that we don't want repeating over and over
 	var/list/ui_users = list()
+	//Override me to display different widgets.
+	var/ui_type = "JSOvermap"
+	var/position_type = /datum/component/overmap_piloting/pilot
+	var/allow_ghosts = FALSE
 
 /obj/machinery/computer/ship/Initialize(mapload)
 	. = ..()
@@ -34,56 +38,58 @@ GLOBAL_LIST_INIT(computer_beeps, list('nsv13/sound/effects/computer/beep.ogg','n
 /obj/machinery/computer/ship/proc/reset_sound()
 	can_sound = TRUE
 
+//This is such a stupid bandaid, but I can't be bothered undoing this spaghetti right now.
 /obj/machinery/computer/ship/proc/has_overmap()
-	linked = get_overmap()
-	if(linked && istype(linked))
-		set_position(linked)
-	linked_js = linked
-	return linked
+	linked_js = get_overmap()
+	return linked_js
 
+///Deprecated.
 /obj/machinery/computer/ship/proc/set_position(obj/structure/overmap/OM)
 	return
 
-/obj/machinery/computer/ship/ui_interact(mob/user)
-	if(isobserver(user))
+/obj/machinery/computer/ship/ui_interact(mob/user, datum/tgui/ui)
+	if(!allow_ghosts && isobserver(user))
 		return FALSE
 	if(!has_overmap())
-		var/sound = pick('nsv13/sound/effects/computer/error.ogg','nsv13/sound/effects/computer/error2.ogg','nsv13/sound/effects/computer/error3.ogg')
-		playsound(src, sound, 100, 1)
+		if(!isobserver(user))
+			var/sound = pick('nsv13/sound/effects/computer/error.ogg','nsv13/sound/effects/computer/error2.ogg','nsv13/sound/effects/computer/error3.ogg')
+			playsound(src, sound, 100, 1)
 		to_chat(user, "<span class='warning'>A warning flashes across [src]'s screen: Unable to locate thrust parameters, no registered ship stored in microprocessor.</span>")
 		return FALSE
-	if((position & (OVERMAP_USER_ROLE_PILOT | OVERMAP_USER_ROLE_GUNNER)) && linked.ai_controlled)
-		var/sound = pick('nsv13/sound/effects/computer/error.ogg','nsv13/sound/effects/computer/error2.ogg','nsv13/sound/effects/computer/error3.ogg')
-		playsound(src, sound, 100, 1)
+
+	//No controlling ai ships!
+	if(linked_js.ai_skynet3)
+		if(!isobserver(user))
+			var/sound = pick('nsv13/sound/effects/computer/error.ogg','nsv13/sound/effects/computer/error2.ogg','nsv13/sound/effects/computer/error3.ogg')
+			playsound(src, sound, 100, 1)
 		to_chat(user, "<span class='warning'>A warning flashes across [src]'s screen: Automated flight protocols are still active. Unable to comply.</span>")
 		return FALSE
-	playsound(src, 'nsv13/sound/effects/computer/startup.ogg', 75, 1)
-	if(!position)
-		return TRUE
-	ui_users += user
-	if(linked.mass < MASS_SMALL)
-		to_chat(user, "<span class='notice'>Small craft use directional keys (WASD in hotkey mode) to accelerate/decelerate in a given direction and the mouse to change the direction of craft.\
-					Mouse 1 will fire the selected weapon (if applicable).</span>")
-		to_chat(user, "<span class='warning'>=Hotkeys=</span>")
-		to_chat(user, "<span class='notice'> Use <b>tab</b> to activate hotkey mode, then:</span>")
-		to_chat(user, "<span class='notice'>Use the <b> Ctrl + Scroll Wheel</b> to zoom in / out. \
-					Press <b>Space</b> to cycle fire modes. \
-					Press <b>X</b> to cycle inertial dampners. \
-					Press <b>Alt<b> to cycle the handbrake.</span>")
+	if(!isobserver(user))
+		playsound(src, 'nsv13/sound/effects/computer/startup.ogg', 75, 1)
+	//to_chat(world, "Overmap: UI update...")
+	ui = SStgui.try_update_ui(user, src, ui)
+	if(!ui)
+		if(!isobserver(user))
+			playsound(src, 'nsv13/sound/effects/computer/hum.ogg', 100, 1)
+		ui = new(user, src, ui_type)
+		user.AddComponent(position_type, linked_js, ui)
+		ui.open()
 
-	else
-		to_chat(user, "<span class='notice'>Large craft use the up and down arrow keys (W & S in hotkey mode) to accelerate/decelerate craft. Use the left and right arrow keys (A & D) to rotate the craft. \
-					Mouse 1 will fire the selected weapon (if applicable).</span>")
-		to_chat(user, "<span class='warning'>=Hotkeys=</span>")
-		to_chat(user, "<span class='notice'> Use <b>tab</b> to activate hotkey mode, then:</span>")
-		to_chat(user, "<span class='notice'> Use the <b> Ctrl + Scroll Wheel</b> to zoom in / out. \
-						Press <b>C</b> to cycle between mouse and keyboard steering. \
-						Press <b>X</b> to cycle inertial dampners. \
-						Press <b>Alt<b> to cycle the handbrake.</span>")
+/obj/machinery/computer/ship/ui_data(mob/user)
+	. = SSJSOvermap.ui_data_for(user, linked_js)
 
-	return linked.start_piloting(user, position)
+/obj/machinery/computer/ship/ui_static_data(mob/user)
+	. = SSJSOvermap.ui_static_data_for(user)
+
+/obj/machinery/computer/ship/ui_act(action, list/params)
+	. = ..()
+	if (.)
+		return
+	return SSJSOvermap.ui_act_for(usr, action, params)
 
 /obj/machinery/computer/ship/ui_close(mob/user)
+	var/datum/component/overmap_piloting/C = user.GetComponent(/datum/component/overmap_piloting)
+	C?.RemoveComponent()
 	ui_users -= user
 	return ..()
 
@@ -91,7 +97,7 @@ GLOBAL_LIST_INIT(computer_beeps, list('nsv13/sound/effects/computer/beep.ogg','n
 	. = ..()
 	for(var/mob/living/M in ui_users)
 		ui_close(M)
-		linked?.stop_piloting(M)
+
 
 //Viewscreens for regular crew to watch combat
 /obj/machinery/computer/ship/viewscreen
@@ -105,6 +111,8 @@ GLOBAL_LIST_INIT(computer_beeps, list('nsv13/sound/effects/computer/beep.ogg','n
 	density = FALSE
 	anchored = TRUE
 	req_access = null
+	position_type = /datum/component/overmap_piloting/observer
+	allow_ghosts = TRUE
 	var/obj/machinery/computer/ship/dradis/minor/internal_dradis
 
 /obj/machinery/computer/ship/viewscreen/Initialize(mapload)
@@ -113,7 +121,7 @@ GLOBAL_LIST_INIT(computer_beeps, list('nsv13/sound/effects/computer/beep.ogg','n
 
 /obj/machinery/computer/ship/viewscreen/examine(mob/user)
 	. = ..()
-	if(!linked)
+	if(!linked_js)
 		return
 	//if(isobserver(user))
 		//var/mob/dead/observer/O = user
@@ -123,23 +131,3 @@ GLOBAL_LIST_INIT(computer_beeps, list('nsv13/sound/effects/computer/beep.ogg','n
 	//linked.observe_ship(user)
 	ui_interact(user)
 	internal_dradis.attack_hand(user)
-
-/obj/machinery/computer/ship/viewscreen/ui_interact(mob/user, datum/tgui/ui)
-	if(!has_overmap())
-		visible_message("<span class='danger'>[icon2html(src, viewers(src))] Microcontrollers corrupt. Unable to locate compatible ship.</span>")
-		return
-	//to_chat(world, "Overmap: UI update...")
-	ui = SStgui.try_update_ui(user, src, ui)
-	if(!ui)
-		if(!isobserver(user))
-			playsound(src, 'nsv13/sound/effects/computer/hum.ogg', 100, 1)
-		ui = new(user, src, "JSOvermap")
-		ui.open()
-		user.AddComponent(/datum/component/overmap_piloting/observer, linked_js, ui)
-	//linked.start_piloting(user, OVERMAP_USER_ROLE_OBSERVER)
-
-/obj/machinery/computer/ship/viewscreen/ui_data(mob/user)
-	. = SSJSOvermap.ui_data_for(user, linked_js)
-
-/obj/machinery/computer/ship/viewscreen/ui_static_data(mob/user)
-	. = SSJSOvermap.ui_static_data_for(user)

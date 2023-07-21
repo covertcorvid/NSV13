@@ -11,6 +11,11 @@
 	var/rights = OVERMAP_CONTROL_RIGHTS_FULL
 	var/fps_capability = -1
 
+/datum/component/overmap_piloting/pilot
+	rights = OVERMAP_CONTROL_RIGHTS_HELM
+
+/datum/component/overmap_piloting/gunner
+	rights = OVERMAP_CONTROL_RIGHTS_GUNNER
 
 /datum/component/overmap_piloting/Initialize(target, ui)
 	src.target = target
@@ -51,6 +56,8 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 	//If the client is reporting its FPS capability to us, set ours to match.
 	if(fps != -1)
 		fps_capability = round(fps)
+		//Immediate interact for FPS changes!
+		src.ui.src_object.ui_interact(ui.user, ui)
 	//to_chat(world, "Overmap UI marked dirty.")
 	//src.ui.needs_update = TRUE
 	//HACK: instant UI update. Take your delay and get out.
@@ -71,6 +78,11 @@ Usually called when anything is added to the overmap, removed from it, or a coll
 
 /datum/component/overmap_piloting/proc/set_zoom(zoom_level)
 	src.zoom_distance = zoom_level
+
+/datum/component/overmap_piloting/proc/sync_keys(zoom_level, _keys)
+	for(var/K in _keys)
+		target.keys[K] = _keys[K]
+	set_zoom(zoom_level)
 
 /datum/component/overmap_piloting/proc/process_input(key, state)
 	if(!target)

@@ -10,7 +10,7 @@
 	req_one_access = list(ACCESS_SYNDICATE)
 
 /obj/machinery/computer/ship/helm/Destroy()
-	linked?.helm = null
+	//linked?.helm = null
 	return ..()
 
 /obj/machinery/computer/ship/helm/set_position(obj/structure/overmap/OM)
@@ -38,8 +38,4 @@
 	name = "debug ship"
 	desc = "You shouldn't be seeing this"
 	color = "red"
-
-/obj/machinery/computer/ship/helm/allinone/ui_interact(mob/user)
-	. = ..()
-	if(!linked.gunner && isliving(user))
-		linked.gunner = user
+	position_type = /datum/component/overmap_piloting
