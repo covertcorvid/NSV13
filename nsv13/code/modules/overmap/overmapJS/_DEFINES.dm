@@ -46,8 +46,16 @@
 #define OVERMAP_ARMOUR_THICKNESS_GIGA 2500
 #define OVERMAP_ARMOUR_THICKNESS_STELLARBODY 9999999
 
-#define SENSOR_MODE_IR 0
-#define SENSOR_MODE_GRAVIMETRIC 1
+//Signature defines //BEGIN
+
+#define BASE_SIGNATURE_DECAY 4 //How much temporary signature of each type ships tend to usually lose per second.
+
+#define SIG_IR "SIG_IR"
+#define SIG_GRAV "SIG_GRAV"
+#define SIG_COMMS "SIG_COMMS" //Well, more like general signals.
+#define SIG_THETA "SIG_THETA"
+
+//~SIGNATURE_NONE is not really needed but here anyways because a 0 start point is nice. If you want a signature to be 0, just don't set it. - Delta
 
 /*
 Very basic (and likely temporary) signature defines to serve as a guideline.
@@ -66,6 +74,63 @@ Play around with the ITS yourself and see what fits your vessel.
 Things that are actively generating lots of heat (anything with an active engine, especially high-yield ones), especially warships,
 tend to class well above the thermal specs their mass would suggest. Especially when actively engaging, or venting heat.
 */
+
+/*
+The same, except for mass, aka gravimetric
+Generally, there is a major discrepancy here between ships and big objects, as the mass differences are enormous.
+Note that as with IR, "scaling" here is non-linear. Things with 2x the mass do not have 2x the signature, its scaling being below-linear.
+*/
+#define MASS_SIGNATURE_NONE 0 //Technically, none is not needed as not setting it in the list counts as it. However, I guess good for conclusiveness.
+#define MASS_SIGNATURE_MINISCULE 5 //Fighters, escape pods, Potentially dropped cargo, very smol rocks and other fancy things.
+#define MASS_SIGNATURE_SMALL 10 //Small ships, dense cargo, small asteroids.
+#define MASS_SIGNATURE_MEDIUM 20 //Medium ships, asteroids, some small stationary objects
+#define MASS_SIGNATURE_LARGE 40 //Large ships, bigger asteroids, stations
+#define MASS_SIGNATURE_HUGE 80 //Very big ships, large asteroids, stations
+#define MASS_SIGNATURE_MASSIVE 140 //Expansive stations, or very very large or dense asteroids.
+#define MASS_SIGNATURE_PLANETOID 200 //Smol planets (like moons). Very massive stations can also fall under this.
+#define MASS_SIGNATURE_PLANET 400 //Planets.
+#define MASS_SIGNATURE_STAR 800 //Stars. Or ungodly things.
+#define MASS_SIGNATURE_SINGULARITY 1600 //I sure wonder what should use this define...
+/*
+Gravimetric readings have some very loud signal types and a LOT of things that have signals, but in exchange are very difficult to mask in any way.
+No matter how good your thermal insulation, your mass remains the same.
+Some few things may however be able to affect gravimetric readings..
+~(Wrecks should be one mass category lower than their respective vessel to emulate lost parts - more if very damaged)
+*/
+
+/*
+Communications signature, which in reality is signals in general and not just communications. Lets hope central doesn't notice that little modification to the comms manager.
+Usually, things that send this are objects constructed by someone, however this may vavery in some cases.
+Note that they also need to be actively yelling. Colonised planets and stations tend to do this, warships not so much.
+*/
+#define COMMS_SIGNATURE_NONE 0
+#define COMMS_SIGNATURE_SPOTTY 5 //Very weak signals, or ones being jammed.
+#define COMMS_SIGNATURE_SPORADIC 10 //Sporadic signals.
+#define COMMS_SIGNATURE_CASUAL 50 //Colonized things like stations or planets that do not try to hide tend to be like this
+#define COMMS_SIGNATURE_BEACON 100 //Beacons tend to send wide-range signals as navigation assistance or to relay messages.
+#define COMMS_SIGNATURE_DISTRESS 300 //Things calling for help, OR general wide-range transmissions to anyone that may want to listen
+#define COMMS_SIGNATURE_PING 600 //Something with high-energetic pulses.
+/*
+Note that signature of repeated signals "should" be implemented to pulse in some sine-wave function style to emulate a cycling "signal".
+Most common example for this are distress signals or other wide-range assistance requests.
+*/
+
+/*
+Theta signature.
+??????
+*/
+#define THETA_SIGNATURE_NONE 0
+#define THETA_SIGNATURE_BLIP 3
+#define THETA_SIGNATURE_WEAK 8
+#define THETA_SIGNATURE_MEDIUM 12
+#define THETA_SIGNATURE_HIGH 18
+#define THETA_SIGNATURE_LARGE 30
+#define THETA_SIGNATURE_HUGE 100
+/*
+01010010-01001001-01000110-01010100
+*/
+
+//Signature defines //END
 
 #define COMSIG_JS_OVERMAP_SYSTEM_RELAY_SOUND "js_system_relay_sound"
 

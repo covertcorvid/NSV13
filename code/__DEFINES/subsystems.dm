@@ -191,6 +191,7 @@
 #define FIRE_PRIORITY_ATMOS_ADJACENCY	300
 #define FIRE_PRIORITY_PHYSICS		340 //NSV13 - Processes after SSprojectiles to keep hitboxes consistent for physics projectiles. Probably won't break anything
 #define FIRE_PRIORITY_PROJECTILES 	350 //NSV13 - Projectile fire priority
+#define FIRE_PRIORITY_JSOVERMAP		380 //NSV13 - JSOvermap priority - could potentially use being even higher.
 #define FIRE_PRIORITY_CHAT			400
 #define FIRE_PRIORITY_RUNECHAT		410
 #define FIRE_PRIORITY_OVERLAYS		500

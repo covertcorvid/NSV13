@@ -3986,6 +3986,7 @@
 #include "nsv13\code\modules\overmap\overmapJS\ship.dm"
 #include "nsv13\code\modules\overmap\overmapJS\subsystems.dm"
 #include "nsv13\code\modules\overmap\overmapJS\components\piloting.dm"
+#include "nsv13\code\modules\overmap\overmapJS\interference_tracking_system\_its_datums.dm"
 #include "nsv13\code\modules\overmap\overmapJS\interior_linkage\machinery.dm"
 #include "nsv13\code\modules\overmap\overmapJS\interior_linkage\memes.dm"
 #include "nsv13\code\modules\overmap\overmapJS\interior_linkage\mobs.dm"

@@ -80,8 +80,19 @@
 	var/list/keys = list()
 	var/last_combat_entered = 0
 	var/inertial_dampeners = TRUE
-	var/sensor_mode = SENSOR_MODE_IR
-	var/thermal_signature = THERMAL_SIGNATURE_NONE
+
+	//ITS-TODO: This stuff should later be on the on the sensor console, NOT the ship itself.
+	///Currently active ITS mode.
+	var/datum/its_sensor_datum/sensor_mode = null
+	///List of sensor modes that (eventually) the ITS console has access to. Typepaths in here, which during init get associated with objects from the global.
+	var/list/sensor_modes = list(/datum/its_sensor_datum/off, /datum/its_sensor_datum/ir, /datum/its_sensor_datum/grav, /datum/its_sensor_datum/comms, /datum/its_sensor_datum/theta)
+
+	///List of signatures of this object. e.g. SIG_IR = 100, SIG_GRAV = 50, etc.
+	var/list/signatures = list()
+	///Temporary signatures, these do not need to be manually decreased but instead decay over time
+	var/list/temp_signatures = list()
+	///Signature decay of this vessel. Decreases all temp signatures by this value each SECOND.
+	var/signature_decay = BASE_SIGNATURE_DECAY;
 	var/datum/component/overmap_ftl_drive/ftl_drive = null
 
 	//Nightmare legacy support.
@@ -132,6 +143,168 @@
 	//TODO: replace this.
 	START_PROCESSING(SSJSOvermap, src)
 	setup_armour()
+	//ITS-TODO: This will be on the sensor console once the scan modes are moved.
+	setup_sensor_modes()
+
+/datum/overmap/proc/setup_sensor_modes()
+	if(!length(GLOB.its_sensor_datums)) //setup the global if not done yet
+		for(var/typepath in subtypesof(/datum/its_sensor_datum))
+			var/datum/its_sensor_datum/sensor_datum = new typepath()
+			GLOB.its_sensor_datums["[typepath]"] = sensor_datum
+
+	var/list/actual_sensor_modes = list()
+	for(var/typepath in sensor_modes)
+		actual_sensor_modes["[typepath]"] = GLOB.its_sensor_datums["[typepath]"]
+	sensor_modes = actual_sensor_modes //replace list and discard the no-longer used one.
+	sensor_mode = GLOB.its_sensor_datums["[/datum/its_sensor_datum/off]"]
+
+/datum/overmap/proc/add_sensor_mode(key)
+	if(!GLOB.its_sensor_datums["[key]"])
+		return
+	sensor_modes["[key]"] = GLOB.its_sensor_datums["[key]"]
+
+/datum/overmap/proc/remove_sensor_mode(key)
+	sensor_modes.Remove("[key]")
+
+/datum/overmap/proc/cycle_sensor_mode()
+	var/current_sensor
+	if(sensor_mode)
+		current_sensor = sensor_modes.Find("[sensor_mode.type]")
+	else
+		current_sensor = 0
+	sensor_mode = sensor_modes["[sensor_modes[((current_sensor%length(sensor_modes))+1)]]"] //mildly cursed but it works.
+
+/datum/overmap/proc/add_signature(key, strength, update = TRUE)
+	if(!signatures["[key]"])
+		signatures["[key]"] = 0
+	signatures["[key]"] = max(0, signatures["[key]"] + strength) //Negative signatures are an interesting concept though.. or, at least negative values that get interpreted as 0..
+	if(update)
+		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, src)
+
+/datum/overmap/proc/remove_signature(key, strength, update = TRUE)
+	if(isnull(signatures["[key]"]))
+		return
+	signatures["[key]"] = max(0, signatures["[key]"] - strength)
+	if(update)
+		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, src)
+
+
+///Decays temporary signatures. Why.
+/datum/overmap/proc/decay_signatures(delta_t)
+	for(var/key as anything in temp_signatures)
+		var/val = temp_signatures["[key]"]
+		if(val > 0)
+			val = max(0, val - (signature_decay * delta_t))
+		else if(val < 0)
+			val = min(0, val + (signature_decay * delta_t))
+		if(val == 0)
+			temp_signatures.Remove("[key]")
+			return
+		temp_signatures["[key]"] = val
+
+///Adds a temporary signature which will decay over time. Supports lists for keys.
+/datum/overmap/proc/add_temp_signature(key, strength, gupdate = TRUE)
+	if(islist(key))
+		for(var/single_key as anything in key)
+			if(isnull(temp_signatures["[single_key]"]))
+				temp_signatures["[single_key]"] = 0
+			temp_signatures["[single_key]"] += strength
+	else
+		if(isnull(temp_signatures["[key]"]))
+			temp_signatures["[key]"] = 0
+		temp_signatures["[key]"] += strength
+	if(gupdate)
+		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, src)
+
+/**
+Adds a temporary signature and supports lists, but more complicated.
+This one is capped, at a specific value, which is applied to all keys handed.
+If you wish to use different caps for different signatures, call this proc seperately per signature (for now?)
+cap modes:
+"hard" - anything above the cap is discarded.
+"soft" - anything above the cap is reduced by a significant percentage.
+"log" - anything above the cap is reduced using a logarithmical function, to a percentage of cap.
+**/
+/datum/overmap/proc/add_temp_signature_capped(key, strength, cap = INFINITY, cap_mode = "log", update = TRUE)
+	var/updated = FALSE
+	if(islist(key))
+		for(var/single_key as anything in key)
+			if(isnull(temp_signatures["[single_key]"]))
+				temp_signatures["[single_key]"] = 0
+			var/current_sig = temp_signatures["[single_key]"]
+			var/new_sig = cap_sig_value(current_sig + strength, cap, cap_mode) //ITS-TODO: Is all this math correct??
+			if(current_sig > 0 && strength < 0 && current_sig + strength > new_sig)
+				temp_signatures["[single_key]"] = current_sig + strength //Avoid negative sigs draining positive sig too hard.
+				updated = TRUE
+			else if(current_sig < 0 && strength > 0 && current_sig + strength < new_sig)
+				temp_signatures["[single_key]"] = current_sig + strength //Avoid positive sig boosting negative sig too hard.
+				updated = TRUE
+			else if(current_sig > 0 && new_sig < current_sig)
+				continue //Avoid small caps reducing already existing positive signals
+			else if(current_sig < 0 && new_sig > current_sig)
+				continue //Same but for negatives
+			else
+				temp_signatures["[single_key]"] = new_sig
+				updated = TRUE
+	else
+		updated = TRUE
+		if(isnull(temp_signatures["[key]"]))
+			temp_signatures["[key]"] = 0
+		var/current_sig = temp_signatures["[key]"]
+		var/new_sig = cap_sig_value(current_sig + strength, cap, cap_mode)
+		if(current_sig > 0 && strength < 0 && current_sig + strength > new_sig)
+			temp_signatures["[key]"] = current_sig + strength //Avoid negative sigs draining positive sig too hard.
+			updated = TRUE
+		else if(current_sig < 0 && strength > 0 && current_sig + strength < new_sig)
+			temp_signatures["[key]"] = current_sig + strength //Avoid positive sig boosting negative sig too hard.
+			updated = TRUE
+		else if(current_sig > 0 && new_sig < current_sig)
+			return //Avoid small caps reducing already existing positive signals
+		else if(current_sig < 0 && new_sig > current_sig)
+			return //Same but for negatives
+		else
+			temp_signatures["[key]"] = new_sig
+	if(update && updated)
+		SEND_SIGNAL(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, src)
+
+///This proc does the capping and returns the capped value. Supports negative signatures. Exists to avoid copypasta. Could probably be a define? meh.
+/datum/overmap/proc/cap_sig_value(value, cap, cap_mode)
+	if(abs(value) <= cap)
+		return value
+	var/negate = FALSE
+	if(value < 0)
+		value = -value
+		negate = TRUE
+	var/overflow = value - cap
+	switch(cap_mode)
+		if("hard")
+			if(negate)
+				return -cap
+			else
+				return cap
+		if("soft")
+			var/total = FLOOR(cap + (overflow / 10), 1)
+			if(negate)
+				return -total
+			else
+				return total
+		if("log") //Cursed.
+			var/ratio = (overflow/cap)
+			var/adjusted_ratio
+			if(ratio > 0.2)
+				adjusted_ratio = (26.2844 * log(0.0753197 * (ratio * 100)) - 7.32019) / 100 //Yes I used a plotter. Sue me.
+			else
+				adjusted_ratio = ratio
+			var/adjusted_total = FLOOR(cap + (cap * adjusted_ratio), 1) //Open for experimentation. overflow * adjusted_value would make it percentage of overflow instead.
+			if(negate)
+				return -adjusted_total
+			else
+				return adjusted_total
+		else
+			CRASH("Invalid cap_mode. Valid modes are 'soft', 'hard' and 'log'. cap_mode was [cap_mode]")
+
+
+
 
 //Stick any operations that require the starsystem to have instanced us here...
 //Used by the grids system.
@@ -146,13 +319,16 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 0, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
 			)
+			add_signature(SIG_IR, THERMAL_SIGNATURE_MINISCULE, update = FALSE)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_MINISCULE)
 		if(MASS_SMALL)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 20, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 10, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 5, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 20, \
 			)
-			thermal_signature = THERMAL_SIGNATURE_SMALL
+			add_signature(SIG_IR, THERMAL_SIGNATURE_SMALL, update = FALSE)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_SMALL)
 
 		if(MASS_MEDIUM)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 90, \
@@ -160,7 +336,8 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 10, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
-			thermal_signature = THERMAL_SIGNATURE_MEDIUM
+			add_signature(SIG_IR, THERMAL_SIGNATURE_MEDIUM, update = FALSE)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_MEDIUM)
 
 		if(MASS_MEDIUM_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 95, \
@@ -168,21 +345,24 @@
 			OVERMAP_DAMAGE_TYPE_ENERGY = 15, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 30, \
 			)
-			thermal_signature = THERMAL_SIGNATURE_LARGE
+			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE, update = FALSE)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_LARGE)
 		if(MASS_LARGE)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 98, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 25, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 15, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 35, \
 			)
-			thermal_signature = THERMAL_SIGNATURE_LARGE
+			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE, update = FALSE)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_LARGE)
 		if(MASS_TITAN)
 			damage_resistances = list(OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL = 100, \
 			OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL = 40, \
 			OVERMAP_DAMAGE_TYPE_ENERGY = 30, \
 			OVERMAP_DAMAGE_TYPE_EXPLOSIVE = 40, \
 			)
-			thermal_signature = THERMAL_SIGNATURE_LARGE
+			add_signature(SIG_IR, THERMAL_SIGNATURE_LARGE, update = FALSE)
+			add_signature(SIG_GRAV, MASS_SIGNATURE_HUGE)
 
 
 /datum/overmap/proc/fire_projectile(angle = src.position.angle, projectile_type=/datum/overmap/projectile/shell, burst_size=1)
@@ -201,6 +381,8 @@
 	map = null
 	if (map)
 		map.unregister(src)
+	sensor_mode = null
+	sensor_modes = null
 	. = ..()
 
 /**
@@ -262,12 +444,13 @@
 	return
 
 //TODO: game coords to canvas coords! major desync issues, here.
-/datum/overmap/process()
+/datum/overmap/process(delta_time)
 	handle_input()
 	position.x += position.velocity.x //y is down but x points right as usual, so these have to be, er, this way.
 	position.y += position.velocity.y
 	physics2d.update()
 	on_move()
+	decay_signatures(delta_time) //Hate.
 	/*
 	//TODO: broken!
 	if(inertial_dampeners) //An optional toggle to make capital ships more "fly by wire" and help you steer in only the direction you want to go.

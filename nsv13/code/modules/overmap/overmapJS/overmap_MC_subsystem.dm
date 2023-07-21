@@ -5,6 +5,7 @@
 PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	name = "JS Overmap"
 	wait = 0.2 SECONDS
+	priority = FIRE_PRIORITY_JSOVERMAP
 	stat_tag = "JS"
 	init_order = INIT_ORDER_JS_OVERMAP
 	flags = SS_BACKGROUND|SS_POST_FIRE_TIMING
@@ -82,7 +83,23 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["control_scheme"] = OP.rights
 	.["fps_capability"] = OP.fps_capability
 	.["keys"] = target.keys
-	.["sensor_mode"] = target.sensor_mode
+	var/datum/its_sensor_datum/ship_sensor_mode = target.sensor_mode
+	if(!isnull(ship_sensor_mode))
+		var/list/sensor_mode_data = list(
+			name = ship_sensor_mode.name,
+			spec_key = ship_sensor_mode.spec_key,
+			signature_key = ship_sensor_mode.signature_key,
+			sig_color = ship_sensor_mode.sig_color,
+			interference_impact = ship_sensor_mode.interference_impact,
+			interference_resolution = ship_sensor_mode.interference_resolution,
+			interference_cut = ship_sensor_mode.interference_cut,
+			signature_cutoff = ship_sensor_mode.signature_cutoff,
+			max_angular_spread = ship_sensor_mode.max_angular_spread,
+			signature_propagation_multiplier = ship_sensor_mode.signature_propagation_multiplier
+		)
+		.["sensor_mode_data"] += sensor_mode_data
+	else
+		.["sensor_mode_data"] = null
 	for(var/datum/overmap/O in (target?.map?.physics_objects || list(target)))
 		var/list/quads = list()
 		if(O.armour_quadrants)
@@ -98,7 +115,9 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			sensor_range = O.get_sensor_range(),
 			armour_quadrants = quads,
 			inertial_dampeners = O.inertial_dampeners,
-			thermal_signature = O.thermal_signature,
+			signatures = O.signatures,
+			temp_signatures = O.temp_signatures,
+			signature_decay = O.signature_decay,
 			position = list(O.position.x, O.position.y, O.position.z, O.position.angle, O.position.velocity.ln(), O.position.velocity.x, O.position.velocity.y)
 		)
 		.["physics_world"] += list(data)
@@ -223,6 +242,10 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			C.target = active_ship
 			ui_interact(usr)
 			return
+		if("toggle_sensor_mode")
+			var/datum/overmap/sensor_update_target = locate(params["target"])
+			sensor_update_target.cycle_sensor_mode()
+			ui_interact(usr)
 		if("swap_control_scheme")
 			C.rights = params["target"]
 			ui_interact(usr)
