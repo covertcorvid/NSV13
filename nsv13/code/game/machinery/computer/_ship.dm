@@ -64,7 +64,7 @@ GLOBAL_LIST_INIT(computer_beeps, list('nsv13/sound/effects/computer/beep.ogg','n
 			playsound(src, sound, 100, 1)
 		to_chat(user, "<span class='warning'>A warning flashes across [src]'s screen: Automated flight protocols are still active. Unable to comply.</span>")
 		return FALSE
-	if(!isobserver(user))
+	if(!isobserver(user) && !ui)
 		playsound(src, 'nsv13/sound/effects/computer/startup.ogg', 75, 1)
 	//to_chat(world, "Overmap: UI update...")
 	ui = SStgui.try_update_ui(user, src, ui)
@@ -86,6 +86,12 @@ GLOBAL_LIST_INIT(computer_beeps, list('nsv13/sound/effects/computer/beep.ogg','n
 	if (.)
 		return
 	return SSJSOvermap.ui_act_for(usr, action, params)
+
+//Trust me, your ears will thank me for this.
+/obj/machinery/computer/ship/play_click_sound(var/custom_clicksound)
+	if((custom_clicksound ||= clicksound) && world.time > next_clicksound)
+		next_clicksound = world.time + 1 SECONDS
+		playsound(src, custom_clicksound, clickvol)
 
 /obj/machinery/computer/ship/ui_close(mob/user)
 	var/datum/component/overmap_piloting/C = user.GetComponent(/datum/component/overmap_piloting)

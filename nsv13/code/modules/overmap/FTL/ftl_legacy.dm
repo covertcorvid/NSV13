@@ -246,12 +246,13 @@ A way for syndies to track where the player ship is going in advance, so they ca
 	if(!target_system)
 		radio.talk_into(src, "ERROR. Specified star_system no longer exists.", radio_channel)
 		return
-	linked?.begin_jump(target_system, force)
+	linked_js?.begin_jump(target_system, force)
 	playsound(src, 'nsv13/sound/voice/ftl_start.wav', 100, FALSE)
 	radio.talk_into(src, "Initiating FTL translation.", radio_channel)
 	playsound(src, 'nsv13/sound/effects/ship/freespace2/computer/escape.wav', 100, 1)
 	visible_message("<span class='notice'>Initiating FTL jump.</span>")
 	ftl_state = FTL_STATE_JUMPING
+
 
 /// Begins a jump regardless of whether we have enough fuel or power. Should only be used for debugging and round events
 /obj/machinery/computer/ship/ftl_computer/proc/force_jump(datum/star_system/target_system)

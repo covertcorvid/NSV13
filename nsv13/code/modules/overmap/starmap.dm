@@ -89,8 +89,8 @@
 				visible_message("<span class='warning'>[icon2html(src, viewers(src))] Unable to comply. Invalid authkey to unlock remove override code.</span>")
 				return
 			if(linked_js.ftl_drive.ftl_drive.cancel_ftl())
-				linked.stop_relay(CHANNEL_IMPORTANT_SHIP_ALERT)
-				linked.relay('nsv13/sound/effects/ship/ftl_stop.ogg', channel=CHANNEL_IMPORTANT_SHIP_ALERT)
+				linked_js.stop_relay(CHANNEL_IMPORTANT_SHIP_ALERT)
+				linked_js.relay('nsv13/sound/effects/ship/ftl_stop.ogg', channel=CHANNEL_IMPORTANT_SHIP_ALERT)
 
 
 /obj/machinery/computer/ship/navigation/ui_data(mob/user)

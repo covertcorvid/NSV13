@@ -475,7 +475,7 @@ export const JSOvermapGame = (props, context) => {
         Camera.zoomTo(zoomLevel);
         // Report our zoom to the backend.
         if (time >= next_zoom_report) {
-          next_zoom_report = time + 50;
+          next_zoom_report = time + 250;
           act('set_zoom', { key: Camera.distance });
         }
         // act('scroll', { key: 1 });
@@ -489,7 +489,7 @@ export const JSOvermapGame = (props, context) => {
         Camera.zoomTo(zoomLevel);
         // Report our zoom to the backend.
         if (time >= next_zoom_report) {
-          next_zoom_report = time + 50;
+          next_zoom_report = time + 250;
           act('set_zoom', { key: Camera.distance });
         }
         // act('scroll', { key: -1 });
