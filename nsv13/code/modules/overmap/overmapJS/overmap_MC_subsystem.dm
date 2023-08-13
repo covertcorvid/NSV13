@@ -210,10 +210,15 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	//other times it's called by a string of procs that results in the usr being the panel itself
 	if((usr != src) && !check_rights(0, 1, TRUE))
 		return
+
+	var/datum/overmap/player_ship = SSJSOvermap.key_overmaps["player"]
 	if (!selected_level)
-		selected_level = SSJSOvermap.debug_level
+		selected_level = player_ship.map
 	if(!active_ship)
-		active_ship = length(selected_level.physics_objects) ? selected_level.physics_objects[1] : null
+		if(selected_level == player_ship.map)
+			active_ship = player_ship
+		else
+			active_ship = length(selected_level.physics_objects) ? selected_level.physics_objects[1] : null
 	ui = SStgui.try_update_ui(user, src, ui)
 	if(!ui)
 		log_admin_private("[user?.ckey] opened the JS overmap panel.")
