@@ -1,12 +1,12 @@
 /// This is a holder for some weapons that fire together
 /datum/weapon_group
-	var/datum/overmap/holder
+	var/datum/overmap/ship/holder
 	/// The name must be unique within the parent ship so we can use it as a list index
 	var/name = ""
 	/// The references to the weapons associated with this group
 	var/list/weapon_list = list()
 
-/datum/weapon_group/New(datum/overmap/holder, name)
+/datum/weapon_group/New(datum/overmap/ship/holder, name)
 	. = ..()
 	src.holder = holder
 	while(!name || (name in holder.weapon_groups))
@@ -16,7 +16,9 @@
 	holder.weapon_groups[name] = src
 	// TODO actual weapons, this is just for testing
 	for(var/type in subtypesof(/datum/ai_weapon))
-		weapon_list += new type()
+		var/datum/overmap_weapon/W = new type()
+		weapon_list += W
+		holder.all_weapons += W
 
 /datum/weapon_group/proc/get_ui_data()
 	. = list()

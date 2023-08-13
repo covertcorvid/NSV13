@@ -25,13 +25,17 @@ export const WeaponManagementPanel = (props, context) => {
             key={key}
             title={group_data.name}>
               <Button
+                icon="plus"
+                tooltip="Add weapon to group"
+                onClick={() => act("add_weapon", {group_id: group_data.id})}/>
+              <Button
                 icon="pen"
                 tooltip="Rename"
-                onClick={() => act("rename_weapon_group", {id: group_data.id})}/>
+                onClick={() => act("rename_weapon_group", {group_id: group_data.id})}/>
               <Button
                 icon="minus"
                 tooltip="Delete"
-                onClick={() => act("delete_weapon_group", {id: group_data.id})}/>
+                onClick={() => act("delete_weapon_group", {group_id: group_data.id})}/>
               <Button
                 icon="eye"
                 tooltip="View Variables"
@@ -46,6 +50,10 @@ export const WeaponManagementPanel = (props, context) => {
                       icon="eye"
                       tooltip="View Variables"
                       onClick={() => act("view_vars", {target: weapon_data.id})}/>
+                    <Button
+                      icon="minus"
+                      tooltip="Remove from group"
+                      onClick={() => act("remove_weapon", {group_id: group_data.id, weapon_id: weapon_data.id})}/>
                     <br />
                   </>
                 )

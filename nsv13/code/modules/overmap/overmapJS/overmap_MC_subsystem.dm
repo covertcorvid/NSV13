@@ -161,6 +161,45 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		if("sync_keys")
 			C.sync_keys(params["zoom"], params["keys"])
 			return TRUE
+
+		// Weapon group actions
+		if("add_weapon_group")
+			var/new_name = tgui_input_text(usr, "Enter a unique name", "New Group")
+			if(new_name && !(new_name in C.target.weapon_groups))
+				new /datum/weapon_group(C.target, new_name)
+				ui_interact()
+		if("rename_weapon_group")
+			var/datum/weapon_group/WG = locate(params["group_id"])
+			var/new_name = tgui_input_text(usr, "Enter the new name", "Rename")
+			if(!new_name)
+				return
+			if(new_name in WG.holder.weapon_groups)
+				to_chat(usr, "<span class='warning'>The new group name must be unique!</span>")
+				return
+			WG.holder.weapon_groups -= WG.name
+			WG.name = new_name
+			WG.holder.weapon_groups[WG.name] = WG
+			ui_interact(user)
+		if("delete_weapon_group")
+			var/datum/weapon_group/WG = locate(params["group_id"])
+			WG.holder.weapon_groups -= WG.name
+			qdel(WG)
+			ui_interact(user)
+		if("add_weapon")
+			var/datum/weapon_group/WG = locate(params["group_id"])
+			var/datum/overmap_weapon/OW = input(usr, "What weapon would you like to add to this group?","Weapon Management", null) as null|anything in WG.holder.all_weapons
+			if(OW)
+				WG.weapon_list |= OW
+				ui_interact(user)
+		if("remove_weapon")
+			var/datum/weapon_group/WG = locate(params["group_id"])
+			var/datum/overmap_weapon/OW = locate(params["weapon_id"])
+			WG.weapon_list -= OW
+			// Debug - make sure we don't somehow lose weapons
+			if(!(OW in WG.holder.all_weapons))
+				message_admins("ERROR: would have lost reference to [OW]")
+				WG.holder.all_weapons |= OW
+			ui_interact(user)
 //datum/controller/subsystem/processing/JSOvermap/proc/start_piloting(mob/user, datum/overmap/OM)
 
 //TODO MAP STAYS SAME WHEN JUMPING!!
@@ -283,29 +322,6 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		if("log")
 			to_chat(usr, "<span class='notice'>Overmap debug: [params["text"]]</span>")
 			return
-		// Weapon group actions
-		if("add_weapon_group")
-			var/new_name = tgui_input_text(usr, "Enter a unique name", "New Group")
-			if(new_name && !(new_name in C.target.weapon_groups))
-				new /datum/weapon_group(C.target, new_name)
-				ui_interact()
-		if("rename_weapon_group")
-			var/datum/weapon_group/WG = locate(params["id"])
-			var/new_name = tgui_input_text(usr, "Enter the new name", "Rename")
-			if(!new_name)
-				return
-			if(new_name in WG.holder.weapon_groups)
-				to_chat(usr, "<span class='warning'>The new group name must be unique!</span>")
-				return
-			WG.holder.weapon_groups -= WG.name
-			WG.name = new_name
-			WG.holder.weapon_groups[WG.name] = WG
-			ui_interact()
-		if("delete_weapon_group")
-			var/datum/weapon_group/WG = locate(params["id"])
-			WG.holder.weapon_groups -= WG.name
-			qdel(WG)
-			ui_interact()
 	return SSJSOvermap.ui_act_for(usr, action, params)
 
 /client/proc/js_overmap_panel() //Admin Verb for the Overmap Gamemode controller
