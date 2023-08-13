@@ -129,7 +129,6 @@ export const JSOvermapPanel = (props, context) => {
                             onClick={() => act('toggle_sensor_mode', { target: value.datum })}
                           />
                         )}
-                        )
                       </Box>
                     </LabeledList.Item>
                   );
