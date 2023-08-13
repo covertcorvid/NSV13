@@ -496,12 +496,6 @@ export const JSOvermapGame = (props, context) => {
         // act('scroll', { key: -1 });
       }
 
-      if (keys["32"]) {
-        // TODO: fill out the weapon to be whatever active weapon we have. I don't care right now for the demo :)
-        // Also todo: mouse aiming!
-        act('fire', { weapon: -1, angle: get_angle(active_ship.x + active_ship.icon.width / 2, active_ship.y + active_ship.icon.height / 2, xy.x, xy.y) });
-      }
-
     }
 
 

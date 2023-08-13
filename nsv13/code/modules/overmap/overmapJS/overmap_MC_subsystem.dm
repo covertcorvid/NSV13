@@ -147,7 +147,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			C.set_zoom(params["key"])
 			return TRUE
 		if("fire")
-			C.process_fire(params["weapon"], params["coords"])
+			C.process_fire(params["weapon"], params["angle"] - 90) // JS and byond use different orientations hence the -90
 			return TRUE
 		if("keyup")
 			C.process_input(params["key"], FALSE)
