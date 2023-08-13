@@ -1,7 +1,7 @@
 /obj/machinery/computer/ship/js_overmap
 	name = "HAHA"
 	var/datum/overmap/ship/active_ship
-
+/*
 //obj/machinery/computer/ship/js_overmap/process()
 
 /obj/machinery/computer/ship/js_overmap/Initialize(mapload)
@@ -42,10 +42,6 @@
 		ui = new(user, src, "JSOvermap")
 		ui.open()
 		user.AddComponent(/datum/component/overmap_piloting, active_ship, ui)
-		//TODO: Do we actually _NEED_ autoupdate?
-		//We can guarantee a certain degree of precision between the client and server..
-		//When the list of overmap ships changes, or a collision occurs etc, we can always update the clients.
-		//ui.set_autoupdate(TRUE) // Contact positions
 
 /obj/machinery/computer/ship/js_overmap/ui_data(mob/user)
 	. = SSJSOvermap.ui_data_for(user, active_ship)
@@ -82,3 +78,4 @@
 			C.mark_dirty(SSJSOvermap, C.target, params["fps"])
 			return
 	//active_ship.position.x += 0.1;
+*/

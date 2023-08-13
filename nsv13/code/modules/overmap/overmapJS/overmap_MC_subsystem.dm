@@ -5,6 +5,7 @@
 PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	name = "JS Overmap"
 	wait = 0.2 SECONDS
+	priority = FIRE_PRIORITY_JSOVERMAP
 	stat_tag = "JS"
 	init_order = INIT_ORDER_JS_OVERMAP
 	flags = SS_BACKGROUND|SS_POST_FIRE_TIMING
@@ -82,7 +83,23 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["control_scheme"] = OP.rights
 	.["fps_capability"] = OP.fps_capability
 	.["keys"] = target?.keys
-	.["sensor_mode"] = target?.sensor_mode
+	var/datum/its_sensor_datum/ship_sensor_mode = target.sensor_mode
+	if(!isnull(ship_sensor_mode))
+		var/list/sensor_mode_data = list(
+			name = ship_sensor_mode.name,
+			spec_key = ship_sensor_mode.spec_key,
+			signature_key = ship_sensor_mode.signature_key,
+			sig_color = ship_sensor_mode.sig_color,
+			interference_impact = ship_sensor_mode.interference_impact,
+			interference_resolution = ship_sensor_mode.interference_resolution,
+			interference_cut = ship_sensor_mode.interference_cut,
+			signature_cutoff = ship_sensor_mode.signature_cutoff,
+			max_angular_spread = ship_sensor_mode.max_angular_spread,
+			signature_propagation_multiplier = ship_sensor_mode.signature_propagation_multiplier
+		)
+		.["sensor_mode_data"] += sensor_mode_data
+	else
+		.["sensor_mode_data"] = null
 	for(var/datum/overmap/O in (target?.map?.physics_objects || list(target)))
 		var/list/quads = list()
 		if(O.armour_quadrants)
@@ -99,7 +116,9 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			sensor_range = O.get_sensor_range(),
 			armour_quadrants = quads,
 			inertial_dampeners = O.inertial_dampeners,
-			thermal_signature = O.thermal_signature,
+			signatures = O.signatures,
+			temp_signatures = O.temp_signatures,
+			signature_decay = O.signature_decay,
 			position = list(O.position.x, O.position.y, O.position.z, O.position.angle, O.position.velocity.ln(), O.position.velocity.x, O.position.velocity.y)
 		)
 		.["physics_world"] += list(data)
@@ -110,6 +129,38 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		var/list/group_data = group.get_ui_data()
 		.["weapon_groups"] += list(group_data)
 
+/**
+	Handle all signals sent by anything using the JS overmap system's frontend.
+	Returns TRUE if the action was handled.
+*/
+/datum/controller/subsystem/processing/JSOvermap/proc/ui_act_for(mob/user, action, list/params)
+	var/datum/component/overmap_piloting/C = user.GetComponent(/datum/component/overmap_piloting)
+	if(!C)
+		return FALSE
+	switch(action)
+		if("test")
+			return
+		if("scroll")
+			C.zoom(params["key"])
+			return TRUE
+		if("set_zoom")
+			C.set_zoom(params["key"])
+			return TRUE
+		if("fire")
+			C.process_fire(params["weapon"], params["coords"])
+			return TRUE
+		if("keyup")
+			C.process_input(params["key"], FALSE)
+			return TRUE
+		if("keydown")
+			C.process_input(params["key"], TRUE)
+			return TRUE
+		if("ui_mark_dirty")
+			C.mark_dirty(SSJSOvermap, C.target, params["fps"])
+			return TRUE
+		if("sync_keys")
+			C.sync_keys(params["zoom"], params["keys"])
+			return TRUE
 //datum/controller/subsystem/processing/JSOvermap/proc/start_piloting(mob/user, datum/overmap/OM)
 
 //TODO MAP STAYS SAME WHEN JUMPING!!
@@ -170,6 +221,11 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		user.AddComponent(/datum/component/overmap_piloting/observer, active_ship, ui)
 		ui.open()
 
+/datum/overmap_js_panel/ui_close(mob/user)
+	var/datum/component/overmap_piloting/C = user.GetComponent(/datum/component/overmap_piloting)
+	C?.RemoveComponent()
+	return ..()
+
 /datum/overmap_js_panel/ui_act(action, list/params)
 	. = ..()
 	if (.)
@@ -177,25 +233,6 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	var/datum/component/overmap_piloting/C = usr.GetComponent(/datum/component/overmap_piloting)
 	message_admins(action)
 	switch(action)
-		if("scroll")
-			C.zoom(params["key"])
-			return
-		if("set_zoom")
-			C.set_zoom(params["key"])
-			return
-		if("fire")
-			C.process_fire(params["weapon"], params["angle"] - 90)
-			ui_interact(usr)
-			return
-		if("keyup")
-			C.process_input(params["key"], FALSE)
-			return
-		if("keydown")
-			C.process_input(params["key"], TRUE)
-			return
-		if("ui_mark_dirty")
-			C.mark_dirty(C.target, C.target, params["fps"])
-			return
 		if("view_vars")
 			usr.client.debug_variables(locate(params["target"]))
 			return
@@ -213,24 +250,34 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			C.target = active_ship
 			ui_interact(usr)
 			return
+		if("toggle_sensor_mode")
+			var/datum/overmap/sensor_update_target = locate(params["target"])
+			sensor_update_target.cycle_sensor_mode()
+			ui_interact(usr)
 		if("swap_control_scheme")
 			C.rights = params["target"]
 			ui_interact(usr)
+			return
 		if("toggle_hide_bullets")
 			hide_bullets = !hide_bullets
 			ui_interact(usr)
-		//TODO: spawney buttons to add enemies?
+			return
+	//TODO: spawney buttons to add enemies?
 		if("set_spawn_type")
 			spawn_type = params["target"]
 			ui_interact(usr)
+			return
 		if("set_spawn_z")
 			spawn_z = params["target"]
 			ui_interact(usr)
+			return
 		if("spawn_ship")
 			SSJSOvermap.instance(spawn_type, SSJSOvermap.debug_level, new /datum/vec5(rand(0, JS_OVERMAP_TACMAP_SIZE), rand(0, JS_OVERMAP_TACMAP_SIZE), spawn_z, 0))
 			ui_interact(usr)
+			return
 		if("log")
 			to_chat(usr, "<span class='notice'>Overmap debug: [params["text"]]</span>")
+			return
 		// Weapon group actions
 		if("add_weapon_group")
 			var/new_name = tgui_input_text(usr, "Enter a unique name", "New Group")
@@ -254,6 +301,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			WG.holder.weapon_groups -= WG.name
 			qdel(WG)
 			ui_interact()
+	return SSJSOvermap.ui_act_for(usr, action, params)
 
 /client/proc/js_overmap_panel() //Admin Verb for the Overmap Gamemode controller
 	set name = "JS Overmap Panel"

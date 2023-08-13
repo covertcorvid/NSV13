@@ -19,7 +19,7 @@ export const JSOvermapPanel = (props, context) => {
   const {
     map_id = 0,
     static_levels = [],
-    icon_cache = data.icon_cache
+    icon_cache = data.icon_cache,
   } = data;
   return (
     <Window
@@ -121,6 +121,15 @@ export const JSOvermapPanel = (props, context) => {
                           content="View Vars"
                           color="blue"
                           onClick={() => act('view_vars', { target: value.datum })} />
+                        {value.active && (
+                          <Button
+                            icon="sensors"
+                            content="Sensor Toggle"
+                            color="orange"
+                            onClick={() => act('toggle_sensor_mode', { target: value.datum })}
+                          />
+                        )}
+                        )
                       </Box>
                     </LabeledList.Item>
                   );

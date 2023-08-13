@@ -3,9 +3,9 @@
 	name = "Seegson model TAC tactical systems control console"
 	desc = "In ship-to-ship combat, most ship systems are digitalized. This console is networked with every weapon system that its ship has to offer, allowing for easy control. There's a section on the screen showing an exterior gun camera view with a rangefinder."
 	icon_screen = "tactical"
-	position = OVERMAP_USER_ROLE_GUNNER
+	position_type = /datum/component/overmap_piloting/gunner
 	circuit = /obj/item/circuitboard/computer/ship/tactical_computer
-
+/*
 /obj/machinery/computer/ship/tactical/Destroy()
 	linked?.tactical = null
 	return ..()
@@ -121,7 +121,7 @@
 /obj/machinery/computer/ship/tactical/set_position(obj/structure/overmap/OM)
 	OM.tactical = src
 	return
-
+*/
 //For use in ghost ships
 /obj/machinery/computer/ship/tactical/internal
 	name = "integrated tactical console"
