@@ -6,7 +6,7 @@ export const WeaponManagementPanel = (props, context) => {
   const { act, data } = useBackend(context);
 
   return (
-    <Section title="Armaments:">
+    <Section>
       <Button fluid
         onClick={() => {act("add_weapon_group")}}
         icon="plus"
