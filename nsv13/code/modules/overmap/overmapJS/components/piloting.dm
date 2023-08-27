@@ -10,6 +10,8 @@
 	dupe_mode = COMPONENT_DUPE_HIGHLANDER
 	var/rights = OVERMAP_CONTROL_RIGHTS_FULL
 	var/fps_capability = -1
+	// TODO store on the console instead
+	var/datum/weapon_group/selected_weapon_group = null
 
 /datum/component/overmap_piloting/pilot
 	rights = OVERMAP_CONTROL_RIGHTS_HELM
@@ -23,14 +25,19 @@
 	RegisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE, PROC_REF(mark_dirty)) //Don't do this for turfs, because we don't care
 	RegisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_STATIC_DATA_UPDATE, PROC_REF(force_update_static_data)) //Don't do this for turfs, because we don't care
 
-/datum/component/overmap_piloting/proc/process_fire(datum/weapon_group/WG, proj_angle)
+/datum/component/overmap_piloting/gunner/Initialize(target, ui)
+	. = ..()
+	if(istype(target, /datum/overmap/ship) && !istype(selected_weapon_group))
+		var/datum/overmap/ship/S = target
+		var/key = S.weapon_groups[1]
+		selected_weapon_group = S.weapon_groups[key]
+
+/datum/component/overmap_piloting/proc/process_fire(proj_angle)
 	if(!(rights & OVERMAP_CONTROL_RIGHTS_GUNNER))
 		return
-	//TODO hack to test the rest of this
-	if(!istype(WG))
-		var/key = target.weapon_groups[1]
-		WG = target.weapon_groups[key]
-	for(var/W in WG.weapon_list)
+	if(!selected_weapon_group)
+		return
+	for(var/W in selected_weapon_group.weapon_list)
 		var/datum/overmap_weapon/weap = W
 		weap.fire(target, proj_angle)
 

@@ -123,6 +123,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 		)
 		.["physics_world"] += list(data)
 
+	.["selected_weapon_group"] = OP.selected_weapon_group?.name
 	.["weapon_groups"] = list()
 	for(var/WG as() in target.weapon_groups)
 		var/datum/weapon_group/group = target.weapon_groups[WG]
@@ -147,7 +148,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			C.set_zoom(params["key"])
 			return TRUE
 		if("fire")
-			C.process_fire(params["weapon"], params["angle"] - 90) // JS and byond use different orientations hence the -90
+			C.process_fire(params["angle"] - 90) // JS and byond use different orientations hence the -90
 			return TRUE
 		if("keyup")
 			C.process_input(params["key"], FALSE)
@@ -163,6 +164,9 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			return TRUE
 
 		// Weapon group actions
+		if("select_weapon_group")
+			C.selected_weapon_group = locate(params["group_id"])
+			return TRUE
 		if("add_weapon_group")
 			var/new_name = tgui_input_text(usr, "Enter a unique name", "New Group")
 			if(new_name && !(new_name in C.target.weapon_groups))

@@ -6,24 +6,30 @@ export const WeaponManagementPanel = (props, context) => {
   const { act, data } = useBackend(context);
 
   return (
-    <Section title="Armaments:" buttons={
-      <>
-        <Button fluid
-          onClick={() => {act("add_weapon_group")}}
-          icon="plus"
-          tooltip="Add Group"/>
-        <Button fluid
-          icon="rotate-left"
-          tooltip="Default Sort"
-          onClick={() => {act("default_sort_weapons")}}/>
-      </>
-    }>
+    <Section title="Armaments:">
+      <Button fluid
+        onClick={() => {act("add_weapon_group")}}
+        icon="plus"
+        label="New group"
+        tooltip="Add Group"/>
+      <Button fluid
+        icon="rotate-left"
+        label="Reset"
+        tooltip="Default Sort"
+        onClick={() => {act("default_sort_weapons")}}/>
+      <br />
       {!!data.weapon_groups && Object.keys(data.weapon_groups).map(key => {
         let group_data = data.weapon_groups[key];
         return (
           <Section
             key={key}
             title={group_data.name}>
+              <Button
+                onClick={() => {act("select_weapon_group", {group_id: group_data.id})}}
+                icon="bullseye"
+                label="Select"
+                color={data.selected_weapon_group === group_data.name ? "green" : "blue"}
+                tooltip="Add Group"/>
               <Button
                 icon="plus"
                 tooltip="Add weapon to group"
