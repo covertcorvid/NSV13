@@ -26,10 +26,8 @@ export const WeaponManagementPanel = (props, context) => {
             title={group_data.name}>
               <Button
                 onClick={() => {act("select_weapon_group", {group_id: group_data.id})}}
-                icon="bullseye"
-                label="Select"
-                color={data.selected_weapon_group === group_data.name ? "green" : "blue"}
-                tooltip="Add Group"/>
+                content="Select"
+                color={data.selected_weapon_group === group_data.name ? "green" : "blue"}/>
               <Button
                 icon="plus"
                 tooltip="Add weapon to group"
