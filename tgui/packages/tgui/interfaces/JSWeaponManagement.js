@@ -1,5 +1,5 @@
 import { useBackend } from '../backend';
-import { Section, Dropdown, Button, Flex } from '../components';
+import { Section, Dropdown, Button, Flex, LabeledList } from '../components';
 import { Window } from '../layouts';
 
 export const WeaponManagementPanel = (props, context) => {
@@ -45,23 +45,23 @@ export const WeaponManagementPanel = (props, context) => {
                 tooltip="View Variables"
                 onClick={() => act("view_vars", {target: group_data.id})}/>
               <br />
-              {!!group_data.weapons && Object.keys(group_data.weapons).map(key2 => {
-                let weapon_data = group_data.weapons[key2];
-                return(
-                  <>
-                    {weapon_data.name}
-                    &ensp;<Button
-                      icon="eye"
-                      tooltip="View Variables"
-                      onClick={() => act("view_vars", {target: weapon_data.id})}/>
-                    <Button
-                      icon="minus"
-                      tooltip="Remove from group"
-                      onClick={() => act("remove_weapon", {group_id: group_data.id, weapon_id: weapon_data.id})}/>
-                    <br />
-                  </>
-                )
-              })}
+              <LabeledList>
+                {!!group_data.weapons && Object.keys(group_data.weapons).map(key2 => {
+                  let weapon_data = group_data.weapons[key2];
+                  return(
+                    <LabeledList.Item label={weapon_data.name}>
+                      <Button
+                        icon="minus"
+                        tooltip="Remove from group"
+                        onClick={() => act("remove_weapon", {group_id: group_data.id, weapon_id: weapon_data.id})}/>
+                      <Button
+                        icon="eye"
+                        tooltip="View Variables"
+                        onClick={() => act("view_vars", {target: weapon_data.id})}/>
+                    </LabeledList.Item>
+                  )
+                })}
+              </LabeledList>
           </Section>
           );
       })}
