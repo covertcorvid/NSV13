@@ -64,8 +64,6 @@ export const JSOvermapPanel = (props, context) => {
                     />
                   </Box>
                 </LabeledList.Item>
-              </LabeledList>
-              <LabeledList>
                 <LabeledList.Item label="Preferences">
                   <Box mb={1}>
                     <Button
@@ -76,8 +74,6 @@ export const JSOvermapPanel = (props, context) => {
                     />
                   </Box>
                 </LabeledList.Item>
-              </LabeledList>
-              <LabeledList>
                 <LabeledList.Item label="Spawning">
                   <Box mb={1}>
                     <Input
