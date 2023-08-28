@@ -7,14 +7,14 @@ export const WeaponManagementPanel = (props, context) => {
 
   return (
     <Section>
-      <Button fluid
+      <Button
         onClick={() => {act("add_weapon_group")}}
         icon="plus"
-        label="New group"
+        content="New group"
         tooltip="Add Group"/>
-      <Button fluid
+      <Button
         icon="rotate-left"
-        label="Reset"
+        content="Reset"
         tooltip="Default Sort"
         onClick={() => {act("default_sort_weapons")}}/>
       <br />
