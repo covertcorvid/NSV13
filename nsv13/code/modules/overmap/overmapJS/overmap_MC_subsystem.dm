@@ -71,6 +71,7 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 
 /datum/controller/subsystem/processing/JSOvermap/proc/ui_data_for(mob/user, datum/overmap/target)
 	. = list()
+	.["debug_rights"] = FALSE
 	.["map_id"] = target?.map?.identifier || 0
 	.["physics_world"] = list()
 	var/datum/component/overmap_piloting/OP = user.GetComponent(/datum/component/overmap_piloting)
@@ -232,6 +233,8 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 	.["spawn_type"] = "[spawn_type]"
 	.["spawn_z"] = spawn_z
 	.["hide_bullets"] = hide_bullets
+	if(check_rights(R_DEBUG))
+		.["debug_rights"] = TRUE
 
 /datum/overmap_js_panel/ui_static_data(mob/user)
 	var/list/data = SSJSOvermap.ui_static_data_for(user)

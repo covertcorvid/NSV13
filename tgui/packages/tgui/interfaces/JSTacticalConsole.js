@@ -14,7 +14,6 @@ import { JSOvermapGame } from './JSOvermap';
 import { WeaponManagementPanel } from './JSWeaponManagement';
 
 export const JSTacticalConsole = (props, context) => {
-  const { act, data } = useBackend(context);
 
   return (
     <Window

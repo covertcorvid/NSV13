@@ -40,10 +40,14 @@ export const WeaponManagementPanel = (props, context) => {
                 icon="minus"
                 tooltip="Delete"
                 onClick={() => act("delete_weapon_group", {group_id: group_data.id})}/>
-              <Button
-                icon="eye"
-                tooltip="View Variables"
-                onClick={() => act("view_vars", {target: group_data.id})}/>
+              {!!data.debug_rights && (
+                <>
+                  <Button
+                    icon="eye"
+                    tooltip="View Variables"
+                    onClick={() => act("view_vars", {target: group_data.id})}/>
+                </>
+              )}
               <br />
               <LabeledList>
                 {!!group_data.weapons && Object.keys(group_data.weapons).map(key2 => {
@@ -54,10 +58,14 @@ export const WeaponManagementPanel = (props, context) => {
                         icon="minus"
                         tooltip="Remove from group"
                         onClick={() => act("remove_weapon", {group_id: group_data.id, weapon_id: weapon_data.id})}/>
-                      <Button
-                        icon="eye"
-                        tooltip="View Variables"
-                        onClick={() => act("view_vars", {target: weapon_data.id})}/>
+                      {!!data.debug_rights && (
+                        <>
+                          <Button
+                            icon="eye"
+                            tooltip="View Variables"
+                            onClick={() => act("view_vars", {target: weapon_data.id})}/>
+                        </>
+                      )}
                     </LabeledList.Item>
                   )
                 })}
