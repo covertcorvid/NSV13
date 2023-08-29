@@ -62,17 +62,25 @@
 	src_overmap.fire_projectile(proj_angle, shell_type)
 	//TODO: Check if theyre the gunner. Roles... I don't care for now!
 
-
 /datum/ai_weapon/pdc
-	name = "Axial Cannon"
+	name = "Point Defense Cannon"
+	shell_type = /datum/overmap/projectile
+
+/datum/ai_weapon/railgun
+	name = "Railgun"
+	shell_type = /datum/overmap/projectile/slug
 	// Testing - remove later
-	shell_type = /datum/overmap/projectile/shell
 	firing_arc_center = 0 // Dead center
 	firing_arc_width = 50 // In percentage - Front side only
 
+/datum/ai_weapon/cannon
+	name = "Naval Artillery Cannon"
+	shell_type = /datum/overmap/projectile/shell
+
 /datum/ai_weapon/torpedo
 	name = "Torpedo"
-	shell_type = /datum/overmap/projectile/slug
+	shell_type = /datum/overmap/projectile/warhead
+	// Testing - remove later
 	firing_arc_center = 180 // Back
 	firing_arc_width = 50
 
