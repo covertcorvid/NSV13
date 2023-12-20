@@ -28,20 +28,24 @@
 	for(var/datum/overmap_weapon/W as() in weapon_list)
 		.["weapons"] += list(list(name = W.name, id = "\ref[W]"))
 
+// overmap_weapon does not have any children - it defines a template to be used for all
+// other types that can be fired as a weapon. You can make them any type as long as
+// they implement these variables and procs.
 /datum/overmap_weapon
 	var/name
 	// Testing - remove later
-	var/firing_arc_center
-	var/firing_arc_width
+	var/firing_arc_center_rel_deg
+	var/firing_arc_width_deg
 
 /datum/overmap_weapon/proc/fire()
 
+// ai_weapon is a non-physical weapon that can be attached to a ship
 /datum/ai_weapon
 	var/name
 	// Testing - remove later
 	var/shell_type
-	var/firing_arc_center
-	var/firing_arc_width
+	var/firing_arc_center_rel_deg
+	var/firing_arc_width_deg
 
 /datum/ai_weapon/proc/fire(datum/overmap/src_overmap, angle)
 	var/proj_angle = angle
@@ -53,9 +57,9 @@
 	// Calculate the angle between the center of the firing arc and the requested angle, and compare it to the width of the firing arc
 	// CC-BY-SA algorithm from StackOverflow https://stackoverflow.com/questions/12234574/calculating-if-an-angle-is-between-two-angles
 	// Solution by Alnitak (https://stackoverflow.com/users/6782/alnitak) and hdante (https://stackoverflow.com/users/1797000/hdante)
-	var/current_arc_center = src_overmap.position.angle + firing_arc_center
+	var/current_arc_center = src_overmap.position.angle + firing_arc_center_rel_deg
 	var/adjusted_angle = arccos(cos(current_arc_center) * cos(proj_angle) + sin(current_arc_center) * sin(proj_angle))
-	if(adjusted_angle > (firing_arc_width/100)*180)
+	if(adjusted_angle > firing_arc_width_deg / 2)
 		to_chat(world, "adjusted angle [adjusted_angle] was out of range")
 		return
 
@@ -70,8 +74,8 @@
 	name = "Railgun"
 	shell_type = /datum/overmap/projectile/slug
 	// Testing - remove later
-	firing_arc_center = 0 // Dead center
-	firing_arc_width = 50 // In percentage - Front side only
+	firing_arc_center_rel_deg = 0 // Bow
+	firing_arc_width_deg = 180 // Front half of the ship
 
 /datum/ai_weapon/cannon
 	name = "Naval Artillery Cannon"
@@ -81,13 +85,12 @@
 	name = "Torpedo"
 	shell_type = /datum/overmap/projectile/warhead
 	// Testing - remove later
-	firing_arc_center = 180 // Back
-	firing_arc_width = 50
+	firing_arc_center_rel_deg = 180 // Stern
+	firing_arc_width_deg = 180 // Back half of the ship
 
 /datum/overmap/proc/fire_projectile(proj_angle = src.position.angle, datum/overmap/projectile/projectile_type=/datum/overmap/projectile/shell, burst_size=1)
 	if (!map)
 		CRASH("Overmap object with no map cannot fire projectiles.")
-	//TODO: magic number "10".
 	//We scromble the position so it originates from the centre of the ship.
 	for(var/i = 1; i <= burst_size; i++)
 		var/new_velocity_x = position.velocity.x + initial(projectile_type.speed) * cos(proj_angle)
