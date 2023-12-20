@@ -66,28 +66,6 @@
 	src_overmap.fire_projectile(proj_angle, shell_type)
 	//TODO: Check if theyre the gunner. Roles... I don't care for now!
 
-/datum/ai_weapon/pdc
-	name = "Point Defense Cannon"
-	shell_type = /datum/overmap/projectile
-
-/datum/ai_weapon/railgun
-	name = "Railgun"
-	shell_type = /datum/overmap/projectile/slug
-	// Testing - remove later
-	firing_arc_center_rel_deg = 0 // Bow
-	firing_arc_width_deg = 180 // Front half of the ship
-
-/datum/ai_weapon/cannon
-	name = "Naval Artillery Cannon"
-	shell_type = /datum/overmap/projectile/shell
-
-/datum/ai_weapon/torpedo
-	name = "Torpedo"
-	shell_type = /datum/overmap/projectile/warhead
-	// Testing - remove later
-	firing_arc_center_rel_deg = 180 // Stern
-	firing_arc_width_deg = 180 // Back half of the ship
-
 /datum/overmap/proc/fire_projectile(proj_angle = src.position.angle, datum/overmap/projectile/projectile_type=/datum/overmap/projectile/shell, burst_size=1)
 	if (!map)
 		CRASH("Overmap object with no map cannot fire projectiles.")

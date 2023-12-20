@@ -22,6 +22,10 @@
 	var/physical_projectile_type = /obj/item/projectile/bullet
 	var/projectile_flags = OVERMAP_PROJECTILE_FLAGS_NONE
 
+/datum/ai_weapon/pdc
+	name = "Point Defense Cannon"
+	shell_type = /datum/overmap/projectile
+
 /datum/overmap/projectile/slug
 	name = "railgun slug"
 	icon_state = "railgun"
@@ -30,6 +34,14 @@
 	range = 25 KM
 	unstoppable = TRUE
 	speed = 50
+
+/datum/ai_weapon/railgun
+	name = "Railgun"
+	shell_type = /datum/overmap/projectile/slug
+	// Testing - remove later
+	firing_arc_center_rel_deg = 0 // Bow
+	firing_arc_width_deg = 180 // Front half of the ship
+
 /datum/overmap/projectile/shell
 	name = "cannon shell"
 	icon_state = "mac"
@@ -37,6 +49,10 @@
 	damage_type = OVERMAP_DAMAGE_TYPE_KINETIC_CAPITAL
 	range = 25 KM
 	speed = 25
+
+/datum/ai_weapon/cannon
+	name = "Naval Artillery Cannon"
+	shell_type = /datum/overmap/projectile/shell
 
 /datum/overmap/projectile/warhead
 	name = "conventional missile"
@@ -47,6 +63,13 @@
 	speed = 50
 	//Hint to gun batteries that we can shoot down warheads.
 	projectile_flags = OVERMAP_PROJECTILE_FLAGS_CAN_BE_SHOT_DOWN
+
+/datum/ai_weapon/torpedo
+	name = "Torpedo Launcher"
+	shell_type = /datum/overmap/projectile/warhead
+	// Testing - remove later
+	firing_arc_center_rel_deg = 180 // Stern
+	firing_arc_width_deg = 180 // Back half of the ship
 
 /datum/overmap/projectile/on_move()
 	..()
