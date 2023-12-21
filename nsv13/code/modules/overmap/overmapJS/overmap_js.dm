@@ -103,7 +103,9 @@
 	var/max_armour_plates = 0
 	var/linked_apnw = null //Our linked APNW
 
+	// Planets or stations may also have weapons
 	var/list/weapon_groups = list()
+	var/list/all_weapons = list()
 
 
 /**

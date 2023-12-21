@@ -18,7 +18,6 @@
 	)
 	integrity = OVERMAP_ARMOUR_THICKNESS_MEDIUM
 	max_integrity = OVERMAP_ARMOUR_THICKNESS_MEDIUM
-	var/list/all_weapons = list()
 
 /datum/overmap/ship/player
 	name = "NSV Rocinante"

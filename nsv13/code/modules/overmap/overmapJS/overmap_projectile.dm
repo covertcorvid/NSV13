@@ -22,9 +22,19 @@
 	var/physical_projectile_type = /obj/item/projectile/bullet
 	var/projectile_flags = OVERMAP_PROJECTILE_FLAGS_NONE
 
+/datum/overmap/projectile/pdc
+	// Yes it's the default but I want them all to match!
+	name = "PDC round"
+	icon_state = "pdc"
+	damage = 10
+	damage_type = OVERMAP_DAMAGE_TYPE_KINETIC_SUBCAPITAL
+	range = 1 KM
+	unstoppable = FALSE
+	speed = 10
+
 /datum/ai_weapon/pdc
 	name = "Point Defense Cannon"
-	shell_type = /datum/overmap/projectile
+	shell_type = /datum/overmap/projectile/pdc
 
 /datum/overmap/projectile/slug
 	name = "railgun slug"

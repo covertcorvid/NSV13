@@ -44,8 +44,8 @@
 	var/name
 	// Testing - remove later
 	var/shell_type
-	var/firing_arc_center_rel_deg
-	var/firing_arc_width_deg
+	var/firing_arc_center_rel_deg = 0
+	var/firing_arc_width_deg = 360 // Anything unspecified is omnidirectional
 
 /datum/ai_weapon/proc/fire(datum/overmap/src_overmap, angle)
 	var/proj_angle = angle
