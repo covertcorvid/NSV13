@@ -32,12 +32,15 @@
 // other types that can be fired as a weapon. You can make them any type as long as
 // they implement these variables and procs.
 /datum/overmap_weapon
+	// Weapons will be sorted into groups by name by default
 	var/name
 	// Testing - remove later
 	var/firing_arc_center_rel_deg
 	var/firing_arc_width_deg
 
+// Must return true if the weapon fired one or more projectiles
 /datum/overmap_weapon/proc/fire()
+	return FALSE
 
 // ai_weapon is a non-physical weapon that can be attached to a ship
 /datum/ai_weapon
