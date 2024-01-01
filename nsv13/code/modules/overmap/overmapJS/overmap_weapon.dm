@@ -9,16 +9,13 @@
 /datum/weapon_group/New(datum/overmap/ship/holder, name)
 	. = ..()
 	src.holder = holder
-	while(!name || (name in holder.weapon_groups))
-		// Look, picking a random number that's already used could happen, okay?
+	if(!name)
 		name = "Group [rand(0, 999)]"
 	src.name = name
 	holder.weapon_groups[name] = src
-	// TODO actual weapons, this is just for testing
-	for(var/type in subtypesof(/datum/ai_weapon))
-		var/datum/overmap_weapon/W = new type()
-		weapon_list += W
-		holder.all_weapons += W
+
+/datum/weapon_group/proc/add_weapon(datum/overmap_weapon/weap)
+	weapon_list |= weap
 
 /datum/weapon_group/proc/get_ui_data()
 	. = list()

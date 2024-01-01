@@ -148,10 +148,24 @@
 	//TODO: replace this.
 	START_PROCESSING(SSJSOvermap, src)
 	setup_armour()
-	for(var/i = 0; i < 2; i++)
-		new /datum/weapon_group(src)
+	// TODO: real weapon init
+	for(var/type in subtypesof(/datum/ai_weapon))
+		var/datum/overmap_weapon/W1 = new type()
+		var/datum/overmap_weapon/W2 = new type()
+		all_weapons += W1
+		all_weapons += W2
+	sort_weapons()
 	//ITS-TODO: This will be on the sensor console once the scan modes are moved.
 	setup_sensor_modes()
+
+/datum/overmap/proc/sort_weapons()
+	for(var/datum/overmap_weapon/OW as() in all_weapons)
+		var/datum/weapon_group/WG = null
+		if(!(OW.name in weapon_groups))
+			WG = new /datum/weapon_group(src, OW.name)
+		else
+			WG = weapon_groups[OW.name]
+		WG.add_weapon(OW)
 
 /datum/overmap/proc/setup_sensor_modes()
 	if(!length(GLOB.its_sensor_datums)) //setup the global if not done yet
