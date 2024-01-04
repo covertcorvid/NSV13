@@ -165,6 +165,12 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 			return TRUE
 
 		// Weapon group actions
+		if("default_sort_weapons")
+			var/response = tgui_alert(usr, "All weapons will be sorted into groups by name. Continue?", "Confirm Re-sort", list("Yes", "No"), timeout = 0, autofocus = TRUE)
+			if(response != "Yes")
+				return TRUE
+			C.target?.sort_weapons()
+			return TRUE
 		if("select_weapon_group")
 			C.selected_weapon_group = locate(params["group_id"])
 			return TRUE
