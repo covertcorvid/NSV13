@@ -205,6 +205,14 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 				message_admins("ERROR: would have lost reference to [OW]")
 				WG.holder.all_weapons |= OW
 			ui_interact(user)
+		if("rename_weapon")
+			var/datum/weapon_group/WG = locate(params["group_id"])
+			var/datum/overmap_weapon/OW = locate(params["weapon_id"])
+			var/new_name = tgui_input_text(usr, "Enter the new name", "Rename")
+			if(!new_name)
+				return
+			OW.name = new_name
+			ui_interact(user)
 //datum/controller/subsystem/processing/JSOvermap/proc/start_piloting(mob/user, datum/overmap/OM)
 
 //TODO MAP STAYS SAME WHEN JUMPING!!

@@ -58,6 +58,10 @@ export const WeaponManagementPanel = (props, context) => {
                         icon="minus"
                         tooltip="Remove from group"
                         onClick={() => act("remove_weapon", {group_id: group_data.id, weapon_id: weapon_data.id})}/>
+                      <Button
+                        icon="pen"
+                        tooltip="Rename"
+                        onClick={() => act("rename_weapon", {group_id: group_data.id, weapon_id: weapon_data.id})}/>
                       {!!data.debug_rights && (
                         <>
                           <Button
