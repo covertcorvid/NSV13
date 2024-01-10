@@ -42,6 +42,16 @@
 // ai_weapon is a non-physical weapon that can be attached to a ship
 /datum/ai_weapon
 	var/name
+	// Ammo counters
+	var/ammo = 0
+	var/max_ammo = 0
+	// Firing rate stuff
+	var/time_between_projectiles = 0
+	var/time_between_bursts = 0 // If this is a single-shot weapon, leave this at zero
+	var/burst_size = 0
+	// Resupply rate stuff
+	var/min_time_between_resupplies = 0 // Convert to times per minute for initial value
+	var/decay_constant = 0 // Mean lifetime = 1 / decay_constant
 	// Testing - remove later
 	var/shell_type
 	var/firing_arc_center_rel_deg = 0
