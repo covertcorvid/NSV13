@@ -28,9 +28,14 @@
 // overmap_weapon does not have any children - it defines a template to be used for all
 // other types that can be fired as a weapon. You can make them any type as long as
 // they implement these variables and procs.
+// In general trying to keep this to stuff that needs to be displayed and have no real
+// implementation here to avoid the problems we had last time.
 /datum/overmap_weapon
 	// Weapons will be sorted into groups by name by default
 	var/name
+	// Ammo counters - use whatever format you want, bullets, bursts, percents, joules...
+	var/ammo = 0
+	var/max_ammo = 0
 	// Testing - remove later
 	var/firing_arc_center_rel_deg
 	var/firing_arc_width_deg
@@ -42,9 +47,6 @@
 // ai_weapon is a non-physical weapon that can be attached to a ship
 /datum/ai_weapon
 	var/name
-	// Ammo counters
-	var/ammo = 0
-	var/max_ammo = 0
 	// Firing rate stuff
 	var/time_between_projectiles = 0
 	var/time_between_bursts = 0 // If this is a single-shot weapon, leave this at zero
