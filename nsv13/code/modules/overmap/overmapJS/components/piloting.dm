@@ -39,7 +39,8 @@
 		return
 	for(var/W in selected_weapon_group.weapon_list)
 		var/datum/overmap_weapon/weap = W
-		weap.fire(target, proj_angle)
+		if(weap.fire(target, proj_angle))
+			break
 
 /datum/component/overmap_piloting/Destroy()
 	UnregisterSignal(SSJSOvermap, COMSIG_JS_OVERMAP_UPDATE)

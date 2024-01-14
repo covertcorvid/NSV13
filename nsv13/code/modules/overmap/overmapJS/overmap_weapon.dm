@@ -50,10 +50,12 @@
 	// Firing rate stuff
 	var/time_between_projectiles = 0
 	var/time_between_bursts = 0 // If this is a single-shot weapon, leave this at zero
-	var/burst_size = 0
-	// Resupply rate stuff
-	var/min_time_between_resupplies = 0 // Convert to times per minute for initial value
-	var/decay_constant = 0 // Mean lifetime = 1 / decay_constant
+	var/burst_size = 1 // TODO handle burst fire
+	var/next_fire = 0
+	// Resupply rate stuff. We'll just make it linear for now.
+	var/max_time_between_resupplies = 0
+	var/resupply_time_slope = 0.5 // 20 minute fight = 10 minutes between resupplies
+	var/next_resupply = 0
 	// Testing - remove later
 	var/shell_type
 	var/firing_arc_center_rel_deg = 0
@@ -73,9 +75,15 @@
 	var/adjusted_angle = arccos(cos(current_arc_center) * cos(proj_angle) + sin(current_arc_center) * sin(proj_angle))
 	if(adjusted_angle > firing_arc_width_deg / 2)
 		to_chat(world, "adjusted angle [adjusted_angle] was out of range")
-		return
+		return FALSE
+
+	if(next_fire > world.time)
+		// Too soon
+		return FALSE
 
 	src_overmap.fire_projectile(proj_angle, shell_type)
+	next_fire = world.time + time_between_bursts
+	return TRUE
 	//TODO: Check if theyre the gunner. Roles... I don't care for now!
 
 /datum/overmap/proc/fire_projectile(proj_angle = src.position.angle, datum/overmap/projectile/projectile_type=/datum/overmap/projectile/shell, burst_size=1)
