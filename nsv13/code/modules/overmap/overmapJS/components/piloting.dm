@@ -48,7 +48,7 @@
 
 	//Bye bye mr UI, took my chevvy to the levy but the levy was dry..
 	ui?.close()
-	. = ..()
+	return ..()
 /**
 Mark our linked TGUI as requiring update.
 The server will send the new positions and state of the physics world.

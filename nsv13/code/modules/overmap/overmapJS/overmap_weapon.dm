@@ -44,8 +44,8 @@
 /datum/overmap_weapon/proc/fire()
 	return FALSE
 
-// ai_weapon is a non-physical weapon that can be attached to a ship
-/datum/ai_weapon
+// virtual_weapon is a non-physical weapon that can be attached to a ship
+/datum/virtual_weapon
 	var/name
 	// Firing rate stuff
 	var/time_between_projectiles = 0
@@ -61,7 +61,7 @@
 	var/firing_arc_center_rel_deg = 0
 	var/firing_arc_width_deg = 360 // Anything unspecified is omnidirectional
 
-/datum/ai_weapon/proc/fire(datum/overmap/src_overmap, angle)
+/datum/virtual_weapon/proc/fire(datum/overmap/src_overmap, angle)
 	var/proj_angle = angle
 	if(!src_overmap)
 		CRASH("Tried to fire [src] without a source overmap")

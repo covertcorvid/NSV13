@@ -148,16 +148,14 @@
 	//TODO: replace this.
 	START_PROCESSING(SSJSOvermap, src)
 	setup_armour()
-	// TODO: real weapon init
-	for(var/type in subtypesof(/datum/ai_weapon))
-		var/datum/overmap_weapon/W1 = new type()
-		var/datum/overmap_weapon/W2 = new type()
-		all_weapons += W1
-		all_weapons += W2
-	sort_weapons()
+	setup_weapons()
 	//ITS-TODO: This will be on the sensor console once the scan modes are moved.
 	setup_sensor_modes()
 
+// This is where people should put specific loadout stuff
+/datum/overmap/proc/setup_weapons()
+
+// Setarate from setup so we can reset to default sorting
 /datum/overmap/proc/sort_weapons()
 	for(var/datum/overmap_weapon/OW as() in all_weapons)
 		var/datum/weapon_group/WG = null

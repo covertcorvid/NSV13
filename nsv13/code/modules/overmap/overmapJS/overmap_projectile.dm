@@ -32,7 +32,7 @@
 	unstoppable = FALSE
 	speed = 10
 
-/datum/ai_weapon/pdc
+/datum/virtual_weapon/pdc
 	name = "Point Defense Cannon"
 	shell_type = /datum/overmap/projectile/pdc
 
@@ -45,7 +45,7 @@
 	unstoppable = TRUE
 	speed = 50
 
-/datum/ai_weapon/railgun
+/datum/virtual_weapon/railgun
 	name = "Railgun"
 	shell_type = /datum/overmap/projectile/slug
 	// Testing - remove later
@@ -60,7 +60,7 @@
 	range = 25 KM
 	speed = 25
 
-/datum/ai_weapon/cannon
+/datum/virtual_weapon/cannon
 	name = "Naval Artillery Cannon"
 	shell_type = /datum/overmap/projectile/shell
 
@@ -74,7 +74,7 @@
 	//Hint to gun batteries that we can shoot down warheads.
 	projectile_flags = OVERMAP_PROJECTILE_FLAGS_CAN_BE_SHOT_DOWN
 
-/datum/ai_weapon/torpedo
+/datum/virtual_weapon/torpedo
 	name = "Torpedo Launcher"
 	shell_type = /datum/overmap/projectile/warhead
 	// Testing - remove later
