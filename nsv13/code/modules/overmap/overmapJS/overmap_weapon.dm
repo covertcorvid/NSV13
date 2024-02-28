@@ -48,9 +48,9 @@
 /datum/virtual_weapon
 	var/name
 	// Firing rate stuff
-	var/time_between_projectiles = 0
-	var/time_between_bursts = 0 // If this is a single-shot weapon, leave this at zero
-	var/burst_size = 1 // TODO handle burst fire
+	var/seconds_between_projectiles = 0
+	var/seconds_between_bursts = 0 // If this is a single-shot weapon, leave this at zero
+	var/burst_size = 1
 	var/next_fire = 0
 	// Resupply rate stuff. We'll just make it linear for now.
 	var/max_time_between_resupplies = 0
@@ -60,6 +60,13 @@
 	var/shell_type
 	var/firing_arc_center_rel_deg = 0
 	var/firing_arc_width_deg = 360 // Anything unspecified is omnidirectional
+
+// I know this feels redundant, but it makes default values on subclasses work
+/datum/virtual_weapon/New(firing_arc_center_rel_deg_ = firing_arc_center_rel_deg, firing_arc_width_deg_ = firing_arc_width_deg, seconds_between_projectiles_ = seconds_between_projectiles, seconds_between_bursts_ = seconds_between_bursts)
+	firing_arc_center_rel_deg = firing_arc_center_rel_deg_
+	firing_arc_width_deg = firing_arc_width_deg_
+	seconds_between_projectiles = seconds_between_projectiles_
+	seconds_between_bursts = seconds_between_bursts_
 
 /datum/virtual_weapon/proc/fire(datum/overmap/src_overmap, angle)
 	var/proj_angle = angle
@@ -76,13 +83,16 @@
 	if(adjusted_angle > firing_arc_width_deg / 2)
 		to_chat(world, "adjusted angle [adjusted_angle] was out of range")
 		return FALSE
-
 	if(next_fire > world.time)
 		// Too soon
 		return FALSE
 
 	src_overmap.fire_projectile(proj_angle, shell_type)
-	next_fire = world.time + time_between_bursts
+	// And then if we're a burst weapon...
+	for(var/i = 1; i < burst_size; i++)
+		sleep(seconds_between_projectiles SECONDS)
+		src_overmap.fire_projectile(proj_angle, shell_type)
+	next_fire = world.time + seconds_between_bursts SECONDS
 	return TRUE
 	//TODO: Check if theyre the gunner. Roles... I don't care for now!
 
