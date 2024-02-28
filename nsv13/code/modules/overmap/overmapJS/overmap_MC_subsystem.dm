@@ -212,7 +212,6 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 				WG.holder.all_weapons |= OW
 			ui_interact(user)
 		if("rename_weapon")
-			var/datum/weapon_group/WG = locate(params["group_id"])
 			var/datum/overmap_weapon/OW = locate(params["weapon_id"])
 			var/new_name = tgui_input_text(usr, "Enter the new name", "Rename")
 			if(!new_name)
