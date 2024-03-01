@@ -102,9 +102,8 @@
 	if (!map)
 		CRASH("Overmap object with no map cannot fire projectiles.")
 	//We scromble the position so it originates from the centre of the ship.
-	for(var/i = 1; i <= burst_size; i++)
-		var/new_velocity_x = position.velocity.x + initial(projectile_type.speed) * cos(proj_angle)
-		var/new_velocity_y = position.velocity.y + initial(projectile_type.speed) * sin(proj_angle)
-		var/datum/overmap/projectile/O = new projectile_type(src.map, position.x + (collision_radius/2), position.y + (collision_radius/2), position.z, proj_angle, new_velocity_x, new_velocity_y)
-		O.faction = faction
+	var/new_velocity_x = position.velocity.x + initial(projectile_type.speed) * cos(proj_angle)
+	var/new_velocity_y = position.velocity.y + initial(projectile_type.speed) * sin(proj_angle)
+	var/datum/overmap/projectile/O = new projectile_type(src.map, position.x + (collision_radius/2), position.y + (collision_radius/2), position.z, proj_angle, new_velocity_x, new_velocity_y)
+	O.faction = faction
 	//to_chat(world, "Fire missile.")
