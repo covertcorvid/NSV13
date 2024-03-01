@@ -87,12 +87,14 @@
 		// Too soon
 		return FALSE
 
-	src_overmap.fire_projectile(proj_angle, shell_type)
-	// And then if we're a burst weapon...
-	for(var/i = 1; i < burst_size; i++)
-		sleep(seconds_between_projectiles SECONDS)
+	spawn(-1) {
 		src_overmap.fire_projectile(proj_angle, shell_type)
-	next_fire = world.time + seconds_between_bursts SECONDS
+		// And then if we're a burst weapon...
+		for(var/i = 1; i < burst_size; i++)
+			sleep(seconds_between_projectiles SECONDS)
+			src_overmap.fire_projectile(proj_angle, shell_type)
+		next_fire = world.time + seconds_between_bursts SECONDS
+	}
 	return TRUE
 	//TODO: Check if theyre the gunner. Roles... I don't care for now!
 
