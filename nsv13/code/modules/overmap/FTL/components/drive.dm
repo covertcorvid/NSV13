@@ -55,7 +55,7 @@
 	radio.keyslot = new radio_key
 	radio.listening = 0
 	radio.recalculateChannels()
-	soundloop = new(list(src), FALSE, FALSE, CHANNEL_FTL_MANIFOLD, TRUE)
+	soundloop = new(src, FALSE, FALSE, CHANNEL_FTL_MANIFOLD, TRUE)
 	STOP_PROCESSING(SSmachines, src)
 	return INITIALIZE_HINT_LATELOAD
 
@@ -311,6 +311,7 @@ Preset classes of FTL drive with pre-programmed behaviours
 		pylon_info["gyro"] = round(P.gyro_speed / P.req_gyro_speed, 0.01)
 		pylon_info["capacitor"] = round(P.capacitor / P.req_capacitor, 0.01)
 		pylon_info["draw"] = display_power(P.power_draw)
+		pylon_info["nucleium"] = round(P.get_nucleium_use() / 2, 0.01) //Converted into mol / second, SSmachines runs every 2 seconds.
 		pylon_info["shielded"] = P.shielded
 		all_pylon_info[++all_pylon_info.len] = pylon_info // Unfortunately, this is currently the best way to embed lists
 	data["pylons"] = all_pylon_info
@@ -362,6 +363,8 @@ Preset classes of FTL drive with pre-programmed behaviours
 	jump_speed_pylon = initial(jump_speed_pylon)
 	if(shutdown_pylons)
 		for(var/obj/machinery/atmospherics/components/binary/drive_pylon/P as() in pylons)
+			if(P.pylon_state == PYLON_STATE_OFFLINE || P.pylon_state == PYLON_STATE_SHUTDOWN)
+				continue
 			P.set_state(PYLON_STATE_SHUTDOWN)
 	cooldown = TRUE
 	addtimer(CALLBACK(src, PROC_REF(post_cooldown), auto_spool_enabled), FTL_COOLDOWN)
