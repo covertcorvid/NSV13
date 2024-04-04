@@ -3682,6 +3682,7 @@
 #include "nsv13\code\__DEFINES\paths.dm"
 #include "nsv13\code\__DEFINES\research.dm"
 #include "nsv13\code\__DEFINES\robot_defines.dm"
+#include "nsv13\code\__DEFINES\ships.dm"
 #include "nsv13\code\__DEFINES\skynet.dm"
 #include "nsv13\code\__DEFINES\starsystem.dm"
 #include "nsv13\code\__DEFINES\traits.dm"

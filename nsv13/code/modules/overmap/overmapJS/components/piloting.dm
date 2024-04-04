@@ -37,7 +37,7 @@
 		return
 	if(!selected_weapon_group)
 		return
-	for(var/W in selected_weapon_group.weapon_list)
+	for(var/W as() in selected_weapon_group.weapon_list)
 		var/datum/overmap_weapon/weap = W
 		if(weap.fire(target, proj_angle))
 			break

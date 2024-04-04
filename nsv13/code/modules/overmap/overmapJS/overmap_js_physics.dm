@@ -47,7 +47,7 @@ PROCESSING_SUBSYSTEM_DEF(physics_processing)
 		//Set up this grid.
 		var/rows = (JS_OVERMAP_TACMAP_TOTAL_SQUARES)
 		var/cols = (JS_OVERMAP_TACMAP_TOTAL_SQUARES)
-		physics_levels[z_str] = new(cols)
+		physics_levels[z_str] = new/list(cols)
 		//TODO: test me
 		for(var/y = 1; y <= rows; y++)
 			var/list/row = new(rows)
