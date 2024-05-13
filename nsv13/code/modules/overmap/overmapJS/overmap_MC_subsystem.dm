@@ -218,6 +218,18 @@ PROCESSING_SUBSYSTEM_DEF(JSOvermap)
 				return
 			OW.name = new_name
 			ui_interact(user)
+		if("firing_arc_center")
+			var/datum/virtual_weapon/VW = locate(params["weapon_id"])
+			if(VW)
+				VW.firing_arc_center_rel_deg = params["firing_arc_center"]
+			ui_interact(user)
+			return
+		if("firing_arc_width")
+			var/datum/virtual_weapon/VW = locate(params["weapon_id"])
+			if(VW)
+				VW.firing_arc_width_deg = params["firing_arc_width"]
+			ui_interact(user)
+			return
 //datum/controller/subsystem/processing/JSOvermap/proc/start_piloting(mob/user, datum/overmap/OM)
 
 //TODO MAP STAYS SAME WHEN JUMPING!!

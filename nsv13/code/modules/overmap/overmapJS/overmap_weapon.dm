@@ -23,7 +23,7 @@
 	.["id"] = "\ref[src]"
 	.["weapons"] = list()
 	for(var/datum/overmap_weapon/W as() in weapon_list)
-		.["weapons"] += list(list(name = W.name, id = "\ref[W]"))
+		.["weapons"] += list(list("name" = W.name, "id" = "\ref[W]", "firing_arc_center" = W.firing_arc_center_rel_deg, "firing_arc_width" = W.firing_arc_width_deg))
 
 // overmap_weapon does not have any children - it defines a template to be used for all
 // other types that can be fired as a weapon. You can make them any type as long as
@@ -62,7 +62,12 @@
 	var/firing_arc_width_deg = 360 // Anything unspecified is omnidirectional
 
 // I know this feels redundant, but it makes default values on subclasses work
-/datum/virtual_weapon/New(firing_arc_center_rel_deg_ = firing_arc_center_rel_deg, firing_arc_width_deg_ = firing_arc_width_deg, seconds_between_projectiles_ = seconds_between_projectiles, seconds_between_bursts_ = seconds_between_bursts)
+/datum/virtual_weapon/New(name_ = name, \
+			firing_arc_center_rel_deg_ = firing_arc_center_rel_deg, \
+			firing_arc_width_deg_ = firing_arc_width_deg, \
+			seconds_between_projectiles_ = seconds_between_projectiles, \
+			seconds_between_bursts_ = seconds_between_bursts)
+	name = name_
 	firing_arc_center_rel_deg = firing_arc_center_rel_deg_
 	firing_arc_width_deg = firing_arc_width_deg_
 	seconds_between_projectiles = seconds_between_projectiles_

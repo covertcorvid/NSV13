@@ -149,6 +149,7 @@
 	START_PROCESSING(SSJSOvermap, src)
 	setup_armour()
 	setup_weapons()
+	sort_weapons()
 	//ITS-TODO: This will be on the sensor console once the scan modes are moved.
 	setup_sensor_modes()
 

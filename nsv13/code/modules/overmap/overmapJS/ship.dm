@@ -27,6 +27,14 @@
 	starting_system = "Sol"
 	//collision_positions = list(new /matrix/vector(-8,46), new /matrix/vector(-17,33), new /matrix/vector(-25,2), new /matrix/vector(-14,-45), new /matrix/vector(9,-46), new /matrix/vector(22,4), new /matrix/vector(14,36))
 
+/datum/overmap/ship/player/setup_weapons()
+	// TODO: Remove once machines do the thing
+	all_weapons.Add(new /datum/virtual_weapon/torpedo(), \
+		new /datum/virtual_weapon/railgun(), \
+		new /datum/virtual_weapon/cannon(), \
+		new /datum/virtual_weapon/pdc(), \
+		new /datum/virtual_weapon/pdc(name_ = "Point Defense Cannon 2"))
+
 /datum/overmap/ship/player/cruiser
 	name = "NSV Tycoon"
 	faction = OVERMAP_FACTION_PLAYER

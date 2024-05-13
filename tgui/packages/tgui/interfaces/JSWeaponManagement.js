@@ -1,5 +1,5 @@
 import { useBackend } from '../backend';
-import { Section, Dropdown, Button, Flex, LabeledList } from '../components';
+import { Section, NumberInput, Button, LabeledList } from '../components';
 import { Window } from '../layouts';
 
 export const WeaponManagementPanel = (props, context) => {
@@ -53,24 +53,59 @@ export const WeaponManagementPanel = (props, context) => {
                 {!!group_data.weapons && Object.keys(group_data.weapons).map(key2 => {
                   let weapon_data = group_data.weapons[key2];
                   return(
-                    <LabeledList.Item label={weapon_data.name}>
-                      <Button
-                        icon="minus"
-                        tooltip="Remove from group"
-                        onClick={() => act("remove_weapon", {group_id: group_data.id, weapon_id: weapon_data.id})}/>
-                      <Button
-                        icon="pen"
-                        tooltip="Rename"
-                        onClick={() => act("rename_weapon", {group_id: group_data.id, weapon_id: weapon_data.id})}/>
+                    <>
+                      <LabeledList.Item label={weapon_data.name} labelColor="white">
+                        <Button
+                          icon="minus"
+                          tooltip="Remove from group"
+                          onClick={() => act("remove_weapon", {group_id: group_data.id, weapon_id: weapon_data.id})}/>
+                        <Button
+                          icon="pen"
+                          tooltip="Rename"
+                          onClick={() => act("rename_weapon", {group_id: group_data.id, weapon_id: weapon_data.id})}/>
+                        {!!data.debug_rights && (
+                          <>
+                            <Button
+                              icon="eye"
+                              tooltip="View Variables"
+                              onClick={() => act("view_vars", {target: weapon_data.id})}/>
+                          </>
+                        )}
+                      </LabeledList.Item>
                       {!!data.debug_rights && (
                         <>
-                          <Button
-                            icon="eye"
-                            tooltip="View Variables"
-                            onClick={() => act("view_vars", {target: weapon_data.id})}/>
+                          <LabeledList.Item label="Firing arc center (deg R)">
+                            <NumberInput
+                              animated
+                              value={parseFloat(data.firing_arc_center)}
+                              // TGUI really is making me do everything myself around here
+                              height="20px"
+                              width="90px"
+                              minValue={0}
+                              maxValue={360}
+                              step={1}
+                              onChange={(e, value) => act('firing_arc_center', {
+                                target: weapon_data.id,
+                                firing_arc_center: value,
+                              })} />
+                          </LabeledList.Item>
+                          <LabeledList.Item label="Firing arc width (deg)">
+                            <NumberInput
+                              animated
+                              value={parseFloat(data.firing_arc_width)}
+                              height="20px"
+                              width="90px"
+                              minValue={0}
+                              maxValue={180}
+                              step={1}
+                              onChange={(e, value) => act('firing_arc_width', {
+                                target: weapon_data.id,
+                                firing_arc_width: value,
+                              })} />
+                          </LabeledList.Item>
                         </>
                       )}
-                    </LabeledList.Item>
+                    </>
                   )
                 })}
               </LabeledList>
