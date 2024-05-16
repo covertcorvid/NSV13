@@ -25,15 +25,16 @@ export const JSOvermapPanel = (props, context) => {
     <Window
       width={1600}
       theme="space_80s"
-      height={800}>
-      <Window.Content>
-        <Flex>
-          <Flex.Item>
+      height={800}
+      scrollable={false}>
+      <Window.Content scrollable={false}>
+        <Flex scrollable="false">
+          <Flex.Item overflow="hidden" minWidth="1200px">
             <Section title="Active view:">
               <JSOvermapGame props={props} context={context} />
             </Section>
           </Flex.Item>
-          <Flex.Item>
+          <Flex.Item scrollable overflow="auto" maxHeight="760px">
             <Section title="Options">
               <LabeledList>
                 <LabeledList.Item label="Control Scheme">
@@ -133,7 +134,7 @@ export const JSOvermapPanel = (props, context) => {
             </Section>
             <Section title="Viewable Maps:">
               <Collapsible>
-                <LabeledList height={256} scrollable>
+                <LabeledList height={256}>
                   {static_levels.map(level => {
                     return (
                       <LabeledList.Item label={level.name} key={level.id}>
