@@ -20,14 +20,14 @@ export const JSTacticalConsole = (props, context) => {
       width={1600}
       theme="space_80s"
       height={800}>
-      <Window.Content>
-        <Flex>
+      <Window.Content scrollable={false}>
+        <Flex scrollable={false}>
           <Flex.Item>
             <Section title="Active view">
               <JSOvermapGame props={props} context={context} />
             </Section>
           </Flex.Item>
-          <Flex.Item>
+          <Flex.Item scrollable>
             <Section title="Weapon Management">
               <WeaponManagementPanel props={props} context={context}/>
             </Section>

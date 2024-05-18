@@ -23,7 +23,7 @@
 	.["id"] = "\ref[src]"
 	.["weapons"] = list()
 	for(var/datum/overmap_weapon/W as() in weapon_list)
-		.["weapons"] += list(list("name" = W.name, "id" = "\ref[W]", "firing_arc_center" = W.firing_arc_center_rel_deg, "firing_arc_width" = W.firing_arc_width_deg))
+		.["weapons"] += list(list(name = W.name, id = "\ref[W]", firing_arc_center = W.firing_arc_center_rel_deg, firing_arc_width = W.firing_arc_width_deg))
 
 // overmap_weapon does not have any children - it defines a template to be used for all
 // other types that can be fired as a weapon. You can make them any type as long as

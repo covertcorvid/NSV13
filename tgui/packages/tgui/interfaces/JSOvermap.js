@@ -971,14 +971,14 @@ export const JSOvermapGame = (props, context) => {
 export const JSOvermap = (props, context) => {
   return (
     <Window
-      width={1280}
-      height={720}>
-      <Window.Content>
-        <Flex>
+      width={1600}
+      height={800}>
+      <Window.Content scrollable={false}>
+        <Flex scrollable={false}>
           <Flex.Item>
             <JSOvermapGame props={props} context={context} />
           </Flex.Item>
-          <Flex.Item>
+          <Flex.Item scrollable>
             <WeaponManagementPanel props={props} context={context} />
           </Flex.Item>
         </Flex>
