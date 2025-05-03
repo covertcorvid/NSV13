@@ -140,6 +140,16 @@
 	filling_color = "#8B4513"
 	foodtype = GROSS
 
+/obj/item/reagent_containers/food/snacks/badrecipe/burn()
+	if(QDELETED(src))
+		return
+	var/turf/T = get_turf(src)
+	var/obj/effect/decal/cleanable/ash/A = new /obj/effect/decal/cleanable/ash(T)
+	A.desc += "\nLooks like this used to be \an [name] some time ago."
+	if(resistance_flags & ON_FIRE)
+		SSfire_burning.processing -= src
+	qdel(src)
+
 /obj/item/reagent_containers/food/snacks/carrotfries
 	name = "carrot fries"
 	desc = "Tasty fries from fresh carrots."
@@ -463,7 +473,7 @@
 	. = ..()
 	if(timer_id)
 		deltimer(timer_id)
-		timer_id = null		
+		timer_id = null
 
 /obj/item/reagent_containers/food/snacks/lollipop/proc/chew()
 	if(iscarbon(loc) && chewing)
