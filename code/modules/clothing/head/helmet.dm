@@ -234,6 +234,8 @@
 		C.head_update(src, forced = TRUE)
 
 /obj/item/clothing/head/helmet/riot/AltClick(mob/user)
+	if(!user.canUseTopic(src, BE_CLOSE))
+		return
 	toggle_helmlight(user)
 
 /obj/item/clothing/head/helmet/riot/ui_action_click(mob/user, datum/actiontype)
